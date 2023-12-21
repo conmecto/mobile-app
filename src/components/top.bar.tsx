@@ -13,13 +13,13 @@ const TopBar = () => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    backgroundColor: COLOR_CODE.OFF_WHITE
+    backgroundColor: COLOR_CODE.OFF_WHITE,
+    //borderWidth: 1
   },
   text: {
-    fontStyle: 'italic',
-    fontWeight: '700',
-    fontSize: 20,
-    color: COLOR_CODE.BRIGHT_BLUE
+    fontWeight: 'bold',
+    fontFamily: 'SavoyeLetPlain',
+    fontSize: 30
   }
 });
 

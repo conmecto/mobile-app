@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, Text, Dimensions, StyleSheet, Modal, FlatList } from 'react-native';
+import { View, TouchableOpacity, Text, Dimensions, StyleSheet, Modal, FlatList, Image } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { COLOR_CODE } from '../utils/enums';
 import createUser from '../api/create.user';
 import getCities from '../api/get.cities';
+import { IMAGE_LOGO } from '../files';
 
 type SignupObj = {
   number?: string,
@@ -131,7 +132,8 @@ const SignupSecondScreen = ({ navigation, route }: any) => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.logoMainContainer}>
-        <Text style={{ fontSize: 30, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE }}>Conmecto</Text>
+        <Image source={ IMAGE_LOGO } style={styles.logo} />
+        <Text style={{ fontSize: 50, fontWeight: '800', fontFamily: 'SavoyeLetPlain' }}>Conmecto</Text>
       </View>
       <View style={styles.signupMainContainer}>
         <View style={styles.iconContainer}>
@@ -430,5 +432,10 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 15,
     fontWeight: '500',
+  },
+
+  logo: {
+    height: height * 0.15,
+    width: height * 0.15
   }
 });

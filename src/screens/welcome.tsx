@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { COLOR_CODE } from '../utils/enums';
+import { IMAGE_LOGO } from '../files';
 
 const { height, width } = Dimensions.get('window');
 
@@ -16,7 +17,8 @@ const WelcomeScreen = ({ navigation }: any) => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.logoMainContainer}>
-        <Text style={{ fontSize: 30, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE }}>Conmecto</Text>
+        <Image source={ IMAGE_LOGO } style={styles.logo} />
+        <Text style={{ fontSize: 50, fontWeight: '800', fontFamily: 'SavoyeLetPlain' }}>Conmecto</Text>
       </View>
       <View style={styles.welcomeMainContainer}>
         <View style={styles.welcomeContainer}>
@@ -50,8 +52,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    // borderWidth: 1,
-    // borderColor: 'black'
   },
 
   welcomeMainContainer: {
@@ -121,4 +121,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLOR_CODE.OFF_WHITE
   },
+
+  logo: {
+    height: height * 0.15,
+    width: height * 0.15
+  }
 });

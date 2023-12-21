@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, Text, Dimensions, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, Dimensions, StyleSheet, Image } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { COLOR_CODE, ERROR_CODES } from '../utils/enums';
 import resendOtp from '../api/resend.otp';
+import { IMAGE_LOGO } from '../files';
 
 FontAwesome.loadFont();
 
@@ -73,7 +74,8 @@ const LoginScreen = ({ navigation }: any) => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.logoMainContainer}>
-        <Text style={{ fontSize: 30, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE }}>Conmecto</Text>
+        <Image source={ IMAGE_LOGO } style={styles.logo} />
+        <Text style={{ fontSize: 50, fontWeight: '800', fontFamily: 'SavoyeLetPlain' }}>Conmecto</Text>
       </View>
       <View style={styles.loginMainContainer}>
         <View style={styles.iconContainer}>
@@ -237,5 +239,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
     color: COLOR_CODE.OFF_WHITE
+  },
+
+  logo: {
+    height: height * 0.15,
+    width: height * 0.15
   }
 });

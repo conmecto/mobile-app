@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Dimensions, Image } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { ERROR_CODES, COLOR_CODE } from '../utils/enums';
 import { saveToken, getToken } from '../utils/helpers';
 import verifyCode from '../api/otp.verify';
 import resendOtp from '../api/resend.otp';
+import { IMAGE_LOGO } from '../files';
 
 type VerifyOtpRes = {
   error?: string,
@@ -138,7 +139,8 @@ const CodeVerificationScreen = ({ navigation, route }: any) => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.logoMainContainer}>
-        <Text style={{ fontSize: 30, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE }}>Conmecto</Text>
+        <Image source={ IMAGE_LOGO } style={styles.logo} />
+        <Text style={{ fontSize: 50, fontWeight: '800', fontFamily: 'SavoyeLetPlain' }}>Conmecto</Text>
       </View>
       <View style={styles.verifyMainContainer}>
         <View style={styles.iconContainer}>
@@ -280,5 +282,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
     color: COLOR_CODE.OFF_WHITE
+  },
+
+  logo: {
+    height: height * 0.15,
+    width: height * 0.15
   }
 });

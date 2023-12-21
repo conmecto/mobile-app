@@ -13,7 +13,7 @@ const NoMatchScreen = () => {
     <SafeAreaView style={styles.noMatchContainer}> 
       <View style={styles.noMatchMessageContainer}>
         <FontAwesome name='info-circle' color='red' size={25} />
-        <Text style={styles.noMatchText}>
+        <Text numberOfLines={2} adjustsFontSizeToFit style={styles.noMatchText}>
           We will notify you as soon as we find the Perfect Match for you.
         </Text>
       </View>
@@ -28,7 +28,7 @@ const NoMatchScreen = () => {
               <FontAwesome name='gear' color={COLOR_CODE.BLACK} size={30}/>
             </View>
             <View style={styles.settingInfoContainer}>
-              <Text style={styles.settingInfo}>Try different settings to increase your chances for a match e.g. city or age</Text>
+              <Text numberOfLines={4} adjustsFontSizeToFit style={styles.settingInfo}>Try different settings to increase your chances for a match e.g. city or age</Text>
             </View>
           </View>
 
@@ -37,7 +37,7 @@ const NoMatchScreen = () => {
               <FontAwesome name='user' color={COLOR_CODE.BLACK} size={30}/>
             </View>
             <View style={styles.profileInfoContainer}>
-              <Text style={styles.profileInfo}>Upload posts & add other details for that hot profile</Text>
+              <Text numberOfLines={3} adjustsFontSizeToFit style={styles.profileInfo}>Upload posts & add other details for that hot profile</Text>
             </View>
           </View>
 
@@ -46,7 +46,7 @@ const NoMatchScreen = () => {
               <FontAwesome name='search' color={COLOR_CODE.BLACK} size={30}/>
             </View>
             <View style={styles.exploreInfoContainer}>
-              <Text style={styles.exploreInfo}>Explore other users and top matches</Text>
+              <Text numberOfLines={2} adjustsFontSizeToFit style={styles.exploreInfo}>Explore other users and top matches</Text>
             </View>
           </View>
           
@@ -55,7 +55,7 @@ const NoMatchScreen = () => {
               <FontAwesome name='level-up' color={COLOR_CODE.BLACK} size={30}/>
             </View>
             <View style={styles.scoreInfoContainer}>
-              <Text style={styles.scoreInfo}>When matched, keep the chatting game on to increase your match's score</Text>
+              <Text numberOfLines={4} adjustsFontSizeToFit style={styles.scoreInfo}>When matched, keep the chatting game on to increase your match's score</Text>
             </View>
           </View>
 
@@ -79,17 +79,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 10,
     alignItems: 'center', 
-    justifyContent: 'space-evenly'
+    justifyContent: 'space-evenly',
+//    borderWidth: 1
   },
   noMatchText: {
     color: COLOR_CODE.BRIGHT_BLUE,
-    padding: 5,
+    paddingLeft: 10,
     fontSize: 15,
     fontWeight: '800'
   },
 
   tipsContainer: {
-    flex: 6,
+    flex: 10,
     width: '90%',
     borderRadius: 30,
     marginBottom: height * 0.01,

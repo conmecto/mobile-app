@@ -1,0 +1,1 @@
+export const IMAGE_LOGO = require('./conmecto.png'); 

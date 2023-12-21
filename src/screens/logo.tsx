@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { View, Image } from 'react-native';
+import { IMAGE_LOGO } from '../files';
 
 const LogoScreen = ({ navigation }: any) => {  
   return (
     <View>
-      <Text>Logo</Text>
+      <Image source={ IMAGE_LOGO } />
     </View>
   );
 }

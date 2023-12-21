@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, Text, Dimensions, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, Dimensions, StyleSheet, Image } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import RNDateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { COLOR_CODE, ERROR_CODES } from '../utils/enums';
 import { getAge } from '../utils/helpers';
 import findNumber from '../api/find.number';
+import { IMAGE_LOGO } from '../files';
 
 type SignupObj = {
   number?: string,
@@ -120,7 +121,8 @@ const SignupHomeScreen = ({ navigation }: any) => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.logoMainContainer}>
-        <Text style={{ fontSize: 30, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE }}>Conmecto</Text>
+        <Image source={ IMAGE_LOGO } style={styles.logo} />
+        <Text style={{ fontSize: 50, fontWeight: '800', fontFamily: 'SavoyeLetPlain' }}>Conmecto</Text>
       </View>
       <View style={styles.signupMainContainer}>
         <View style={styles.iconContainer}>
@@ -388,5 +390,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     color: COLOR_CODE.BLACK
+  },
+
+  logo: {
+    height: height * 0.15,
+    width: height * 0.15
   }
 });
