@@ -30,6 +30,7 @@ const updateChatsRead = async (matchId: number, userId: number, callIfUnauthoriz
     const response = await fetch(Environments.api.matchService.baseUrl + `/match/${matchId}/chats/read`, {
       method: 'PUT',
       headers: {
+        'Content-Type': 'application/json', 
         authorization: 'Bearer ' + token 
       },
       body

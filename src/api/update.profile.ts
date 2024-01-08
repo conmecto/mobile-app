@@ -37,6 +37,7 @@ const updateProfile = async (userId: number, updateObj: UpdateProfileObj, callIf
     const response = await fetch(Environments.api.profileService.baseUrl + `/profile/users/${userId}`, {
       method: 'PATCH',
       headers: {
+        'Content-Type': 'application/json', 
         authorization: 'Bearer ' + token 
       },
       body

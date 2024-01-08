@@ -9,6 +9,7 @@ const deletePost = async (postId: number, userId: number, callIfUnauthorized: bo
     const response = await fetch(Environments.api.profileService.baseUrl + `/profile/users/${userId}/post/${postId}`, {
       method: 'DELETE',
       headers: {
+        'Content-Type': 'application/json', 
         authorization: 'Bearer ' + token 
       }
     });

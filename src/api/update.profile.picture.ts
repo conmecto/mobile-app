@@ -36,6 +36,7 @@ const updateProfilePicture = async (userId: number, profilePictureObj: Asset, ca
       method: 'POST',
       body: formData,
       headers: {
+        'Content-Type': 'multipart/form-data', 
         authorization: 'Bearer ' + token 
       },
     });

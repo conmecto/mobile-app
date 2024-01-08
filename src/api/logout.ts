@@ -15,6 +15,7 @@ const logout = async (userId: number, callIfUnauthorized: boolean = true): Promi
     const response = await fetch(Environments.api.userService.baseUrl + `/users/${userId}/logout`, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         authorization: 'Bearer ' + token 
       },
     });

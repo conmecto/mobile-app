@@ -46,6 +46,7 @@ const addPost = async (userId: number, post: Asset, callIfUnauthorized: boolean 
       method: 'POST',
       body: formData,
       headers: {
+        'Content-Type': 'multipart/form-data',
         authorization: 'Bearer ' + token 
       }
     });

@@ -30,6 +30,7 @@ const updateMatchSetting = async (userId: number, updateObj: UpdateMatchSettingO
     const response = await fetch(Environments.api.matchService.baseUrl + `/match/setting/${userId}`, {
       method: 'PUT',
       headers: {
+        'Content-Type': 'application/json', 
         authorization: 'Bearer ' + token
       },
       body

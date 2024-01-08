@@ -18,6 +18,7 @@ const endMatch = async (matchId: number, userId: number, callIfUnauthorized: boo
     const response = await fetch(Environments.api.matchService.baseUrl + `/match/${matchId}/end`, {
       method: 'PUT',
       headers: {
+        'Content-Type': 'application/json', 
         authorization: 'Bearer ' + token 
       },
       body
