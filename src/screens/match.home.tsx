@@ -9,6 +9,7 @@ import Loading from '../components/loading';
 import { createChatSocketConnection, getChatSocketInstance } from '../sockets/chat.socket';
 import { formatText, fireColorScoreBased } from '../utils/helpers';
 import updateChatsRead from '../api/update.chats.read';
+import { getUserId } from '../utils/user.id'; 
 
 type UserProfileRes = {
   id: number,
@@ -34,7 +35,7 @@ const { width, height } = Dimensions.get('window');
 
 const MatchHomeScreen = ({ route, navigation }: any) => {
   const params = route?.params;
-  const userId = params?.userId;
+  const userId = getUserId() as number;
   const matchedUserId = params?.userMatchRes?.matchedUserId;
   const matchId = params?.userMatchRes?.id;
   const [profileDataFetchError, setIsProfileDataFetchError] = useState(false);

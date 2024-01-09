@@ -5,6 +5,7 @@ import TopBar from '../components/top.bar';
 import getUserMatch from '../api/user.match';
 import Loading from '../components/loading';
 import MatchNavigator from '../navigations/match';
+import { getUserId } from '../utils/user.id';
   
 type UserMatchRes = {
   id: number,
@@ -16,7 +17,7 @@ type UserMatchRes = {
 const MatchScreen = ({ navigation, route }: any) => {
   const [isLoading, setIsLoading] = useState(true);
   const [userMatchRes, setUserMatchRes] = useState<UserMatchRes | null>(null);
-  const userId = route.params.userId;
+  const userId = getUserId() as number;
 
   useEffect(() => {
     let check = true;

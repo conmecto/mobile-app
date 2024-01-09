@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CodeVerificationScreen from '../screens/code.verification';
@@ -11,16 +10,12 @@ import HomeScreen from '../screens/home';
 import ContactAdminScreen from '../screens/contact.admin';
 import { getToken, updateTokens } from '../utils/helpers';
 import LogoScreen from '../screens/logo';
+import { setUserId } from '../utils/user.id';
 
 const Stack = createNativeStackNavigator();
 
-type InitialScreenParams = {
-  userId: number
-}
-
 const LaunchStackNavigator = () => {
   const [isLoading, setLoading] = useState(true);
-  const [homeScreenInitialParams, setHomeScreenInitialParams] = useState<undefined | InitialScreenParams>();
   const [initialScreen, setInitialScreen] = useState('WelcomeScreen');
 
   const checkAuthenticated = async () => {
@@ -29,7 +24,7 @@ const LaunchStackNavigator = () => {
       const userId = Number(userIdObj?.password);
       const authCheckRes = await updateTokens(userId);
       if (authCheckRes) {
-        setHomeScreenInitialParams({ userId });
+        setUserId(userId);
         setInitialScreen('HomeScreen');
       }
     }
@@ -58,7 +53,7 @@ const LaunchStackNavigator = () => {
             <Stack.Screen name='SignupHomeScreen' component={SignupHomeScreen} options={{headerShown: false}}/>
             <Stack.Screen name='SignupSecondScreen' component={SignupSecondScreen} options={{headerShown: false}}/>
             <Stack.Screen name='CodeVerificationScreen' component={CodeVerificationScreen} options={{headerShown: false}}/>
-            <Stack.Screen name='HomeScreen' component={HomeScreen} options={{headerShown: false}}  initialParams={homeScreenInitialParams}/>
+            <Stack.Screen name='HomeScreen' component={HomeScreen} options={{headerShown: false}} />
             <Stack.Screen name='ContactAdminScreen' component={ContactAdminScreen} options={{headerShown: false}}/>
           </Stack.Navigator>
         </NavigationContainer>

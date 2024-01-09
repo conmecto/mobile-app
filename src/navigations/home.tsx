@@ -29,6 +29,7 @@ const HomeTabNavigator = (data: any) => {
         tabBarItemStyle: { marginBottom, borderRadius: 50, height: barHeight },
         tabBarActiveBackgroundColor: COLOR_CODE.OFF_WHITE, 
         tabBarInactiveBackgroundColor: COLOR_CODE.OFF_WHITE,
+        unmountOnBlur: true
       }}>
 
       <Tab.Screen name='MatchScreen' component={MatchScreen} options={{ 

@@ -12,6 +12,7 @@ import { TextInput } from 'react-native-paper';
 import Loading from '../components/loading';
 import { profilePictureOptions, allowedImageTypes, maxImageSizeBytes } from '../utils/constants';
 import { formatText } from '../utils/helpers';
+import { getUserId } from '../utils/user.id';
 
 type UpdateProfileObj = {
   profilePicture?: Asset, 
@@ -40,7 +41,7 @@ const { width, height } = Dimensions.get('window');
 
 const EditProfileScreen = (props: any) => {
   const params = props?.route?.params;
-  const userId = params?.userId;
+  const userId = getUserId() as number;
   const profileObj = params?.profileDetails;
   const [updateObj, setUpdateObj] = useState<UpdateProfileObj>({});
   const [selectedUpdate, setSelectedUpdate] = useState<string>();

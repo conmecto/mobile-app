@@ -6,6 +6,7 @@ import Posts from '../components/posts';
 import getUserProfile from '../api/user.profile';
 import getUserPosts from '../api/user.posts';
 import Loading from '../components/loading';
+import { getUserId } from '../utils/user.id';
 
 type UserProfileRes = {
   id: number,
@@ -36,7 +37,7 @@ type UserPost = {
 }
 
 const ProfileScreen = (props: any) => {
-  const userId = props?.route?.params?.userId;
+  const userId = getUserId() as number;
   const [isProfileLoading, setIsProfileLoading] = useState(true);
   const [isPostLoading, setIsPostLoading] = useState(true);
   const [postPagination, setPostPagination] = useState({

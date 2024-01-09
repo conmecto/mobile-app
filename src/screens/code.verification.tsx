@@ -6,6 +6,7 @@ import { saveToken, getToken } from '../utils/helpers';
 import verifyCode from '../api/otp.verify';
 import resendOtp from '../api/resend.otp';
 import { IMAGE_LOGO } from '../files';
+import { setUserId } from '../utils/user.id';
 
 type VerifyOtpRes = {
   error?: string,
@@ -36,7 +37,8 @@ const CodeVerificationScreen = ({ navigation, route }: any) => {
       saveToken('userId', userId?.toString()).then((response: any) => console.log('Save user id response', response)),
       saveToken(key, JSON.stringify({ refresh: res.refresh })).then((response: any) => console.log('Save auth token response', response))
     ]);
-    navigation.navigate('HomeScreen', { userId });
+    setUserId(userId);
+    navigation.navigate('HomeScreen');
   }
 
   useEffect(() => {

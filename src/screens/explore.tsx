@@ -9,6 +9,7 @@ import getTopMatches from '../api/top.matches';
 import Loading from '../components/loading';
 import TopMatchesFlatList from '../components/top.matches';
 import SearchProfilesScreen from './search.profiles';
+import { getUserId } from '../utils/user.id';
 
 type UserProfileDetail = {
   id: number,
@@ -34,7 +35,7 @@ FontAwesome.loadFont();
 const { width, height } = Dimensions.get('window');
 
 const ExploreScreen = ({ navigation, route }: any) => {
-  const { userId } = route.params;
+  const userId = getUserId() as number;
   const [isSearchSelected, setIsSearchSelected] = useState(false);
   const [topMatchCount, setTopMatchCount] = useState(10);
   const [topMatches, setTopMatches] = useState<UserMatchRes[]>([]);

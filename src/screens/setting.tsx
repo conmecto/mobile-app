@@ -11,6 +11,7 @@ import Loading from '../components/loading';
 import { deleteToken, formatText, fireColorScoreBased } from '../utils/helpers';
 import getCities from '../api/get.cities';
 
+import { getUserId } from '../utils/user.id';
 type UserMatchSettingObject = {
   id?: number,
   country?: string, 
@@ -57,7 +58,7 @@ for(let i = 18; i <= 70; i++) {
 }
 
 const SettingScreen = ({ navigation, route }: any) => {  
-  const { userId } = route.params;
+  const userId = getUserId() as number;
   const [cities, setCities] = useState<string[]>([]);
   const [searchSettings, setSearchSettings] = useState<SearchSettings>({
     isLoading: true,

@@ -12,6 +12,7 @@ import { Days } from '../utils/constants';
 import { useHeaderHeight } from '@react-navigation/elements';
 import getChats from '../api/get.chats';
 import endMatch from '../api/end.match';
+import { getUserId } from '../utils/user.id';
 
 type Chats = {
   id?: number,
@@ -46,7 +47,8 @@ const { width, height } = Dimensions.get('window');
 
 const MatchChatScreen = ({ navigation, route }: any) => {
   const headerHeight = useHeaderHeight();
-  const { userId, matchId, matchedUserId } = route?.params;
+  const userId = getUserId() as number;
+  const { matchId, matchedUserId } = route?.params;
   const chatSocket = getChatSocketInstance();
   if (!chatSocket || chatSocket.readyState === 2 || chatSocket.readyState === 3) {
     // Handle this better
