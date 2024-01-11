@@ -28,21 +28,21 @@
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<!-- <key>13.233.252.123</key>
+			<key>65.2.130.170</key>
 			<dict>
 				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
      	  <true/>
 			</dict>
-			<key>15.206.123.242</key>
+			<key>15.206.170.209</key>
 			<dict>
 				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
      	  <true/>
 			</dict>
-			<key>3.109.182.192</key>
+			<key>43.205.196.136</key>
 			<dict>
 				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
      	  <true/>
-			</dict> -->
+			</dict>
 			<key>localhost</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>

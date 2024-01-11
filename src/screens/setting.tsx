@@ -10,6 +10,7 @@ import getPastMatches from '../api/past.matches';
 import Loading from '../components/loading';
 import { deleteToken, formatText, fireColorScoreBased } from '../utils/helpers';
 import getCities from '../api/get.cities';
+import { deleteChatSocketInstance } from '../sockets/chat.socket';
 
 import { getUserId } from '../utils/user.id';
 type UserMatchSettingObject = {
@@ -195,6 +196,7 @@ const SettingScreen = ({ navigation, route }: any) => {
   const onPressLogout = () => {
     deleteToken(userId).then(res => {
       if (res) {
+        deleteChatSocketInstance();
         navigation.navigate('WelcomeScreen');
       }
     }).catch(error => console.log('Logout error: ', error));

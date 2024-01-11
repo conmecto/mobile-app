@@ -8,4 +8,8 @@ const setAccessToken = (token: string) => {
   accessToken = token;
 }
 
-export { getAccessToken, setAccessToken }
+const resetToken = () => {
+  accessToken = '';
+}
+
+export { getAccessToken, setAccessToken, resetToken }

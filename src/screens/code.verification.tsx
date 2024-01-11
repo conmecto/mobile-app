@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Dimensions, Image } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { ERROR_CODES, COLOR_CODE } from '../utils/enums';
-import { saveToken, getToken } from '../utils/helpers';
+import { saveToken } from '../utils/helpers';
 import verifyCode from '../api/otp.verify';
 import resendOtp from '../api/resend.otp';
 import { IMAGE_LOGO } from '../files';
 import { setUserId } from '../utils/user.id';
+import { setAccessToken } from '../utils/token';
 
 type VerifyOtpRes = {
   error?: string,
@@ -38,6 +39,7 @@ const CodeVerificationScreen = ({ navigation, route }: any) => {
       saveToken(key, JSON.stringify({ refresh: res.refresh })).then((response: any) => console.log('Save auth token response', response))
     ]);
     setUserId(userId);
+    setAccessToken(res.access as string);
     navigation.navigate('HomeScreen');
   }
 

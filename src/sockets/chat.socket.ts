@@ -1,6 +1,6 @@
 import Environments from '../utils/environments';
 
-let chatSocket: WebSocket;
+let chatSocket: WebSocket | null = null;
 
 const createChatSocketConnection = (userId: number) => {
   try {
@@ -23,4 +23,8 @@ const getChatSocketInstance = () => {
   return chatSocket;
 }
 
-export { createChatSocketConnection, getChatSocketInstance }
+const deleteChatSocketInstance = () => {
+  chatSocket = null;
+}
+
+export { createChatSocketConnection, getChatSocketInstance, deleteChatSocketInstance }

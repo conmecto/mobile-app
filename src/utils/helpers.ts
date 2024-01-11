@@ -2,7 +2,7 @@ import * as Keychain from 'react-native-keychain';
 import logout from '../api/logout';
 import { COLOR_CODE } from './enums';
 import authenticateRefreshToken from '../api/auth';
-import { setAccessToken } from './token';
+import { setAccessToken, resetToken } from './token';
 
 const formatPayloadDob = (dob: string): string => {
   const newDate = new Date(dob);
@@ -22,6 +22,7 @@ const deleteToken = async (userId: number) => {
       Keychain.resetGenericPassword({ service: key }),
       logout(userId)
     ]);
+    resetToken();
   } catch(error) {
     console.log('Delete token error: ', error);
   }
