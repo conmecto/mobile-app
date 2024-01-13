@@ -9,10 +9,11 @@ type endMatchRes = {
   message?: string
 }
 
-const endMatch = async (matchId: number, userId: number, callIfUnauthorized: boolean = true): Promise<endMatchRes | undefined> => {
+const endMatch = async (matchId: number, userId: number, block: boolean, callIfUnauthorized: boolean = true): Promise<endMatchRes | undefined> => {
   try {
     const body = JSON.stringify({
-      userId
+      userId,
+      block
     });
     const token = getAccessToken();
     const response = await fetch(Environments.api.matchService.baseUrl + `/match/${matchId}/end`, {
@@ -27,7 +28,7 @@ const endMatch = async (matchId: number, userId: number, callIfUnauthorized: boo
     if (response?.status === 401 && callIfUnauthorized) {
       const tokens = await updateTokens(userId);
       if (tokens) {
-        const res = await endMatch(matchId, userId, false);
+        const res = await endMatch(matchId, userId, block, false);
         return res;
       }
     }

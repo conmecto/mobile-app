@@ -13,6 +13,7 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import getChats from '../api/get.chats';
 import endMatch from '../api/end.match';
 import { getUserId } from '../utils/user.id';
+import { deleteChatSocketInstance } from '../sockets/chat.socket';
 
 type Chats = {
   id?: number,
@@ -37,7 +38,8 @@ type Errors = {
 type EndMatchType = {
   error: string,  
   endMatch: boolean,
-  openEndMatchModal: boolean
+  openEndMatchModal: boolean,
+  block: boolean,
 }
 
 MaterialCommunityIcons.loadFont();
@@ -50,7 +52,7 @@ const MatchChatScreen = ({ navigation, route }: any) => {
   const userId = getUserId() as number;
   const { matchId, matchedUserId } = route?.params;
   const chatSocket = getChatSocketInstance();
-  if (!chatSocket || chatSocket.readyState === 2 || chatSocket.readyState === 3) {
+  if (!chatSocket || chatSocket.readyState !== 1) {
     // Handle this better
     return (
       <View style={styles.mainContainer}> 
@@ -74,6 +76,7 @@ const MatchChatScreen = ({ navigation, route }: any) => {
     error: '',
     endMatch: false,
     openEndMatchModal: false,
+    block: false
   })
 
   useEffect(() => {
@@ -102,14 +105,16 @@ const MatchChatScreen = ({ navigation, route }: any) => {
   useEffect(() => {
     let check = true;
     const callEndMatch = async () => {
-      const res = await endMatch(matchId, userId);
+      const res = await endMatch(matchId, userId, endMatchObj.block);
       if (check) {
         if (res) {
           setEndMatchObj({
             error: '',
             endMatch: false,
             openEndMatchModal: false,
+            block: false
           });
+          deleteChatSocketInstance();
           navigation.navigate('NoMatchScreen');
         }
       }
@@ -123,11 +128,11 @@ const MatchChatScreen = ({ navigation, route }: any) => {
   }, [endMatchObj.endMatch]);
 
   const onPressEndMatch = () => {
-    setEndMatchObj({ error: '', endMatch: false, openEndMatchModal: true });
+    setEndMatchObj({ error: '', endMatch: false, openEndMatchModal: true, block: false });
   }
 
-  const onPressConfirmOrCancelEndMatch = (check: boolean) => {
-    setEndMatchObj({ error: '', endMatch: check, openEndMatchModal: false });
+  const onPressConfirmOrCancelEndMatch = (check: boolean, block: boolean) => {
+    setEndMatchObj({ error: '', endMatch: check, openEndMatchModal: false, block });
   }
 
   const handleLoadMoreChats = ({ distanceFromEnd }: { distanceFromEnd: number }) => {
@@ -204,15 +209,19 @@ const MatchChatScreen = ({ navigation, route }: any) => {
         ( 
           <Modal transparent visible={endMatchObj.openEndMatchModal} animationType='none'>
             <View style={styles.endMatchModalContainer}>
-              <View style={styles.endMatchMessageContainer}> 
-                <Text style={{ fontSize: 20, fontWeight: '600' }}>Are you sure, you want to end the Match?</Text>
-              </View>
-              <View style={styles.endMatchModalButtonContainer}> 
-                <TouchableOpacity style={styles.cancelButtonPressable} onPress={() => onPressConfirmOrCancelEndMatch(false)}>
-                  <Text style={{ fontSize: 20, fontWeight: '600', color: COLOR_CODE.BRIGHT_RED }}>Cancel</Text>
+              <View style={styles.endMatchCancelContainer}> 
+                <TouchableOpacity style={styles.cancelButtonPressable} onPress={() => onPressConfirmOrCancelEndMatch(false, false)}>
+                  <Text numberOfLines={1} adjustsFontSizeToFit style={{ fontSize: 20, fontWeight: '600', color: COLOR_CODE.BRIGHT_RED }}>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.confirmButtonPressable} onPress={() => onPressConfirmOrCancelEndMatch(true)}>
-                  <Text style={{ fontSize: 20, fontWeight: '600', color: COLOR_CODE.BRIGHT_BLUE }}>Confirm</Text>
+              </View>
+              <View style={styles.endMatchConfirmContainer}> 
+                <TouchableOpacity style={styles.confirmButtonPressable} onPress={() => onPressConfirmOrCancelEndMatch(true, false)}>
+                  <Text numberOfLines={1} adjustsFontSizeToFit style={{ fontSize: 20, fontWeight: '600', color: COLOR_CODE.BRIGHT_BLUE }}>Confirm</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.endMatchConfirmAndBlockContainer}>
+                <TouchableOpacity style={styles.confirmAndBlockButtonPressable} onPress={() => onPressConfirmOrCancelEndMatch(true, true)}>
+                  <Text numberOfLines={2} adjustsFontSizeToFit style={{ fontSize: 20, fontWeight: '600', color: COLOR_CODE.BRIGHT_BLUE }}>Confirm and Block the user</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -328,36 +337,40 @@ const styles = StyleSheet.create({
   },
   endMatchModalContainer: {
     position: 'absolute',
-    height: height * 0.2,
+    height: height * 0.3,
     width: width * 0.5,
     top: height * 0.3,
     left: width * 0.25,
     backgroundColor: COLOR_CODE.OFF_WHITE,
     borderRadius: 30,
   },
-  endMatchMessageContainer: {
+  endMatchCancelContainer: {
     flex: 1,
-    padding: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  endMatchModalButtonContainer: {
+  endMatchConfirmContainer: {
     flex: 1,
-    flexDirection: 'row',
-    borderColor: COLOR_CODE.LIGHT_GREY,
-    borderTopWidth: 1
+  },
+  endMatchConfirmAndBlockContainer: {
+    flex: 1,
   },
   cancelButtonPressable: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     borderColor: COLOR_CODE.LIGHT_GREY,
-    borderRightWidth: 1
+    borderBottomWidth: 1
   },
   confirmButtonPressable: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    borderColor: COLOR_CODE.LIGHT_GREY,
+    borderBottomWidth: 1
+  },
+  confirmAndBlockButtonPressable: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
 
   bodyContainer: {

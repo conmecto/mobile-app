@@ -42,7 +42,8 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
   const [matchedUserProfile, setMatchedUserProfile] = useState<UserProfileRes>();
   const [isLoading, setIsLoading] = useState(true);
   const [markChatsRead, setMarkChatsRead] = useState(false);
-  if (!getChatSocketInstance()) {
+  const socket = getChatSocketInstance();
+  if (!socket || socket.readyState !== 1) {
     createChatSocketConnection(userId);
   }
   
