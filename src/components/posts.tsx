@@ -74,6 +74,10 @@ const Posts = ({ navigation, posts, userId, setPostPagination, setIsPostLoading,
   }, [postFields.postError]);
 
   const handleFileImport = () => {
+    if (posts.length === 3 && posts[2].length === 2) {
+      setPostFields({ newPost: null, addPost: false, postError:  'Great, you have reached the max limit for adding posts' });
+      return;
+    }
     launchImageLibrary(postOptions as ImageLibraryOptions, res => {
       if (res.errorMessage) {
         setPostFields({ newPost: null, addPost: false, postError: res.errorMessage });
@@ -132,10 +136,14 @@ const Posts = ({ navigation, posts, userId, setPostPagination, setIsPostLoading,
   return (
     <View style={styles.mainContainer}>
       <View style={styles.addPostContainer}>
-        <Text style={styles.postErrorText}>{postFields.postError}</Text> 
-        <TouchableOpacity style={styles.pressableAddPost} onPress={onAddPostHandler}>
-          <FontAwesome name='plus-circle' color={COLOR_CODE.BRIGHT_BLUE} size={height * 0.04} />        
-        </TouchableOpacity>
+        <View style={styles.addPostErrorContainer}>
+          <Text numberOfLines={2} adjustsFontSizeToFit style={styles.postErrorText}>{postFields.postError}</Text> 
+        </View>
+        <View style={styles.addPostPressableContainer}>
+          <TouchableOpacity style={styles.pressableAddPost} onPress={onAddPostHandler}>
+            <FontAwesome name='plus-circle' color={COLOR_CODE.BRIGHT_BLUE} size={height * 0.04} />        
+          </TouchableOpacity>
+        </View>
       </View>
       <ScrollView style={{ flex: 1 }}>
         {
@@ -207,14 +215,21 @@ const styles = StyleSheet.create({
   addPostContainer: {
     height: height * 0.05,
     width: width,
-    justifyContent: 'flex-end',
     flexDirection: 'row',
-    paddingRight: 10,
+  },
+  addPostErrorContainer: {
+    flex: 4,
+    paddingLeft: 10,
+    alignItems: 'flex-end',
+  },
+  addPostPressableContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   postErrorText: {
     alignSelf: 'center',
     fontWeight: '600',
-    paddingRight: 10,
     fontSize: 20,
     color: COLOR_CODE.BRIGHT_RED,
   },
@@ -222,7 +237,7 @@ const styles = StyleSheet.create({
     height: height * 0.05,
     width: height * 0.05,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
 
   postMainContainer: {
