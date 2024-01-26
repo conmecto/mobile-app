@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, Text, Dimensions, StyleSheet, Image } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, Dimensions, StyleSheet, Image, ScrollView } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import RNDateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { COLOR_CODE, ERROR_CODES } from '../utils/enums';
@@ -119,82 +119,84 @@ const SignupHomeScreen = ({ navigation }: any) => {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={styles.logoMainContainer}>
-        <Image source={ IMAGE_LOGO } style={styles.logo} />
-        <Text style={{ fontSize: 50, fontWeight: '800', fontFamily: 'SavoyeLetPlain' }}>Conmecto</Text>
-      </View>
-      <View style={styles.signupMainContainer}>
-        <View style={styles.iconContainer}>
-          <FontAwesome name='user-plus' color={COLOR_CODE.OFF_WHITE} size={height * 0.05}/>
+    <ScrollView contentContainerStyle={{ flex: 1 }} automaticallyAdjustKeyboardInsets={true}>
+      <View style={{ flex: 1 }}>
+        <View style={styles.logoMainContainer}>
+          <Image source={ IMAGE_LOGO } style={styles.logo} />
+          <Text style={{ fontSize: 50, fontWeight: '800', fontFamily: 'SavoyeLetPlain' }}>Conmecto</Text>
         </View>
-
-        <View style={styles.phoneFieldContainer}>
-          <View style={styles.phoneContainer}>
-            <View style={styles.extensionContainer}>
-              <Text style={styles.extensionText}>{extension}</Text>
-            </View>
-            <TextInput placeholder='Enter your number' style={styles.inputField} onChangeText={onChangeNumber}/>
+        <View style={styles.signupMainContainer}>
+          <View style={styles.iconContainer}>
+            <FontAwesome name='user-plus' color={COLOR_CODE.OFF_WHITE} size={height * 0.05}/>
           </View>
-          <View style={styles.phoneErrorContainer}>
-            <Text style={styles.numberErrorText}>{signupErrors?.number}</Text>
-          </View>
-        </View>
 
-        <View style={styles.nameFieldContainer}>
-          <TextInput placeholder='Name' style={styles.nameInput} onChangeText={onChangeName}/>
-          <Text style={styles.nameErrorText}>{signupErrors?.name}</Text>
-        </View>
-
-        <View style={styles.dobFieldContainer}>
-          { 
-            showDatePicker ? 
-            (
-              <View>
-                <RNDateTimePicker 
-                  value={signupObj?.dob ? signupObj?.dob : new Date()} 
-                  display='spinner'
-                  onChange={onChangeDob} 
-                  textColor={COLOR_CODE.OFF_WHITE}   
-                  maximumDate={new Date()}
-                  minimumDate={new Date(1950,0,1)}
-                  style={styles.datePicker}
-                />
-                <TouchableOpacity onPress={onPressShowDatePicker} style={styles.closeDatePickerPressable}>
-                  <Text style={styles.datePickerCloseText}>Select</Text>
-                </TouchableOpacity>
+          <View style={styles.phoneFieldContainer}>
+            <View style={styles.phoneContainer}>
+              <View style={styles.extensionContainer}>
+                <Text style={styles.extensionText}>{extension}</Text>
               </View>
-            ) : (
-              <View>
-                <TouchableOpacity onPress={onPressShowDatePicker} style={styles.datePickerPressable}>
-                  <Text style={styles.datePickerText}>{signupObj.dob ? signupObj.dob?.toDateString() : 'Select date of birth'}</Text>
-                </TouchableOpacity>
-                <Text style={styles.dobErrorText}>{signupErrors?.dob}</Text>
-              </View>
-            )
-          }
-        </View>
-
-        <View style={styles.nextOrLoginContainer}>
-          <View style={styles.nextContainer}>
-            <Text style={styles.confirmText}>Please confirm all the details before clicking next</Text>
-            <Text style={styles.confirmText}>you cannot edit these options again.</Text>
-            <Text style={styles.confirmText}></Text>
-            <TouchableOpacity style={styles.nextPressable} onPress={onPressNext}>
-              <Text style={styles.nextText}>Next</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.loginContainer}>
-            <View>
-              <Text style={styles.loginText}>Already have an account?  </Text>
+              <TextInput placeholder='Enter your number' style={styles.inputField} onChangeText={onChangeNumber}/>
             </View>
-            <TouchableOpacity onPress={onPressLogin}>
-              <Text style={styles.loginPressableText}>Login</Text>
-            </TouchableOpacity>
+            <View style={styles.phoneErrorContainer}>
+              <Text style={styles.numberErrorText}>{signupErrors?.number}</Text>
+            </View>
+          </View>
+
+          <View style={styles.nameFieldContainer}>
+            <TextInput placeholder='Name' style={styles.nameInput} onChangeText={onChangeName}/>
+            <Text style={styles.nameErrorText}>{signupErrors?.name}</Text>
+          </View>
+
+          <View style={styles.dobFieldContainer}>
+            { 
+              showDatePicker ? 
+              (
+                <View>
+                  <RNDateTimePicker 
+                    value={signupObj?.dob ? signupObj?.dob : new Date()} 
+                    display='spinner'
+                    onChange={onChangeDob} 
+                    textColor={COLOR_CODE.OFF_WHITE}   
+                    maximumDate={new Date()}
+                    minimumDate={new Date(1950,0,1)}
+                    style={styles.datePicker}
+                  />
+                  <TouchableOpacity onPress={onPressShowDatePicker} style={styles.closeDatePickerPressable}>
+                    <Text style={styles.datePickerCloseText}>Select</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View>
+                  <TouchableOpacity onPress={onPressShowDatePicker} style={styles.datePickerPressable}>
+                    <Text style={styles.datePickerText}>{signupObj.dob ? signupObj.dob?.toDateString() : 'Select date of birth'}</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.dobErrorText}>{signupErrors?.dob}</Text>
+                </View>
+              )
+            }
+          </View>
+
+          <View style={styles.nextOrLoginContainer}>
+            <View style={styles.nextContainer}>
+              <Text style={styles.confirmText}>Please confirm all the details before clicking next</Text>
+              <Text style={styles.confirmText}>you cannot edit these options again.</Text>
+              <Text style={styles.confirmText}></Text>
+              <TouchableOpacity style={styles.nextPressable} onPress={onPressNext}>
+                <Text style={styles.nextText}>Next</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.loginContainer}>
+              <View>
+                <Text style={styles.loginText}>Already have an account?  </Text>
+              </View>
+              <TouchableOpacity onPress={onPressLogin}>
+                <Text style={styles.loginPressableText}>Login</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 

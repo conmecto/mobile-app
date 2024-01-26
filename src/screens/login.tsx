@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, Text, Dimensions, StyleSheet, Image } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, Dimensions, StyleSheet, Image, ScrollView } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { COLOR_CODE, ERROR_CODES } from '../utils/enums';
 import resendOtp from '../api/resend.otp';
@@ -72,49 +72,51 @@ const LoginScreen = ({ navigation }: any) => {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={styles.logoMainContainer}>
-        <Image source={ IMAGE_LOGO } style={styles.logo} />
-        <Text style={{ fontSize: 50, fontWeight: '800', fontFamily: 'SavoyeLetPlain' }}>Conmecto</Text>
-      </View>
-      <View style={styles.loginMainContainer}>
-        <View style={styles.iconContainer}>
-          <FontAwesome name='mobile' size={height * 0.1} color={COLOR_CODE.OFF_WHITE}/>
-          <FontAwesome name='commenting-o' size={height * 0.05} color={COLOR_CODE.OFF_WHITE} style={{ paddingLeft: 10 }}/>
+    <ScrollView contentContainerStyle={{ flex: 1 }} automaticallyAdjustKeyboardInsets={true}>
+      <View style={{ flex: 1 }}>
+        <View style={styles.logoMainContainer}>
+          <Image source={ IMAGE_LOGO } style={styles.logo} />
+          <Text style={{ fontSize: 50, fontWeight: '800', fontFamily: 'SavoyeLetPlain' }}>Conmecto</Text>
         </View>
-
-        <View style={styles.inputMainContainer}>
-          <View style={styles.inputContainer}>
-            <View style={styles.extensionContainer}>
-              <Text style={styles.extensionText}>{extension}</Text>
-            </View>
-            <TextInput placeholder='Enter your number' style={styles.inputField} onChangeText={onChangeText}/>
+        <View style={styles.loginMainContainer}>
+          <View style={styles.iconContainer}>
+            <FontAwesome name='mobile' size={height * 0.12} color={COLOR_CODE.OFF_WHITE} style={{ paddingLeft: 50 }}/>
+            <FontAwesome name='commenting-o' size={height * 0.06} color={COLOR_CODE.OFF_WHITE} style={{ paddingLeft: 10 }}/>
           </View>
-          <View style={styles.infoContainer}>
-            <Text style={styles.numberErrorText}>{numberError}</Text> 
-            <Text style={styles.infoText}>We need to send you a OTP </Text>
-            <Text style={styles.infoText}>to verify your mobile number</Text>
-          </View>
-        </View>
 
-        <View style={styles.sendContainer}>
-          <TouchableOpacity style={styles.sendPressable} onPress={onPressSend}>
-            <Text style={styles.sendText}>Send</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.signupContainer}>
-          <View style={{ flexDirection: 'row' }}>
-            <View>
-              <Text style={styles.signupText}>Don't have an account yet? </Text>
+          <View style={styles.inputMainContainer}>
+            <View style={styles.inputContainer}>
+              <View style={styles.extensionContainer}>
+                <Text style={styles.extensionText}>{extension}</Text>
+              </View>
+              <TextInput placeholder='Enter your number' style={styles.inputField} onChangeText={onChangeText}/>
             </View>
-            <TouchableOpacity onPress={onPressSignup}>
-              <Text style={styles.signupPressableText}>Signup</Text>
+            <View style={styles.infoContainer}>
+              <Text numberOfLines={1} adjustsFontSizeToFit style={styles.infoText}>We need to send you an OTP </Text>
+              <Text numberOfLines={1} adjustsFontSizeToFit style={styles.infoText}>to verify your mobile number</Text>
+              <Text numberOfLines={1} adjustsFontSizeToFit style={styles.numberErrorText}>{numberError}</Text> 
+            </View>
+          </View>
+
+          <View style={styles.sendContainer}>
+            <TouchableOpacity style={styles.sendPressable} onPress={onPressSend}>
+              <Text numberOfLines={1} adjustsFontSizeToFit style={styles.sendText}>Send</Text>
             </TouchableOpacity>
           </View>
+
+          <View style={styles.signupContainer}>
+            <View style={{ flexDirection: 'row' }}>
+              <View>
+                <Text style={styles.signupText}>Don't have an account yet? </Text>
+              </View>
+              <TouchableOpacity onPress={onPressSignup}>
+                <Text style={styles.signupPressableText}>Signup</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -134,6 +136,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     backgroundColor: COLOR_CODE.BRIGHT_BLUE,
+    // borderWidth: 1,
+    // borderColor: 'black'
   },
 
   iconContainer: {
@@ -146,7 +150,7 @@ const styles = StyleSheet.create({
   },
 
   inputMainContainer: {
-    flex: 2,
+    flex: 3,
     // borderWidth: 1,
     // borderColor: 'black'
   },
@@ -156,6 +160,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'center',
     flexDirection: 'row',
+    // borderWidth: 1,
+    // borderColor: 'black'
   },
   extensionContainer: {
     height: '75%',
@@ -202,7 +208,7 @@ const styles = StyleSheet.create({
   sendContainer: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     // borderWidth: 1,
     // borderColor: 'black'
   },
