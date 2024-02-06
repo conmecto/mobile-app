@@ -1,10 +1,12 @@
 import Environments from '../utils/environments';
+import { getAccessToken } from '../utils/token';
 
 let chatSocket: WebSocket | null = null;
 
 const createChatSocketConnection = (userId: number) => {
   try {
-    chatSocket = new WebSocket(Environments.socket.matchService.baseUrl + `?userId=${userId}`);
+    const token = getAccessToken();
+    chatSocket = new WebSocket(Environments.socket.matchService.baseUrl + `?userId=${userId}` + `&accessToken=abcd`);
     chatSocket.onerror = (error) => {
       console.log(`Chat socket connection error`, error.message);
     }
