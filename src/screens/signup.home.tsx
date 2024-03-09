@@ -4,18 +4,21 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import RNDateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { COLOR_CODE, ERROR_CODES } from '../utils/enums';
 import { getAge } from '../utils/helpers';
-import findNumber from '../api/find.number';
+//import findNumber from '../api/find.number';
+import findEmail from '../api/find.email';
 import { IMAGE_LOGO } from '../files';
 
 type SignupObj = {
-  number?: string,
+  email?: string,
+  //number?: string,
   name?: string,
   dob?: Date,
   country?: string,
 }
 
 type SignupErrors = {
-  number?: string,
+  email?: string,
+  //number?: string,
   name?: string,
   dob?: string,
 }
@@ -25,56 +28,66 @@ FontAwesome.loadFont();
 const { height, width } = Dimensions.get('window');
 
 const SignupHomeScreen = ({ navigation }: any) => {
-  const numberRegex = new RegExp(/^[0-9]*$/);
-  const extension = '+91';
+  //const numberRegex = new RegExp(/^[0-9]*$/);
+  const emailRegex = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
+  //const extension = '+91';
   const [signupObj, setSignupObj] = useState<SignupObj>({ country: 'india' });
   const [signupErrors, setSignupErrors] = useState<SignupErrors>({});
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [numberCheck, setNumberCheck] = useState(false);
+  const [emailCheck, setEmailCheck] = useState(false);
 
   useEffect(() => {
     let check = true;
-    const callNumberCheck = async () => {
-      const res = await findNumber('91', signupObj.number as string);
+    const callEmailCheck = async () => {
+      const res = await findEmail(signupObj.email as string);
       if (check) {
-        setNumberCheck(false);
+        setEmailCheck(false);
         if (res?.userId) {
-          setSignupObj({ ...signupObj, number: '' });
-          setSignupErrors({ ...signupErrors, number: 'This number already exists' });
+          setSignupObj({ ...signupObj, email: '' });
+          setSignupErrors({ ...signupErrors, email: 'This email already exists' });
         } else if (res?.errorCode === ERROR_CODES.USER_NOT_FOUND) {
           navigation.navigate('SignupSecondScreen', { signupObj: JSON.stringify(signupObj) });
         } 
       }
     }
-    if (numberCheck) {
-      callNumberCheck();
+    if (emailCheck) {
+      callEmailCheck();
     }
     return () => {
       check = false;
     }
-  }, [numberCheck]);
+  }, [emailCheck]);
 
   const onPressShowDatePicker = () => {
     setShowDatePicker(!showDatePicker);
   }
 
-  const onChangeNumber = (text: string) => {
-    if (!numberRegex.test(text)) {
-      setSignupErrors({ ...signupErrors, number: 'Only digits are allowed' });
+  const onChangeEmail = (text: string) => {
+    if (!emailRegex.test(text)) {
+      setSignupErrors({ ...signupErrors, email: 'Please enter a valid email address' });
     } else {
-      if (text.length === 10) {
-        setSignupErrors({ ...signupErrors, number: '' });
-        setSignupObj({ ...signupObj, number: text });
-      } else {
-        setSignupErrors({ ...signupErrors, number: 'Number should have exactly 10 digits' });
-      }
+      setSignupErrors({ ...signupErrors, email: '' });
+      setSignupObj({ ...signupObj, email: text?.toLowerCase() });
     }
   }
+
+  // const onChangeNumber = (text: string) => {
+  //   if (!numberRegex.test(text)) {
+  //     setSignupErrors({ ...signupErrors, number: 'Only digits are allowed' });
+  //   } else {
+  //     if (text.length === 10) {
+  //       setSignupErrors({ ...signupErrors, number: '' });
+  //       setSignupObj({ ...signupObj, number: text });
+  //     } else {
+  //       setSignupErrors({ ...signupErrors, number: 'Number should have exactly 10 digits' });
+  //     }
+  //   }
+  // }
 
   const onChangeName = (text: string) => {
     if (text.length >= 2) {
       setSignupErrors({ ...signupErrors, name: '' });
-      setSignupObj({ ...signupObj, name: text });
+      setSignupObj({ ...signupObj, name: text?.toLowerCase() });
     } else {
       setSignupErrors({ ...signupErrors, name: 'Name should have atleast 2 characters' });
     }
@@ -99,8 +112,8 @@ const SignupHomeScreen = ({ navigation }: any) => {
 
   const onPressNext = () => {
     let errors: SignupErrors = {};
-    if (!signupObj.number) {
-      errors.number = 'Number is required';
+    if (!signupObj.email) {
+      errors.email = 'Email is required';
     }
     if (!signupObj.name) {
       errors.name = 'Name is required';
@@ -114,7 +127,7 @@ const SignupHomeScreen = ({ navigation }: any) => {
     }
     const checkErrors = Object.values(signupErrors).find(i => Boolean(i.length));
     if (!checkErrors) {
-      setNumberCheck(true);
+      setEmailCheck(true);
     }
   }
 
@@ -130,7 +143,7 @@ const SignupHomeScreen = ({ navigation }: any) => {
             <FontAwesome name='user-plus' color={COLOR_CODE.OFF_WHITE} size={height * 0.05}/>
           </View>
 
-          <View style={styles.phoneFieldContainer}>
+          {/* <View style={styles.phoneFieldContainer}>
             <View style={styles.phoneContainer}>
               <View style={styles.extensionContainer}>
                 <Text style={styles.extensionText}>{extension}</Text>
@@ -140,6 +153,11 @@ const SignupHomeScreen = ({ navigation }: any) => {
             <View style={styles.phoneErrorContainer}>
               <Text style={styles.numberErrorText}>{signupErrors?.number}</Text>
             </View>
+          </View> */}
+
+          <View style={styles.emailFieldContainer}>
+            <TextInput placeholder='Enter your Email' style={styles.emailInputField} onChangeText={onChangeEmail}/>
+            <Text style={styles.emailErrorText}>{signupErrors?.email}</Text>
           </View>
 
           <View style={styles.nameFieldContainer}>
@@ -226,57 +244,80 @@ const styles = StyleSheet.create({
     // borderColor: 'black'
   },
 
-  phoneFieldContainer: {
+  emailFieldContainer: {
     flex: 2,
-    // borderWidth: 1,
-    // borderColor: 'black'
-  },
-  phoneContainer: {
-    flex: 5,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     // borderWidth: 1,
     // borderColor: 'black'
   },
-  phoneErrorContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    // borderWidth: 1,
-    // borderColor: 'black'
-  },
-  extensionContainer: {
-    height: '60%',
-    width: '20%',
-    backgroundColor: COLOR_CODE.LIGHT_GREY,
-    borderTopLeftRadius: 20,
-    borderBottomLeftRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10
-  },
-  extensionText: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: COLOR_CODE.OFF_WHITE
-  },
-  inputField: {
-    height: '60%',
-    width: '60%',
-    borderTopEndRadius: 20,
-    borderBottomEndRadius: 20,
+  emailInputField: {
+    height: '50%',
+    width: '80%',
+    borderRadius: 20,
     backgroundColor: COLOR_CODE.OFF_WHITE,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
     fontSize: 20
   },
-  numberErrorText: {
+  emailErrorText: {
     fontSize: 15,
     fontWeight: '500',
     color: COLOR_CODE.OFF_WHITE
   },
+
+  // phoneFieldContainer: {
+  //   flex: 2,
+  //   // borderWidth: 1,
+  //   // borderColor: 'black'
+  // },
+  // phoneContainer: {
+  //   flex: 5,
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   // borderWidth: 1,
+  //   // borderColor: 'black'
+  // },
+  // phoneErrorContainer: {
+  //   flex: 1,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   // borderWidth: 1,
+  //   // borderColor: 'black'
+  // },
+  // extensionContainer: {
+  //   height: '60%',
+  //   width: '20%',
+  //   backgroundColor: COLOR_CODE.LIGHT_GREY,
+  //   borderTopLeftRadius: 20,
+  //   borderBottomLeftRadius: 20,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   padding: 10
+  // },
+  // extensionText: {
+  //   fontSize: 20,
+  //   fontWeight: '600',
+  //   color: COLOR_CODE.OFF_WHITE
+  // },
+  // inputField: {
+  //   height: '60%',
+  //   width: '60%',
+  //   borderTopEndRadius: 20,
+  //   borderBottomEndRadius: 20,
+  //   backgroundColor: COLOR_CODE.OFF_WHITE,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   padding: 10,
+  //   fontSize: 20
+  // },
+  // numberErrorText: {
+  //   fontSize: 15,
+  //   fontWeight: '500',
+  //   color: COLOR_CODE.OFF_WHITE
+  // },
 
   nameFieldContainer: {
     flex: 2,

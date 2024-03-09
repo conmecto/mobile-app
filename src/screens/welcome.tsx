@@ -25,12 +25,12 @@ const WelcomeScreen = ({ navigation }: any) => {
           <Text style={styles.welcomeText}>Welcome</Text>
           <Text>
           </Text>
-          <Text style={styles.infoText}>
+          {/* <Text style={styles.infoText}>
             Get ready to connect with some 
           </Text>
           <Text style={styles.infoText}>
             interesting people
-          </Text>
+          </Text> */}
         </View>
         <View style={styles.loginAndSignupContainer}>
           <TouchableOpacity style={styles.loginPressable} onPress={onPressLoginHandler}>
@@ -63,9 +63,9 @@ const styles = StyleSheet.create({
 
   welcomeContainer: {
     flex: 1,
-    paddingLeft: 20,
+    //paddingLeft: 20,
     paddingTop: 50,
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'flex-start',
     // borderWidth: 1,
     // borderColor: 'black'
