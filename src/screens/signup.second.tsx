@@ -7,7 +7,8 @@ import getCities from '../api/get.cities';
 import { IMAGE_LOGO } from '../files';
 
 type SignupObj = {
-  number?: string,
+  email?: string,
+  //number?: string,
   name?: string,
   dob?: Date,
   city?: string,
@@ -37,7 +38,7 @@ const { height, width } = Dimensions.get('window');
 
 const SignupSecondScreen = ({ navigation, route }: any) => {
   const signupObj = JSON.parse(route.params.signupObj);
-  const extension = '+91';
+  //const extension = '+91';
   const [cities, setCities] = useState<string[]>([]); 
   const [finalSignupObj, setFinalSignupObj] = useState<SignupObj>({});
   const [signupErrors, setSignupErrors] = useState<SignupErrors>({});
@@ -83,7 +84,7 @@ const SignupSecondScreen = ({ navigation, route }: any) => {
         setCreateUserCheck(false);
         setSignupErrors({});
         if (res?.userId) {
-          navigation.navigate('CodeVerificationScreen', { extension, number: signupObj.number, token: res.token });
+          navigation.navigate('CodeVerificationScreen', { email: signupObj.email, token: res.token });
         }
       }
     }

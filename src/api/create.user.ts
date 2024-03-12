@@ -9,7 +9,8 @@ type CreateUserRes = {
 }
 
 type CreateUserObj = {
-  number: string,
+  email: string,
+  //number: string,
   name: string,
   dob: string,
   city: string,

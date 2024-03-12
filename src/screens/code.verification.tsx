@@ -21,7 +21,8 @@ FontAwesome.loadFont();
 const { height, width } = Dimensions.get('window');
 
 const CodeVerificationScreen = ({ navigation, route }: any) => {
-  const { extension, number } = route.params;
+  //const { extension, number } = route.params;
+  const { email } = route.params;
   const numberRegex = new RegExp(/^[0-9]*$/);
   const [token, setToken] = useState(route.params.token);
   const [otp, setOtp] = useState('');
@@ -46,7 +47,7 @@ const CodeVerificationScreen = ({ navigation, route }: any) => {
   useEffect(() => {
     let check = true;
     const callLogin = async () => {
-      const res = await resendOtp(extension, number);
+      const res = await resendOtp(email);
       if (check) {
         setSendOtp(false);
         if (res) {
@@ -88,7 +89,7 @@ const CodeVerificationScreen = ({ navigation, route }: any) => {
   useEffect(() => {
     let check = true;
     const callVerify = async () => {
-      const res = await verifyCode(extension, number, Number(otp), token);
+      const res = await verifyCode(email, Number(otp), token);
       if (check) {
         setOtp('');
         setVerifyOtp(false);

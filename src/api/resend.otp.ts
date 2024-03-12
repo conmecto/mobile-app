@@ -8,11 +8,10 @@ type ResendOtpRes = {
   errorCode?: string
 }
 
-const resendOtp = async (extension: string, number: string): Promise<ResendOtpRes | undefined> => {
+const resendOtp = async (email: string): Promise<ResendOtpRes | undefined> => {
   try {
     const body = JSON.stringify({
-      extension,
-      number
+      email
     });
     const response = await fetch(Environments.api.userService.baseUrl + '/users/otp/resend', {
       method: 'POST',

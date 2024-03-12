@@ -9,11 +9,12 @@ type VerifyOtpRes = {
   refresh?: string
 }
 
-const verifyOtp = async (extension: string, number: string, code: number, token: string): Promise<VerifyOtpRes | undefined> => {
+const verifyOtp = async (email: string, code: number, token: string): Promise<VerifyOtpRes | undefined> => {
   try {
     const body = JSON.stringify({
-      extension,
-      number,
+      // extension,
+      // number,
+      email,
       code,
       token
     });

@@ -10,35 +10,38 @@ FontAwesome.loadFont();
 const { height, width } = Dimensions.get('window');
 
 const LoginScreen = ({ navigation }: any) => {
-  const numberRegex = new RegExp(/^[0-9]*$/);
-  const extension = '+91';
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
-  const [numberError, setNumberError] = useState<string>('');
+  // const numberRegex = new RegExp(/^[0-9]*$/);
+  // const extension = '+91';
+  // const [phoneNumber, setPhoneNumber] = useState<string>('');
+  // const [numberError, setNumberError] = useState<string>('');
+  const emailRegex = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
+  const [email, setEmail] = useState<string>('');
+  const [emailError, setEmailError] = useState<string>('');
   const [sendOtp, setSendOtp] = useState(false);
 
   useEffect(() => {
     let check = true;
     const callLogin = async () => {
-      const res = await resendOtp(extension, phoneNumber);
+      const res = await resendOtp(email);
       if (check) {
         setSendOtp(false);
-        setPhoneNumber('');
+        setEmail('');
         if (res) {
           if (res.token) {
-            setNumberError('');
-            navigation.navigate('CodeVerificationScreen', { extension, number: phoneNumber, token: res.token });
+            setEmailError('');
+            navigation.navigate('CodeVerificationScreen', { email, token: res.token });
           } else if (res?.errorCode === ERROR_CODES.USER_NOT_FOUND){
-            setNumberError('User with this number not found');
+            setEmailError('User with this email not found');
           } else if (res?.errorCode === ERROR_CODES.OTP_RESEND_LIMIT) {
-            setNumberError('');
+            setEmailError('');
             navigation.navigate('ContactAdminScreen', { error: 'OTP resend max attempts reached' });
           }
         } else {
-          setNumberError('');
+          setEmailError('');
         }
       }
     }
-    if (sendOtp && phoneNumber.length && numberError.length === 0) {
+    if (sendOtp && email.length && emailError.length === 0) {
       callLogin();
     }
     return () => {
@@ -47,26 +50,22 @@ const LoginScreen = ({ navigation }: any) => {
   }, [sendOtp]);
 
   const onChangeText = (text: string) => {
-    if (!numberRegex.test(text)) {
-      setNumberError('Only digits are allowed');
+    if (!emailRegex.test(text)) {
+      setEmailError('Please enter a valid email address');
     } else {
-      if (text.length === 10) {
-        setNumberError('');
-        setPhoneNumber(text);
-      } else {
-        setNumberError('Number should have exactly 10 digits');
-      }
+      setEmailError('');
+      setEmail(text?.toLowerCase());
     }
   }
 
   const onPressSignup = () => {
-    setPhoneNumber('');
-    setNumberError('');
+    setEmail('');
+    setEmailError('');
     navigation.navigate('SignupHomeScreen');
   }
 
   const onPressSend = () => {
-    if (phoneNumber.length && numberError.length === 0) {
+    if (email.length && emailError.length === 0) {
       setSendOtp(true);
     }
   }
@@ -84,7 +83,7 @@ const LoginScreen = ({ navigation }: any) => {
             <FontAwesome name='commenting-o' size={height * 0.06} color={COLOR_CODE.OFF_WHITE} style={{ paddingLeft: 10 }}/>
           </View>
 
-          <View style={styles.inputMainContainer}>
+          {/* <View style={styles.inputMainContainer}>
             <View style={styles.inputContainer}>
               <View style={styles.extensionContainer}>
                 <Text style={styles.extensionText}>{extension}</Text>
@@ -95,6 +94,17 @@ const LoginScreen = ({ navigation }: any) => {
               <Text numberOfLines={1} adjustsFontSizeToFit style={styles.infoText}>We need to send you an OTP </Text>
               <Text numberOfLines={1} adjustsFontSizeToFit style={styles.infoText}>to verify your mobile number</Text>
               <Text numberOfLines={1} adjustsFontSizeToFit style={styles.numberErrorText}>{numberError}</Text> 
+            </View>
+          </View> */}
+
+          <View style={styles.inputMainContainer}>
+            <View style={styles.inputContainer}>
+              <TextInput placeholder='Enter your Email' style={styles.emailInputField} onChangeText={onChangeText}/>
+            </View>
+            <View style={styles.infoContainer}>
+              <Text numberOfLines={1} adjustsFontSizeToFit style={styles.infoText}>We need to send you an OTP </Text>
+              <Text numberOfLines={1} adjustsFontSizeToFit style={styles.infoText}>to verify your Email address</Text>
+              <Text numberOfLines={1} adjustsFontSizeToFit style={styles.numberErrorText}>{emailError}</Text> 
             </View>
           </View>
 
@@ -147,6 +157,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     // borderWidth: 1,
     // borderColor: 'black'
+  },
+
+  emailInputField: {
+    height: '75%',
+    width: '80%',
+    borderRadius: 20,
+    backgroundColor: COLOR_CODE.OFF_WHITE,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    fontSize: 20
   },
 
   inputMainContainer: {
