@@ -99,7 +99,7 @@ const updateTokens = async (userId: number) => {
   if (newToken) {
     setAccessToken(newToken.access);
     const key = userId + ':auth:token';
-    await saveToken(key, JSON.stringify({ refresh: newToken.refresh })).then((response: any) => console.log('Save auth token response', response));
+    await saveToken(key, JSON.stringify({ refresh: newToken.refresh }))
     return true;
   }
   return false;

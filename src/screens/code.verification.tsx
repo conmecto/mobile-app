@@ -36,8 +36,8 @@ const CodeVerificationScreen = ({ navigation, route }: any) => {
     const userId = res.userId as number;
     const key = userId + ':auth:token';
     await Promise.all([
-      saveToken('userId', userId?.toString()).then((response: any) => console.log('Save user id response', response)),
-      saveToken(key, JSON.stringify({ refresh: res.refresh })).then((response: any) => console.log('Save auth token response', response))
+      saveToken('userId', userId?.toString()),
+      saveToken(key, JSON.stringify({ refresh: res.refresh }))
     ]);
     setUserId(userId);
     setAccessToken(res.access as string);

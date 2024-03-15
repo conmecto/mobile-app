@@ -6,7 +6,7 @@ let chatSocket: WebSocket | null = null;
 const createChatSocketConnection = (userId: number) => {
   try {
     const token = getAccessToken();
-    chatSocket = new WebSocket(Environments.socket.matchService.baseUrl + `?userId=${userId}` + `&accessToken=abcd`);
+    chatSocket = new WebSocket(Environments.socket.matchService.baseUrl + `?userId=${userId}` + `&accessToken=${token}`);
     chatSocket.onerror = (error) => {
       console.log(`Chat socket connection error`, error.message);
     }
