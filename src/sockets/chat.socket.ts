@@ -8,16 +8,22 @@ const createChatSocketConnection = (userId: number) => {
     const token = getAccessToken();
     chatSocket = new WebSocket(Environments.socket.matchService.baseUrl + `?userId=${userId}` + `&accessToken=${token}`);
     chatSocket.onerror = (error) => {
-      console.log(`Chat socket connection error`, error.message);
+      if (Environments.appEnv !== 'prod') {
+        console.log(`Chat socket connection error`, error.message);
+      }
     }
     
     chatSocket.onopen = () => {
-      console.log(`Chat socket connection established`);
+      if (Environments.appEnv !== 'prod') {
+        console.log(`Chat socket connection established`);
+      }
     }
 
     return chatSocket;
   } catch(error) {
-    console.log(`Socket error`, error);
+    if (Environments.appEnv !== 'prod') {
+      console.log(`Socket error`, error);
+    }
   }
 }
 

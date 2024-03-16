@@ -51,7 +51,9 @@ const updateChatsRead = async (matchId: number, userId: number, callIfUnauthoriz
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Update chats read api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Update chats read api error', error);
+    }
   }
 }
 

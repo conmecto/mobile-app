@@ -3,6 +3,7 @@ import logout from '../api/logout';
 import { COLOR_CODE } from './enums';
 import authenticateRefreshToken from '../api/auth';
 import { setAccessToken, resetToken } from './token';
+import Environments from './environments'
 
 const formatPayloadDob = (dob: string): string => {
   const newDate = new Date(dob);
@@ -24,7 +25,9 @@ const deleteToken = async (userId: number) => {
     ]);
     resetToken();
   } catch(error) {
-    console.log('Delete token error: ', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Delete token error: ', error);
+    }
   }
   return res;
 }
@@ -34,7 +37,9 @@ const saveToken = async (key: string, value: string) => {
   try {
     res = await Keychain.setGenericPassword(key, value, { service: key });
   } catch(error) {
-    console.log('Token save error: ', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Token save error: ', error);
+    }
   }
   return res;
 }
@@ -44,7 +49,9 @@ const getToken = async (key: string) => {
   try {
     token = await Keychain.getGenericPassword({ service: key });
   } catch(error) {
-    console.log('Retrieve token error: ', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Retrieve token error: ', error);
+    }
   }
   return token;
 }

@@ -16,5 +16,6 @@ export default {
     matchService: {
       baseUrl: Config.API_BASE_URL_MATCH_SERVICE_CHAT_SOCKET || ''
     }
-  }
+  },
+  appEnv: Config.APP_ENV || 'dev'
 };

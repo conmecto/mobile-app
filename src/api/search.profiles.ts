@@ -39,7 +39,9 @@ const searchProfiles = async (page: number, perPage: number, q: string, userId: 
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Search profiles api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Search profiles api error', error);
+    }
   }
   return [];
 }

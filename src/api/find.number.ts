@@ -1,7 +1,4 @@
 import Environments from '../utils/environments';
-import { ERROR_CODES } from '../utils/enums';
-import { updateTokens } from '../utils/helpers';
-import { getAccessToken } from '../utils/token';
 
 type FindNumberRes = {
   userId?: number,
@@ -25,7 +22,9 @@ const findNumber = async (extension: string, number: string): Promise<FindNumber
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Find number api error:', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Find number api error:', error);
+    }
   }
 }
 

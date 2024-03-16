@@ -35,7 +35,9 @@ const getUserMatch = async (userId: number, callIfUnauthorized: boolean = true):
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Get user match api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Get user match api error', error);
+    }
   }
 }
 

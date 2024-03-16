@@ -34,7 +34,9 @@ const logout = async (userId: number, callIfUnauthorized: boolean = true): Promi
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Logout api error:', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Logout api error:', error);
+    }
   }
 }
 

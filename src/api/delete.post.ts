@@ -1,5 +1,4 @@
 import Environments from '../utils/environments';
-import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
 
@@ -29,7 +28,9 @@ const deletePost = async (postId: number, userId: number, callIfUnauthorized: bo
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Delete user post api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Delete user post api error', error);
+    }
   }
 }
 

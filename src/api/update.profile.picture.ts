@@ -56,7 +56,9 @@ const updateProfilePicture = async (userId: number, profilePictureObj: Asset, ca
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Update profile picture error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Update profile picture error', error);
+    }
   }
 }
 

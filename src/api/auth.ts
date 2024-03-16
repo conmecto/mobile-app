@@ -1,5 +1,4 @@
 import Environments from '../utils/environments';
-import { ERROR_CODES } from '../utils/enums';
 
 type AuthenticateRefreshToken = {
   userId: number,
@@ -28,7 +27,9 @@ const authenticateRefreshToken = async (refreshToken: string): Promise<Authentic
       return jsonResponse.data[0];
     } 
   } catch(error) {
-    console.log('Refresh token authenticate error:', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Refresh token authenticate error:', error);
+    }
   }
 }
 

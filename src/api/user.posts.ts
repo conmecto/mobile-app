@@ -43,8 +43,10 @@ const getUserPosts = async (userId: number, paginationOptions: PaginationOptions
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Get user posts api error', error);
-  }
+    if (Environments.appEnv !== 'prod') {
+      console.log('Get user posts api error', error);
+    }
+  } 
 }
 
 export default getUserPosts;

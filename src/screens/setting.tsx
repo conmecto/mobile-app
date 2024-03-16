@@ -11,6 +11,7 @@ import Loading from '../components/loading';
 import { deleteToken, formatText, fireColorScoreBased } from '../utils/helpers';
 import getCities from '../api/get.cities';
 import { deleteChatSocketInstance } from '../sockets/chat.socket';
+import Environments from '../utils/environments';
 
 import { getUserId } from '../utils/user.id';
 type UserMatchSettingObject = {
@@ -199,7 +200,11 @@ const SettingScreen = ({ navigation, route }: any) => {
         deleteChatSocketInstance();
         navigation.navigate('WelcomeScreen');
       }
-    }).catch(error => console.log('Logout error: ', error));
+    }).catch(error => {
+      if (Environments.appEnv !== 'prod') {
+        console.log('Logout error: ', error)
+      }
+    });
   }
 
   const renderItemsSettings = (item: string | number, index: number) => {

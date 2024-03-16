@@ -41,8 +41,10 @@ const getUserMatchSettings = async (userId: number, callIfUnauthorized: boolean 
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Get user match settings api error', error);
-  }
+    if (Environments.appEnv !== 'prod') {
+      console.log('Get user match settings api error', error);
+    }
+  }  
 }
 
 export default getUserMatchSettings;

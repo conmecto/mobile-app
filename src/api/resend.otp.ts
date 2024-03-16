@@ -28,7 +28,9 @@ const resendOtp = async (email: string): Promise<ResendOtpRes | undefined> => {
       return jsonResponse.data[0];
     }
   } catch(error) {
-    console.log('Resend otp api error:', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Resend otp api error:', error);
+    }
   }
 }
 

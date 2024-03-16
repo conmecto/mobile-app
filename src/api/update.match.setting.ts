@@ -51,7 +51,9 @@ const updateMatchSetting = async (userId: number, updateObj: UpdateMatchSettingO
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Get update match settings api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Get update match settings api error', error);
+    }
   }
 }
 

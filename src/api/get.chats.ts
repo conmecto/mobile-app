@@ -1,5 +1,4 @@
 import Environments from '../utils/environments';
-import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
 
@@ -45,7 +44,9 @@ const getChats = async ({ matchId, userId, page }: params, callIfUnauthorized: b
         return jsonResponse;
     }
   } catch(error) {
-    console.log('Get user chats api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Get user chats api error', error);
+    }
   }
   return;
 }

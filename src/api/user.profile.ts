@@ -44,7 +44,9 @@ const getUserProfile = async (userId: number, callIfUnauthorized: boolean = true
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Get user profile api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Get user profile api error', error);
+    }
   }
 }
 

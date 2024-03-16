@@ -7,6 +7,7 @@ import Video from 'react-native-video';
 import { COLOR_CODE } from '../utils/enums';
 import { postOptions, maxFileSizeBytes, allowedFileTypes } from '../utils/constants';
 import addPost from '../api/add.post';
+import Environments from '../utils/environments';
 
 type UserPost = {
   id: number,
@@ -103,8 +104,14 @@ const Posts = ({ navigation, posts, userId, setPostPagination, setIsPostLoading,
           break;
         case RESULTS.DENIED:
           request(PERMISSIONS.IOS.PHOTO_LIBRARY).then(result => {
-            console.log('request result', result)
-          }).catch(error => console.log('request error', error));
+            if (Environments.appEnv !== 'prod') {
+              console.log('request result', result)
+            }
+          }).catch(error => {
+            if (Environments.appEnv !== 'prod') {
+              console.log('request error', error)
+            }
+          });
         case RESULTS.LIMITED:
         case RESULTS.GRANTED:
           handleFileImport();
@@ -115,7 +122,11 @@ const Posts = ({ navigation, posts, userId, setPostPagination, setIsPostLoading,
         default: 
           break;
       }
-    }).catch(error => console.log('upload post error', error));
+    }).catch(error => { 
+      if (Environments.appEnv !== 'prod') {
+        console.log('upload post error', error)
+      }
+    });
   }
 
   const onPressPostHandler = (post: UserPost) => {

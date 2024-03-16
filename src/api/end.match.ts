@@ -36,7 +36,9 @@ const endMatch = async (matchId: number, userId: number, block: boolean, callIfU
         return jsonResponse;
     }
   } catch(error) {
-    console.log('End match api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('End match api error', error);
+    }
   }
   return;
 }

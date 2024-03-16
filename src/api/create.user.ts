@@ -1,5 +1,4 @@
 import Environments from '../utils/environments';
-import { ERROR_CODES } from '../utils/enums';
 
 type CreateUserRes = {
   userId?: number,
@@ -35,7 +34,9 @@ const createUser = async (createUserObj: CreateUserObj): Promise<CreateUserRes |
       return jsonResponse.data[0];
     }
   } catch(error) {
-    console.log('Create user api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Create user api error', error);
+    }
   }
 }
 

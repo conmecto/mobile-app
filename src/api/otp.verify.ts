@@ -33,7 +33,9 @@ const verifyOtp = async (email: string, code: number, token: string): Promise<Ve
       return jsonResponse.data[0];
     }
   } catch(error) {
-    console.log('Verify otp api error:', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Verify otp api error:', error);
+    }
   }
 }
 

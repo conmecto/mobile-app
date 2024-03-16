@@ -62,7 +62,9 @@ const updateProfile = async (userId: number, updateObj: UpdateProfileObj, callIf
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Get user profile api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Get user profile api error', error);
+    }
   }
 }
 

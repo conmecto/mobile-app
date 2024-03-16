@@ -13,6 +13,7 @@ import Loading from '../components/loading';
 import { profilePictureOptions, allowedImageTypes, maxImageSizeBytes } from '../utils/constants';
 import { formatText } from '../utils/helpers';
 import { getUserId } from '../utils/user.id';
+import Environments from '../utils/environments';
 
 type UpdateProfileObj = {
   profilePicture?: Asset, 
@@ -137,8 +138,14 @@ const EditProfileScreen = (props: any) => {
           break;
         case RESULTS.DENIED:
           request(PERMISSIONS.IOS.PHOTO_LIBRARY).then(result => {
-            console.log('request result', result)
-          }).catch(error => console.log('request error', error));
+            if (Environments.appEnv !== 'prod') {
+              console.log('request result', result)
+            }
+          }).catch(error => {
+            if (Environments.appEnv !== 'prod') {
+              console.log('request error', error)
+            }
+          });
         case RESULTS.LIMITED:
         case RESULTS.GRANTED:
           handleFileImport();
@@ -149,7 +156,11 @@ const EditProfileScreen = (props: any) => {
         default: 
           break;
       }
-    }).catch(error => console.log('upload image error', error));
+    }).catch(error => { 
+      if (Environments.appEnv !== 'prod') {
+        console.log('upload image error', error)
+      }
+    });
   }
  
   return (

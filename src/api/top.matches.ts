@@ -64,7 +64,9 @@ const getTopMatches = async (count: number = 10, userId: number, callIfUnauthori
       });
     }
   } catch(error) {
-    console.log('Get top matches api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Get top matches api error', error);
+    }
   }
   return [];
 }

@@ -66,7 +66,9 @@ const addPost = async (userId: number, post: Asset, callIfUnauthorized: boolean 
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Add post error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Add post error', error);
+    }
   }
 }
 

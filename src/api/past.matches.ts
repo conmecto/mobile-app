@@ -66,7 +66,9 @@ const getPastMatches = async (userId: number, callIfUnauthorized: boolean = true
       }
     }
   } catch(error) {
-    console.log('Get past matches api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Get past matches api error', error);
+    }
   }
   return [];
 }

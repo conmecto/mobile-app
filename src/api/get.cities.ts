@@ -13,7 +13,9 @@ const getCities = async (country: string): Promise<string[] | undefined> => {
         return jsonResponse.cities;
     }
   } catch(error) {
-    console.log('Get cities api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Get cities api error', error);
+    }
   }
   return;
 }

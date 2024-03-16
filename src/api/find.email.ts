@@ -22,7 +22,9 @@ const findEmail = async (email: string): Promise<FindEmailRes | undefined> => {
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Find email api error:', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Find email api error:', error);
+    }
   }
 }
 

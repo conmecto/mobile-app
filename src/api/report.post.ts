@@ -29,7 +29,9 @@ const reportUserPost = async (postId: number, userId: number, callIfUnauthorized
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Report user post api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Report user post api error', error);
+    }
   }
 }
 

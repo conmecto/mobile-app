@@ -32,7 +32,9 @@ const getMultipleUsersProfile = async (userIds: number[], loggedInUserId: number
       return jsonResponse;
     }
   } catch(error) {
-    console.log('Get multiple profiles by userIds api error', error);
+    if (Environments.appEnv !== 'prod') {
+      console.log('Get multiple profiles by userIds api error', error);
+    }
   }
   return [];
 }
