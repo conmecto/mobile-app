@@ -31,6 +31,7 @@ const addPost = async (userId: number, post: Asset, callIfUnauthorized: boolean 
       uri: post.uri,
       type: post.type,
       height: post.height,
+      width: post.width
     });
     formData.append('metadata', JSON.stringify({
       height: post.height,
