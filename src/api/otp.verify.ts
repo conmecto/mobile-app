@@ -9,14 +9,15 @@ type VerifyOtpRes = {
   refresh?: string
 }
 
-const verifyOtp = async (email: string, code: number, token: string): Promise<VerifyOtpRes | undefined> => {
+const verifyOtp = async (email: string, code: number, token: string, deviceToken?: string): Promise<VerifyOtpRes | undefined> => {
   try {
     const body = JSON.stringify({
       // extension,
       // number,
       email,
       code,
-      token
+      token,
+      ...(deviceToken ? { deviceToken } : {})
     });
     const response = await fetch(Environments.api.userService.baseUrl + '/users/login', {
       method: 'POST',

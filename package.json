@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@react-native-community/datetimepicker": "^7.1.0",
+    "@react-native-community/push-notification-ios": "^1.11.0",
     "@react-native-picker/picker": "^2.4.10",
     "@react-navigation/bottom-tabs": "^6.5.7",
     "@react-navigation/material-bottom-tabs": "^6.2.16",
@@ -26,6 +27,7 @@
     "react-native-linear-gradient": "^2.8.3",
     "react-native-paper": "^5.9.1",
     "react-native-permissions": "^3.9.2",
+    "react-native-push-notification": "^8.1.1",
     "react-native-safe-area-context": "^4.5.3",
     "react-native-screens": "^3.20.0",
     "react-native-vector-icons": "^10.0.0",
@@ -40,6 +42,7 @@
     "@types/jest": "^29.2.1",
     "@types/lodash": "^4.14.195",
     "@types/react": "^18.0.24",
+    "@types/react-native-push-notification": "^8.1.4",
     "@types/react-native-vector-icons": "^6.4.13",
     "@types/react-native-video": "^5.0.16",
     "@types/react-test-renderer": "^18.0.0",

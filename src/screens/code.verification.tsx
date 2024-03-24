@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Dimensions, Image } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { ERROR_CODES, COLOR_CODE } from '../utils/enums';
-import { saveToken } from '../utils/helpers';
+import { saveToken, getToken } from '../utils/helpers';
 import verifyCode from '../api/otp.verify';
 import resendOtp from '../api/resend.otp';
 import { IMAGE_LOGO } from '../files';
@@ -89,7 +89,12 @@ const CodeVerificationScreen = ({ navigation, route }: any) => {
   useEffect(() => {
     let check = true;
     const callVerify = async () => {
-      const res = await verifyCode(email, Number(otp), token);
+      let deviceToken: string | undefined;
+      const deviceTokenObj = await getToken('deviceToken');
+      if (deviceTokenObj) {
+        deviceToken = deviceTokenObj.password;
+      }
+      const res = await verifyCode(email, Number(otp), token, deviceToken);
       if (check) {
         setOtp('');
         setVerifyOtp(false);
