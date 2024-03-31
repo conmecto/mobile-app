@@ -1,19 +1,19 @@
 {
   "images" : [
     {
-      "filename" : "conmecto-40-40.png",
+      "filename" : "conmecto-40.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "20x20"
     },
     {
-      "filename" : "conmecto-60-60.png",
+      "filename" : "conmecto-60.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "20x20"
     },
     {
-      "filename" : "conmecto-58-58.png",
+      "filename" : "conmecto-58.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "29x29"
@@ -49,7 +49,7 @@
       "size" : "60x60"
     },
     {
-      "filename" : "conmecto-1024.png",
+      "filename" : "conmecto.png",
       "idiom" : "ios-marketing",
       "scale" : "1x",
       "size" : "1024x1024"
