@@ -99,7 +99,7 @@ const EditProfileScreen = (props: any) => {
         if (!asset.fileSize || !asset.type) {
           setFieldErrors({ ...fieldErrors, profilePicture: 'Corrupt file' });    
         } else if (asset.fileSize > maxImageSizeBytes) {
-          setFieldErrors({ ...fieldErrors, profilePicture: 'File size exceed 50mb' });    
+          setFieldErrors({ ...fieldErrors, profilePicture: 'File size exceed 10mb' });    
         } else if (!allowedImageTypes.includes(asset.type)) {
           setFieldErrors({ ...fieldErrors, profilePicture: 'File type not supported' });    
         } else {

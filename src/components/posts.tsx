@@ -87,7 +87,7 @@ const Posts = ({ navigation, posts, userId, setPostPagination, setIsPostLoading,
         if (!asset.fileSize || !asset.type) {
           setPostFields({ newPost: null, addPost: false, postError:  'Corrupt file' });
         } else if (asset.fileSize > maxFileSizeBytes) {
-          setPostFields({ newPost: null, addPost: false, postError: 'File size exceed 100mb' });
+          setPostFields({ newPost: null, addPost: false, postError: 'File size exceed 10mb' });
         } else if (!allowedFileTypes.includes(asset.type)) {
           setPostFields({ newPost: null, addPost: false, postError: 'File type not supported' });
         } else {
