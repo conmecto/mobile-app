@@ -4,6 +4,9 @@ const Days = ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat']
 
 const postOptions = {
   mediaType: 'photo',	
+  maxWidth: 675,	
+  maxHeight: 1200,
+  //quality: 0.8,
   //durationLimit: 60,
   includeBase64: false,
   includeExtra: false,
@@ -12,8 +15,9 @@ const postOptions = {
 
 const profilePictureOptions = {
   mediaType: 'photo',	
-  // maxWidth: ''	
-  // maxHeight	
+  maxWidth: 320,	
+  maxHeight: 320,
+  //quality: 1,
   // videoQuality
   //durationLimit
   //quality
