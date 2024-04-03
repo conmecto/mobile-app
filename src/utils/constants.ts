@@ -45,7 +45,9 @@ const maxImageSizeBytes = 10485760;
 //10mb
 const maxFileSizeBytes = 10485760;
 
+const initialLogoScreenTimeMilli = 2000;
+
 export { 
   SEARCH_FOR, profilePictureOptions, postOptions, maxFileSizeBytes, allowedFileTypes, allowedImageTypes,
-  maxImageSizeBytes, Days
+  maxImageSizeBytes, Days, initialLogoScreenTimeMilli
 };

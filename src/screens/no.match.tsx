@@ -18,7 +18,7 @@ const NoMatchScreen = () => {
         </Text>
       </View>
       <View style={styles.tipsContainer}>
-        <LinearGradient colors={[COLOR_CODE.BRIGHT_BLUE, COLOR_CODE.BRIGHT_RED]}style={styles.gradient}>
+        <LinearGradient colors={[COLOR_CODE.BRIGHT_BLUE, COLOR_CODE.BRIGHT_RED]} style={styles.gradient}>
           <View style={styles.tipsTitleContainer}>
             <Text style={styles.tipsTitle}>About the Game</Text>
           </View>

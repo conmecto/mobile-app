@@ -9,6 +9,7 @@ import SignupSecondScreen from '../screens/signup.second';
 import HomeScreen from '../screens/home';
 import ContactAdminScreen from '../screens/contact.admin';
 import { getToken, updateTokens } from '../utils/helpers';
+import { initialLogoScreenTimeMilli } from '../utils/constants';
 import LogoScreen from '../screens/logo';
 import { setUserId } from '../utils/user.id';
 
@@ -28,7 +29,7 @@ const LaunchStackNavigator = () => {
         setInitialScreen('HomeScreen');
       }
     }
-    setLoading(false);
+    setTimeout(() => setLoading(false), initialLogoScreenTimeMilli);
   }
 
   useEffect(() => {
