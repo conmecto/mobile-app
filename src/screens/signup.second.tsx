@@ -1,35 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, Text, Dimensions, StyleSheet, Modal, FlatList, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, TextInput, Text, Dimensions, StyleSheet } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import RNDateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { Button } from 'react-native-paper';
 import { COLOR_CODE } from '../utils/enums';
-import createUser from '../api/create.user';
-import getCities from '../api/get.cities';
-import { IMAGE_LOGO } from '../files';
+import { getAge } from '../utils/helpers';
+//import findNumber from '../api/find.number';
+import TopBar from '../components/top.bar';
 
 type SignupObj = {
+  country: string,
   email?: string,
-  //number?: string,
   name?: string,
-  dob?: Date,
-  city?: string,
-  country?: string,
-  searchIn?: string,
-  searchFor?: string,
-  gender?: string
-}
-
-type SignupErrors = {
-  city?: string,
-  searchIn?: string,
-  searchFor?: string,
-  gender?: string
-}
-
-type ModalCheck = {
-  city: boolean,
-  searchIn: boolean,
-  searchFor: boolean,
-  gender: boolean
+  appleAuthToken?: string,
+  termsAccepted?: boolean,
+  appleAuthUserId?: string,
+  dob?: Date
 }
 
 FontAwesome.loadFont();
@@ -37,406 +23,163 @@ FontAwesome.loadFont();
 const { height, width } = Dimensions.get('window');
 
 const SignupSecondScreen = ({ navigation, route }: any) => {
-  const signupObj = JSON.parse(route.params.signupObj);
+  //const numberRegex = new RegExp(/^[0-9]*$/);
+  //const emailRegex = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
   //const extension = '+91';
-  const [cities, setCities] = useState<string[]>([]); 
-  const [finalSignupObj, setFinalSignupObj] = useState<SignupObj>({});
-  const [signupErrors, setSignupErrors] = useState<SignupErrors>({});
-  const [showModal, setShowModal] = useState<ModalCheck>({
-    city: false,
-    searchIn: false,
-    searchFor: false,
-    gender: false
-  });
-  const [createUserCheck, setCreateUserCheck] = useState(false);
+  const signupObj = JSON.parse(route.params.signupObj);
+  const [signupObjSecondStage, setSignupObjSecondStage] = useState<SignupObj>({ ...signupObj });
+  const [signupError, setSignupError] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  useEffect(() => {
-    let check = true;
-    const callCities = async () => {
-      const res = await getCities('india');
-      if (check && res) {
-        setCities(res);
-      }
-    }
-    if (!cities.length) {
-      callCities();
-    }
-    return () => {
-      check = false;
-    }
-  }, []);
+  const onChangeName = (text: string) => {
+    setSignupObjSecondStage({ ...signupObjSecondStage, name: text.toLowerCase() });
+  }
 
-  const onPressShowModal = (field: string) => {
-    setShowModal({ ...showModal, [field]: true });
+  const onPressShowDatePicker = () => {
+    setShowDatePicker(!showDatePicker);
   } 
 
-  const onSelectField = (field: string, fieldValue: string) => {
-    setFinalSignupObj({ ...finalSignupObj, [field]: fieldValue });
-    setSignupErrors({ ...signupErrors, [field]: '' });
-    setShowModal({ ...showModal, [field]: false });
-  }
+  const onChangeDob = (event: DateTimePickerEvent, selectedDate: Date | undefined) => {
+    const age = getAge(selectedDate?.toISOString() as string);
+    if (age >= 18) {
+      setSignupObjSecondStage({ ...signupObjSecondStage, dob: selectedDate });
+      setSignupError('');
+    } else {
+      setSignupError('Age should be 18 or above');
+    }
+  };
 
-  useEffect(() => {
-    let check = true;
-    const callCreateUser = async () => {
-      const res = await createUser({ ...signupObj, ...finalSignupObj });
-      if (check) {
-        setCreateUserCheck(false);
-        setSignupErrors({});
-        if (res?.userId) {
-          navigation.navigate('CodeVerificationScreen', { email: signupObj.email, token: res.token });
-        }
-      }
+  const onPressNextHandler = () => {
+    let error = '';
+    if (!signupObjSecondStage.name) {
+      error = 'Please enter your full name';
     }
-    if (createUserCheck) {
-      callCreateUser();
+    if (!signupObjSecondStage.dob) {
+      error = 'Please enter your date of birth';
     }
-    return () => {
-      check = false;
-    }
-  }, [createUserCheck]);
-
-  const renderCities = (field: string) => {
-    return ({ item }: any) => {
-      return (
-        <TouchableOpacity style={styles.searchInModalPressable} onPress={() => onSelectField(field, item)}>
-          <Text style={styles.searchInText}>{item}</Text>
-        </TouchableOpacity>
-      );
-    }
-  }
-
-  const onPressCreate = () => {
-    let errors: SignupErrors = {};
-    if (!finalSignupObj.gender) {
-      errors.gender = 'Gender is required';
-    }
-    if (!finalSignupObj.city) {
-      errors.city = 'City is required';
-    }
-    if (!finalSignupObj.searchFor) {
-      errors.searchFor = 'Connect with is required';
-    }
-    if (!finalSignupObj.searchIn) {
-      errors.searchIn = 'Connect in is required';
-    }
-    if (Object.keys(errors).length) {
-      setSignupErrors({ ...signupErrors, ...errors });
-      return;
-    }
-    const checkErrors = Object.values(signupErrors).find(i => Boolean(i.length));
-    if (!checkErrors) {
-      setCreateUserCheck(true);
+    if (error) {
+      setSignupError(error);
+    } else {
+      navigation.navigate('SignupThirdScreen', { signupObjSecondStage: JSON.stringify(signupObjSecondStage) });
     }
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={styles.logoMainContainer}>
-        <Image source={ IMAGE_LOGO } style={styles.logo} />
-        <Text style={{ fontSize: 50, fontWeight: '800', fontFamily: 'SavoyeLetPlain' }}>Conmecto</Text>
-      </View>
-      <View style={styles.signupMainContainer}>
-        <View style={styles.iconContainer}>
-          <FontAwesome name='user-plus' color={COLOR_CODE.OFF_WHITE} size={height * 0.05}/>
+    <View style={{ flex: 1 }}>  
+      <TopBar />
+      <View style={styles.container}>          
+        <View style={styles.nameContainer}>
+          <Text style={styles.errorTextStyle} numberOfLines={1} adjustsFontSizeToFit>{signupError}</Text>
+          <Text>{'\n'}{'\n'}{'\n'}{'\n'}{'\n'}</Text>
+          <TextInput
+            placeholder='Name'
+            value={signupObjSecondStage.name}
+            onChangeText={onChangeName}
+            style={styles.nameInput}
+          />
         </View>
-
-        <View style={styles.genderContainer}>
-          <TouchableOpacity style={styles.genderPressable} onPress={() => onPressShowModal('gender')}>
-            <Text style={styles.genderText}>{finalSignupObj.gender ? finalSignupObj.gender : 'I identify as'}</Text>
-          </TouchableOpacity>
-          <Text style={styles.errorText}>{signupErrors.gender}</Text>
+        <View style={styles.dobContainer}>
           { 
-            showModal.gender &&
-            <Modal transparent visible={showModal.gender} animationType='none'>
-              <View style={styles.genderModal}>
-                {['man', 'nonbinary', 'woman'].map((gender, index) => {
-                  return (
-                    <TouchableOpacity style={styles.genderModalPressable} key={index+1} onPress={() => onSelectField('gender', gender)}>
-                      <Text style={styles.genderText}>{gender}</Text>
-                    </TouchableOpacity>
-                  )
-                })}
+            showDatePicker ? 
+            (
+              <View>
+                <RNDateTimePicker 
+                  value={signupObjSecondStage?.dob ? signupObjSecondStage?.dob : new Date()} 
+                  display='spinner'
+                  onChange={onChangeDob} 
+                  textColor={COLOR_CODE.BLACK}   
+                  maximumDate={new Date()}
+                  minimumDate={new Date(1950,0,1)}
+                  style={styles.datePicker}
+                />
+                <Button mode='contained' onPress={onPressShowDatePicker} buttonColor={COLOR_CODE.BRIGHT_RED} style={styles.selectButton} labelStyle={{ color: COLOR_CODE.OFF_WHITE }}>
+                  Select
+                </Button>
               </View>
-            </Modal>
+            ) : (
+              <Button mode='contained-tonal' onPress={onPressShowDatePicker} style={styles.dobButton} labelStyle={{ color: COLOR_CODE.BLACK }}>
+                {signupObjSecondStage.dob ? signupObjSecondStage.dob?.toDateString() : 'Select date of birth'}
+              </Button>
+            )
           }
         </View>
-
-        <View style={styles.cityContainer}>
-          <TouchableOpacity style={styles.cityPressable} onPress={() => onPressShowModal('city')}>
-            <Text style={styles.cityText}>{finalSignupObj.city ? finalSignupObj.city : 'Your location'}</Text>
-          </TouchableOpacity>
-          <Text style={styles.errorText}>{signupErrors.city}</Text>
-          { 
-            showModal.city &&
-            <Modal transparent visible={showModal.city} animationType='none'>
-              <View style={styles.cityModal}>
-                <FlatList 
-                  data={cities}
-                  style={{ flex: 1 }}
-                  renderItem={renderCities('city')}
-                  keyExtractor={(item, index) => index.toString()}
-                  />
-              </View>
-            </Modal>
-          }
-        </View>
-
-        <View style={styles.searchForContainer}>
-          <TouchableOpacity style={styles.searchForPressable} onPress={() => onPressShowModal('searchFor')}>
-            <Text style={styles.searchForText}>{finalSignupObj.searchFor ? finalSignupObj.searchFor : 'Connect with'}</Text>
-          </TouchableOpacity>
-          <Text style={styles.errorText}>{signupErrors.searchFor}</Text>
-          { 
-            showModal.searchFor &&
-            <Modal transparent visible={showModal.searchFor} animationType='none'>
-              <View style={styles.searchForModal}>
-                {['everyone', 'men', 'women'].map((item, index) => {
-                  return (
-                    <TouchableOpacity style={styles.searchForModalPressable} key={index+1} onPress={() => onSelectField('searchFor', item)}>
-                      <Text style={styles.searchForText}>{item}</Text>
-                    </TouchableOpacity>
-                  )
-                })}
-              </View>
-            </Modal>
-          }
-        </View>
-
-        <View style={styles.searchInContainer}>
-          <TouchableOpacity style={styles.searchInPressable} onPress={() => onPressShowModal('searchIn')}>
-            <Text style={styles.searchInText}>{finalSignupObj.searchIn ? finalSignupObj.searchIn : 'Connect with users in'}</Text>
-          </TouchableOpacity>
-          <Text style={styles.errorText}>{signupErrors.searchIn}</Text>
-          { 
-            showModal.searchIn &&
-            <Modal transparent visible={showModal.searchIn} animationType='none'>
-              <View style={styles.searchInModal}>
-                <FlatList 
-                  data={cities}
-                  style={{ flex: 1 }}
-                  renderItem={renderCities('searchIn')}
-                  keyExtractor={(item, index) => index.toString()}
-                  />
-              </View>
-            </Modal>
-          }
-        </View>
-
-        <View style={styles.createContainer}>
-          <TouchableOpacity style={styles.createPressable} onPress={onPressCreate}>
-            <Text style={styles.createText}>Create</Text>
-          </TouchableOpacity>
+        <View style={styles.nextContainer}>
+          <Button mode='outlined' onPress={onPressNextHandler} labelStyle={styles.nextButtonText}>Next</Button>
         </View>
       </View>
     </View>
-  );
+  )
 }
 
 export default SignupSecondScreen;
 
 const styles = StyleSheet.create({
-  logoMainContainer: {
+  container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    // borderWidth: 1,
-    // borderColor: 'black'
+    backgroundColor: COLOR_CODE.OFF_WHITE
   },
 
-  signupMainContainer: {
+  nameContainer: {
     flex: 2,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    backgroundColor: COLOR_CODE.BRIGHT_BLUE,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    //paddingBottom: 50,
+    //borderWidth: 1
   },
 
-  iconContainer: {
-    flex: 1,
+  dobContainer: {
+    flex: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    // borderWidth: 1,
-    // borderColor: 'black'
+    //borderWidth: 1
   },
 
-  genderContainer: {
+  nextContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    // borderWidth: 1,
-    // borderColor: 'black'
-  },
-  genderPressable: {
-    height: '50%',
-    width: '70%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-    backgroundColor: COLOR_CODE.OFF_WHITE
-  },
-  genderModalPressable: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  genderText: {
-    fontSize: 20,
-    fontWeight: '500',
-    color: COLOR_CODE.BRIGHT_BLUE
-  },
-  genderModal: {
-    position: 'absolute',
-    height: width * 0.5,
-    width: width * 0.5,
-    top: height * 0.4,
-    left: width * 0.25,
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: COLOR_CODE.BLACK,
-    backgroundColor: COLOR_CODE.OFF_WHITE
+    //borderWidth: 1
   },
 
-  searchInContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    // borderWidth: 1,
-    // borderColor: 'black'
-  },
-  searchInPressable: {
-    height: '50%',
-    width: '70%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-    backgroundColor: COLOR_CODE.OFF_WHITE
-  },
-  searchInText: {
-    fontSize: 20,
-    fontWeight: '500',
-    color: COLOR_CODE.BRIGHT_BLUE
-  },
-  searchInModal: {
-    position: 'absolute',
-    height: width * 0.75,
-    width: width * 0.75,
-    top: height * 0.3,
-    left: width * 0.15,
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: COLOR_CODE.BLACK,
-    backgroundColor: COLOR_CODE.OFF_WHITE
-  },
-  searchInModalPressable: {
-    height: height * 0.05,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  searchForContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    // borderWidth: 1,
-    // borderColor: 'black'
-  },
-  searchForPressable: {
-    height: '50%',
-    width: '70%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-    backgroundColor: COLOR_CODE.OFF_WHITE
-  },
-  searchForText: {
-    fontSize: 20,
-    fontWeight: '500',
-    color: COLOR_CODE.BRIGHT_BLUE
-  },
-  searchForModal: {
-    position: 'absolute',
-    height: width * 0.5,
-    width: width * 0.5,
-    top: height * 0.4,
-    left: width * 0.25,
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: COLOR_CODE.BLACK,
-    backgroundColor: COLOR_CODE.OFF_WHITE
-  },
-  searchForModalPressable: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  cityContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    // borderWidth: 1,
-    // borderColor: 'black'
-  },
-  cityPressable: {
-    height: '50%',
-    width: '70%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-    backgroundColor: COLOR_CODE.OFF_WHITE
-  },
-  cityText: {
-    fontSize: 20,
-    fontWeight: '500',
-    color: COLOR_CODE.BRIGHT_BLUE
-  },
-  cityModal: {
-    position: 'absolute',
-    height: width * 0.75,
-    width: width * 0.75,
-    top: height * 0.3,
-    left: width * 0.15,
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: COLOR_CODE.BLACK,
-    backgroundColor: COLOR_CODE.OFF_WHITE
-  },
-  cityModalPressable: {
-    height: height * 0.05,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  createContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    // borderWidth: 1,
-    // borderColor: 'black'
-  },
-  createPressable: {
-    height: '50%',
-    width: '25%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 30,
-    backgroundColor: COLOR_CODE.BRIGHT_RED,
-    // borderWidth: 1,
-    // borderColor: 'black'
-  },
-  createText: {
-    fontSize: 20,
-    fontWeight: '500',
-    color: COLOR_CODE.OFF_WHITE
-  },
-
-  errorText: {
+  errorTextStyle: {
+    fontWeight: 'bold',
     fontSize: 15,
-    fontWeight: '500',
+    color: COLOR_CODE.BRIGHT_RED
   },
 
-  logo: {
-    height: height * 0.15,
-    width: height * 0.15
-  }
+  nextButtonText: {
+    color: COLOR_CODE.BRIGHT_BLUE
+  },
+
+  nameInput: { 
+    height: '15%', 
+    width: '70%', 
+    backgroundColor: COLOR_CODE.LIGHT_GREY, 
+    borderRadius: 10,
+    padding: 5 
+  },
+
+  dobButton: {
+    height: '15%', 
+    width: '70%', 
+    backgroundColor: COLOR_CODE.LIGHT_GREY,
+    borderRadius: 10,
+    justifyContent: 'center'
+  },
+
+  datePicker: {
+    flex: 1,
+  },
+  datePickerPressable: {
+    height: height * 0.07,
+    width: width * 0.5,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLOR_CODE.LIGHT_GREY,
+  },
+
+  selectButton: {
+    alignSelf: 'center'
+  },
 });

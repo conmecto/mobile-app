@@ -1,22 +1,27 @@
 import Environments from '../utils/environments';
 
 type CreateUserRes = {
-  userId?: number,
-  token?: string,
+  data?: {
+    userId?: number,
+    access?: string,
+    refresh?: string,
+  }[],
   error?: string,
   errorCode?: string
 }
 
 type CreateUserObj = {
-  email: string,
   //number: string,
-  name: string,
-  dob: string,
-  city: string,
-  country: string, 
-  searchFor: string,
-  searchIn: string,
-  gender: string,
+  email?: string,
+  name?: string,
+  appleAuthToken?: string,
+  termsAccepted?: boolean,
+  appleAuthUserId?: string,
+  dob?: Date,
+  city?: string,
+  searchIn?: string,
+  searchFor?: string,
+  gender?: string
 }
 
 const createUser = async (createUserObj: CreateUserObj): Promise<CreateUserRes | undefined> => {
@@ -30,9 +35,7 @@ const createUser = async (createUserObj: CreateUserObj): Promise<CreateUserRes |
       body
     });
     const jsonResponse = await response.json();
-    if (response?.status === 201 && jsonResponse) {
-      return jsonResponse.data[0];
-    }
+    return jsonResponse;
   } catch(error) {
     if (Environments.appEnv !== 'prod') {
       console.log('Create user api error', error);

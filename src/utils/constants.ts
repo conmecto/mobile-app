@@ -1,4 +1,5 @@
-const SEARCH_FOR = ['men', 'women', 'everyone'];
+const SEARCH_FOR = ['women', 'men', 'everyone'];
+const GENDER = ['woman', 'others', 'man'];
 
 const Days = ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat']
 
@@ -49,5 +50,5 @@ const initialLogoScreenTimeMilli = 2000;
 
 export { 
   SEARCH_FOR, profilePictureOptions, postOptions, maxFileSizeBytes, allowedFileTypes, allowedImageTypes,
-  maxImageSizeBytes, Days, initialLogoScreenTimeMilli
+  maxImageSizeBytes, Days, initialLogoScreenTimeMilli, GENDER
 };

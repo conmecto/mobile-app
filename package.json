@@ -11,6 +11,7 @@
     "clear": "rm -f node_modules/react-native-config/ios/ReactNativeConfig/GeneratedDotEnv.m"
   },
   "dependencies": {
+    "@invertase/react-native-apple-authentication": "^2.3.0",
     "@react-native-community/datetimepicker": "^7.1.0",
     "@react-native-community/push-notification-ios": "^1.11.0",
     "@react-native-picker/picker": "^2.4.10",
@@ -19,7 +20,7 @@
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
     "lodash": "^4.17.21",
-    "react": "18.2.0",
+    "react": "^18.2.0",
     "react-native": "0.71.8",
     "react-native-config": "^1.5.1",
     "react-native-image-picker": "^7.0.0",
@@ -41,7 +42,7 @@
     "@tsconfig/react-native": "^2.0.2",
     "@types/jest": "^29.2.1",
     "@types/lodash": "^4.14.195",
-    "@types/react": "^18.0.24",
+    "@types/react": "^18.2.74",
     "@types/react-native-push-notification": "^8.1.4",
     "@types/react-native-vector-icons": "^6.4.13",
     "@types/react-native-video": "^5.0.16",
