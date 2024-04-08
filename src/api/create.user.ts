@@ -2,9 +2,9 @@ import Environments from '../utils/environments';
 
 type CreateUserRes = {
   data?: {
-    userId?: number,
-    access?: string,
-    refresh?: string,
+    userId: number,
+    access: string,
+    refresh: string,
   }[],
   error?: string,
   errorCode?: string

@@ -42,7 +42,7 @@ const SignupHomeScreen = ({ navigation }: any) => {
       if (check) {
         setEmailCheck(false);
         if (res?.userId) {
-          setSignupObj({ ...signupObj, email: '' });
+          setSignupObj({ country: 'india' });
           setSignupError('This email already exists, please login instead');
         }
       }
@@ -71,6 +71,9 @@ const SignupHomeScreen = ({ navigation }: any) => {
   }
   const onAppleButtonPress = async () => {
     try {
+      if (signupObj.appleAuthToken) {
+        return;
+      }
       const appleAuthRequestResponse = await appleAuth.performRequest({
         requestedOperation: appleAuth.Operation.LOGIN,
         requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL]

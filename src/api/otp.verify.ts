@@ -1,23 +1,31 @@
 import Environments from '../utils/environments';
 import { ERROR_CODES } from '../utils/enums';
 
+type LoginObj = {
+  userId?: number,
+  appleAuthToken?: string,
+  deviceToken?: string
+}
+
 type VerifyOtpRes = {
   error?: string,
   errorCode?: string,
-  userId?: number,
-  access?: string,
-  refresh?: string
+  data?: {
+    userId: number,
+    access: string,
+    refresh: string
+  }[]
 }
 
-const verifyOtp = async (email: string, code: number, token: string, deviceToken?: string): Promise<VerifyOtpRes | undefined> => {
+const verifyOtp = async (loginObj: LoginObj): Promise<VerifyOtpRes | undefined> => {
   try {
     const body = JSON.stringify({
       // extension,
       // number,
-      email,
-      code,
-      token,
-      ...(deviceToken ? { deviceToken } : {})
+      // email,
+      // code,
+      // token,
+      ...loginObj
     });
     const response = await fetch(Environments.api.userService.baseUrl + '/users/login', {
       method: 'POST',
@@ -27,12 +35,7 @@ const verifyOtp = async (email: string, code: number, token: string, deviceToken
       body
     });
     const jsonResponse = await response.json();
-    if (response?.status === 403 || response?.status === 498) {
-      return jsonResponse;
-    }
-    if (response?.status === 200 && jsonResponse) {
-      return jsonResponse.data[0];
-    }
+    return jsonResponse;
   } catch(error) {
     if (Environments.appEnv !== 'prod') {
       console.log('Verify otp api error:', error);

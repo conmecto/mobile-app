@@ -37,6 +37,7 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
   const [signupError, setSignupError] = useState('');
   const [modalField, setModalField] = useState('');
   const [createUserCheck, setCreateUserCheck] = useState(false);
+  
   useEffect(() => {
     let check = true;
     const callCities = async () => {
@@ -67,7 +68,6 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
       const res = await createUser(finalSignupObj);
       if (check) {
         setCreateUserCheck(false);
-        setSignupError('');
         if (res?.errorCode === ERROR_CODES.TOKEN_INVALID) {
           setSignupError('Token expired or invalid, please retry');
           timerId1 = setTimeout(() => navigation.navigate('SignupHomeScreen'), 3000);
@@ -83,8 +83,10 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
           ]);
           setUserId(userId);
           setAccessToken(res.data[0].access as string);
+          setSignupError('');
           navigation.navigate('HomeScreen');
         } else {
+          setSignupError('');
           navigation.navigate('ContactAdminScreen');
         }
       }
