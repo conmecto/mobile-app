@@ -8,6 +8,7 @@ import { COLOR_CODE } from '../utils/enums';
 import findEmail from '../api/find.email';
 import TopBar from '../components/top.bar';
 import environments from '../utils/environments';
+import { getToken } from '../utils/helpers';
 
 type SignupObj = {
   country: string,
@@ -15,7 +16,8 @@ type SignupObj = {
   name?: string,
   appleAuthToken?: string,
   termsAccepted?: boolean,
-  appleAuthUserId?: string
+  appleAuthUserId?: string,
+  deviceToken?: string
 }
 
 FontAwesome.loadFont();
@@ -91,13 +93,16 @@ const SignupHomeScreen = ({ navigation }: any) => {
           }
           name = name.toLowerCase();
         }
+        const deviceTokenObj = await getToken('deviceToken');
         setSignupObj({ 
           ...signupObj, 
           appleAuthToken: appleAuthRequestResponse.identityToken, 
           email: appleAuthRequestResponse.email,
           name,
-          appleAuthUserId: appleAuthRequestResponse.user
+          appleAuthUserId: appleAuthRequestResponse.user,
+          ...(deviceTokenObj ? { deviceToken: deviceTokenObj.password } : {})
         });
+        setSignupError('');
         setEmailCheck(true);
       }
     } catch(error) {

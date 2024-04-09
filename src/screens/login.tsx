@@ -8,7 +8,7 @@ import verifyOtp from '../api/otp.verify';
 import TopBar from '../components/top.bar';
 import environments from '../utils/environments';
 import { setAccessToken } from '../utils/token';
-import { saveToken } from '../utils/helpers';
+import { saveToken, getToken } from '../utils/helpers';
 
 type LoginObj = {
   appleAuthUserId?: string,
@@ -71,9 +71,11 @@ const LoginScreen = ({ navigation }: any) => {
       if (!appleAuthRequestResponse.identityToken || !appleAuthRequestResponse.user) {
         throw new Error();
       } else {
+        const deviceTokenObj = await getToken('deviceToken');
         setLoginObj({ 
           appleAuthUserId: appleAuthRequestResponse.user,
-          appleAuthToken: appleAuthRequestResponse.identityToken
+          appleAuthToken: appleAuthRequestResponse.identityToken,
+          ...(deviceTokenObj ? { deviceToken: deviceTokenObj.password } : {})
         });
         setLoginUser(true);
       }
