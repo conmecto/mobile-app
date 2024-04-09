@@ -8,10 +8,10 @@ import verifyOtp from '../api/otp.verify';
 import TopBar from '../components/top.bar';
 import environments from '../utils/environments';
 import { setAccessToken } from '../utils/token';
-import { saveToken, getToken } from '../utils/helpers';
+import { saveToken } from '../utils/helpers';
 
 type LoginObj = {
-  userId?: number,
+  appleAuthUserId?: string,
   appleAuthToken?: string,
   deviceToken?: string
 }
@@ -30,10 +30,6 @@ const LoginScreen = ({ navigation }: any) => {
   useEffect(() => {
     let check = true;
     const callLogin = async () => {
-      const userIdObj = await getToken('userId');
-      if (userIdObj) {
-        loginObj.userId = Number(userIdObj?.password);
-      }
       const res = await verifyOtp(loginObj);
       if (check) {
         setLoginObj({});
@@ -41,7 +37,7 @@ const LoginScreen = ({ navigation }: any) => {
         if (res && res.errorCode && res.errorCode === ERROR_CODES.TOKEN_INVALID) {
           setLoginError('Invalid token, please retry with same apple id you used for creating user');
         } else if (res && res.errorCode && res.errorCode === ERROR_CODES.USER_NOT_FOUND) {
-          setLoginError('Please retry with same apple id you used for creating user');
+          setLoginError('User not found, please remove apple sign in permission and sign up first');
         } else if (res && res.data) {
           const userId = res.data[0].userId as number;
           const key = userId + ':auth:token';
@@ -72,11 +68,11 @@ const LoginScreen = ({ navigation }: any) => {
         requestedOperation: appleAuth.Operation.LOGIN,
         requestedScopes: []
       });
-      if (!appleAuthRequestResponse.identityToken) {
+      if (!appleAuthRequestResponse.identityToken || !appleAuthRequestResponse.user) {
         throw new Error();
       } else {
         setLoginObj({ 
-          ...loginObj, 
+          appleAuthUserId: appleAuthRequestResponse.user,
           appleAuthToken: appleAuthRequestResponse.identityToken
         });
         setLoginUser(true);
@@ -85,7 +81,7 @@ const LoginScreen = ({ navigation }: any) => {
       if (environments.appEnv !== 'prod') {
         console.log('Apple sign in error', error);
       }
-      setLoginError('Something went wrong, please retry');
+      setLoginError('Something went wrong, please retry or contact admin@conmecto.com');
     }
   }
 

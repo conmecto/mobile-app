@@ -2,7 +2,7 @@ import Environments from '../utils/environments';
 import { ERROR_CODES } from '../utils/enums';
 
 type LoginObj = {
-  userId?: number,
+  appleAuthUserId?: string,
   appleAuthToken?: string,
   deviceToken?: string
 }
