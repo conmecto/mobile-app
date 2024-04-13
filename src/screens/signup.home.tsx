@@ -31,31 +31,10 @@ const SignupHomeScreen = ({ navigation }: any) => {
   const [signupObj, setSignupObj] = useState<SignupObj>({ country: 'india' });
   const [signupError, setSignupError] = useState('');
   const [showTerms, setShowTerms] = useState(false);
-  const [emailCheck, setEmailCheck] = useState(false);
-
+  
   const onPressTerms = () => {
     setSignupObj({ ...signupObj, termsAccepted: !signupObj.termsAccepted })
   }
-
-  useEffect(() => {
-    let check = true;
-    const callEmailCheck = async () => {
-      const res = await findEmail(signupObj.email as string);
-      if (check) {
-        setEmailCheck(false);
-        if (res?.userId) {
-          setSignupObj({ country: 'india' });
-          setSignupError('This email already exists, please login instead');
-        }
-      }
-    }
-    if (emailCheck) {
-      callEmailCheck();
-    }
-    return () => {
-      check = false;
-    }
-  }, [emailCheck]);
 
   const onPressNextHandler = () => {
     let error = '';
@@ -80,9 +59,7 @@ const SignupHomeScreen = ({ navigation }: any) => {
         requestedOperation: appleAuth.Operation.LOGIN,
         requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL]
       });
-      if (!appleAuthRequestResponse.email) {
-        setSignupError('Please allow email access for signin');
-      } else if (!appleAuthRequestResponse.identityToken) {
+      if (!appleAuthRequestResponse.identityToken || !appleAuthRequestResponse.user) {
         throw new Error();
       } else {
         let name = '';
@@ -97,13 +74,12 @@ const SignupHomeScreen = ({ navigation }: any) => {
         setSignupObj({ 
           ...signupObj, 
           appleAuthToken: appleAuthRequestResponse.identityToken, 
-          email: appleAuthRequestResponse.email,
+          ...(appleAuthRequestResponse.email ? { email: appleAuthRequestResponse.email } : {}),
           name,
           appleAuthUserId: appleAuthRequestResponse.user,
           ...(deviceTokenObj ? { deviceToken: deviceTokenObj.password } : {})
         });
         setSignupError('');
-        setEmailCheck(true);
       }
     } catch(error) {
       if (environments.appEnv !== 'prod') {

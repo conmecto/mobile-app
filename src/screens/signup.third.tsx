@@ -62,18 +62,14 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
 
   useEffect(() => {
     let check = true;
-    let timerId1: NodeJS.Timeout;
-    let timerId2: NodeJS.Timeout; 
+    let timerId: NodeJS.Timeout;
     const callCreateUser = async () => {
       const res = await createUser(finalSignupObj);
       if (check) {
         setCreateUserCheck(false);
         if (res?.errorCode === ERROR_CODES.TOKEN_INVALID) {
           setSignupError('Token expired or invalid, please retry');
-          timerId1 = setTimeout(() => navigation.navigate('SignupHomeScreen'), 3000);
-        } else if (res?.errorCode === ERROR_CODES.INVALID_EMAIL) {
-          setSignupError('Invalid email, please retry');
-          timerId2 = setTimeout(() => navigation.navigate('SignupHomeScreen'), 3000);
+          timerId = setTimeout(() => navigation.navigate('SignupHomeScreen'), 3000);
         } else if (res?.data && res.data[0].userId) {
           const userId = res.data[0].userId as number;
           const key = userId + ':auth:token';
@@ -95,8 +91,7 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
       callCreateUser();
     }
     return () => {
-      clearTimeout(timerId1);
-      clearTimeout(timerId2)
+      clearTimeout(timerId);
       check = false;
     }
   }, [createUserCheck]);
