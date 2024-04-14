@@ -68,8 +68,11 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
       if (check) {
         setCreateUserCheck(false);
         if (res?.errorCode === ERROR_CODES.TOKEN_INVALID) {
-          setSignupError('Token expired or invalid, please retry');
-          timerId = setTimeout(() => navigation.navigate('SignupHomeScreen'), 3000);
+          setSignupError('Token expired or invalid, Please retry');
+          timerId = setTimeout(() => navigation.navigate('WelcomeScreen'), 3000);
+        } else if (res?.errorCode === ERROR_CODES.DUPLICATE_USER) {
+          setSignupError('You have already signed up, Please login');
+          timerId = setTimeout(() => navigation.navigate('WelcomeScreen'), 3000);
         } else if (res?.data && res.data[0].userId) {
           const userId = res.data[0].userId as number;
           const key = userId + ':auth:token';

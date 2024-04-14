@@ -38,8 +38,8 @@ const SignupHomeScreen = ({ navigation }: any) => {
 
   const onPressNextHandler = () => {
     let error = '';
-    if (!signupObj.email || !signupObj.appleAuthToken) {
-      error = 'Please sign in with email access';
+    if (!signupObj.appleAuthToken) {
+      error = 'Apple sign in error, Please retry';
     }
     if (!signupObj.termsAccepted) {
       error = 'Please read and accept the Term and Conditions';

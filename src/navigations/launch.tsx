@@ -24,9 +24,9 @@ const LaunchStackNavigator = () => {
     const userIdObj = await getToken('userId');
     if (userIdObj) {
       const userId = Number(userIdObj?.password);
+      setUserId(userId);
       const authCheckRes = await updateTokens(userId);
       if (authCheckRes) {
-        setUserId(userId);
         setInitialScreen('HomeScreen');
       }
     }

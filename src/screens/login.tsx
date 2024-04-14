@@ -37,7 +37,7 @@ const LoginScreen = ({ navigation }: any) => {
         if (res && res.errorCode && res.errorCode === ERROR_CODES.TOKEN_INVALID) {
           setLoginError('Invalid token, please retry with same apple id you used for creating user');
         } else if (res && res.errorCode && res.errorCode === ERROR_CODES.USER_NOT_FOUND) {
-          setLoginError('User not found, please sign up first');
+          setLoginError('User not found, Please sign up first');
         } else if (res && res.data) {
           const userId = res.data[0].userId as number;
           const key = userId + ':auth:token';
