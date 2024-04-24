@@ -8,10 +8,16 @@ import MatchNavigator from '../navigations/match';
 import { getUserId } from '../utils/user.id';
   
 type UserMatchRes = {
-  id: number,
-  score: number,
-  createdAt: Date,
+  matchId?: number,
+  score?: number,
+  createdAt?: Date,
   matchedUserId?: number
+  city?: string,
+  country?: string,
+  settingId: number,
+  userId: number,
+  totalMatchScore: number,
+  pinnedPostId?: number
 }
 
 const MatchScreen = ({ navigation, route }: any) => {
@@ -25,10 +31,15 @@ const MatchScreen = ({ navigation, route }: any) => {
       const res = await getUserMatch(userId);
       if (check) {
         if (res) {
+          const matchRes = omit({
+            ...res, 
+            matchUserId: res.userId1 === userId ? res.userId2 : res.userId1,
+            matchId: res.id
+          }, ['userId1', 'userId2', 'id'])
           if (res.userId1 === userId) {
-            setUserMatchRes(omit({ ...res, matchedUserId: res.userId2}, ['userId1', 'userId2']));
+            setUserMatchRes(matchRes);
           } else {
-            setUserMatchRes(omit({ ...res, matchedUserId: res.userId1}, ['userId1', 'userId2']));
+            setUserMatchRes(matchRes);
           }
         }
         setIsLoading(false);

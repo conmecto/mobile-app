@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import CodeVerificationScreen from '../screens/code.verification';
 import WelcomeScreen from '../screens/welcome';
 import LoginScreen from '../screens/login';
 import SignupHomeScreen from '../screens/signup.home';
@@ -55,7 +54,6 @@ const LaunchStackNavigator = () => {
             <Stack.Screen name='SignupHomeScreen' component={SignupHomeScreen} options={{headerShown: false}}/>
             <Stack.Screen name='SignupSecondScreen' component={SignupSecondScreen} options={{headerShown: false, gestureEnabled: false}}/>
             <Stack.Screen name='SignupThirdScreen' component={SignupThirdScreen} options={{headerShown: false, gestureEnabled: false}}/>
-            {/* <Stack.Screen name='CodeVerificationScreen' component={CodeVerificationScreen} options={{headerShown: false}}/> */}
             <Stack.Screen name='HomeScreen' component={HomeScreen} options={{headerShown: false, gestureEnabled: false}} />
             <Stack.Screen name='ContactAdminScreen' component={ContactAdminScreen} options={{headerShown: false}}/>
           </Stack.Navigator>

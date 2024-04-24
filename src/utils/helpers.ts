@@ -77,16 +77,30 @@ const formatText = (text: string | undefined) => {
 }
 
 const fireColorScoreBased = (score: number) => {
-  if (score >= 1 && score < 100) {
+  if (score >= 0 && score < 100) {
     return COLOR_CODE.BRIGHT_RED;
   } else if (score >= 100 && score < 500) {
     return COLOR_CODE.FIRE_YELLOW;
   } else if (score >= 500 && score < 1000) {
     return COLOR_CODE.FIRE_GREEN;
-  } else if (score >= 1000 && score <= 2000) {
+  } else if (score >= 1000 && score <= 5000) {
     return COLOR_CODE.FIRE_PURPLE;
   } else {
     return COLOR_CODE.FIRE_SILVER;
+  }
+}
+
+const getNextMaxScore = (score: number) => {
+  if (score >= 0 && score < 100) {
+    return 100;
+  } else if (score >= 100 && score < 500) {
+    return 500;
+  } else if (score >= 500 && score < 1000) {
+    return 1000;
+  } else if (score >= 1000 && score <= 5000) {
+    return 5000;
+  } else {
+    return 10000;
   }
 }
 
@@ -94,7 +108,7 @@ const updateTokens = async (userId: number) => {
   if (!userId) {
     return false;
   }
-  const authToken = await getToken(userId + ':auth:token');    
+  const authToken = await getToken(userId + ':auth:token');  
   if (!authToken) {
     return false;
   }
@@ -112,4 +126,7 @@ const updateTokens = async (userId: number) => {
   return false;
 }
 
-export { formatPayloadDob, saveToken, getToken, getAge, deleteToken, formatText, fireColorScoreBased, updateTokens }
+export { 
+  formatPayloadDob, saveToken, getToken, getAge, deleteToken, formatText, fireColorScoreBased, updateTokens, 
+  getNextMaxScore 
+}

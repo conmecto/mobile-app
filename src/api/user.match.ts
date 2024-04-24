@@ -4,11 +4,17 @@ import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
 
 type UserMatchRes = {
-  id: number,
-  userId1: number,
-  userId2: number,
-  score: number,
-  createdAt: Date
+  id?: number,
+  userId1?: number,
+  userId2?: number,
+  score?: number,
+  createdAt?: Date,
+  city?: string,
+  country?: string,
+  settingId: number,
+  userId: number,
+  totalMatchScore: number,
+  pinnedPostId?: number
 }
 const getUserMatch = async (userId: number, callIfUnauthorized: boolean = true): Promise<UserMatchRes | undefined> => {
   try {

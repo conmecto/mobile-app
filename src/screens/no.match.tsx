@@ -1,199 +1,262 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import LinearGradient from 'react-native-linear-gradient';
+import { check, PERMISSIONS, RESULTS, request } from 'react-native-permissions';
+import { launchImageLibrary, ImageLibraryOptions, Asset } from 'react-native-image-picker';
+import { Button, ProgressBar } from 'react-native-paper';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLOR_CODE } from '../utils/enums';
+import environments from '../utils/environments';
+import { profilePictureOptions, maxImageSizeBytes, allowedImageTypes } from '../utils/constants';
+import { NO_MATCH_GIF } from '../files';
+import Loading from '../components/loading';
+import updatePinnedPost from '../api/update.pinned.post';
+import { getNextMaxScore, fireColorScoreBased } from '../utils/helpers';
 
 FontAwesome.loadFont();
+MaterialCommunityIcons.loadFont();
 
-const { width, height } = Dimensions.get('window');
+type UserMatchRes = {
+  matchId?: number,
+  score?: number,
+  createdAt?: Date,
+  matchedUserId?: number
+  city?: string,
+  country?: string,
+  settingId: number,
+  userId: number,
+  totalMatchScore: number,
+  pinnedPostId?: number
+}
 
-const NoMatchScreen = () => {  
+const NoMatchScreen = ({ route }: any) => {  
+  const setting: UserMatchRes = route?.params?.userMatchRes;
+  const [uploadImageError, setUploadImageError] = useState('');
+  const [pinnedPost, setPinnedPost] = useState<Asset>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [settingObj, setSettingObj] = useState<UserMatchRes>(setting);
+      
+  useEffect(() => {
+    let check = true;
+    const callUpdatePinnedImage = async () => {
+      const res = await updatePinnedPost(settingObj.userId, pinnedPost as Asset);
+      if (check) {
+        setIsLoading(false);
+        setPinnedPost(undefined);
+        if (res && res.postId) {
+          settingObj.pinnedPostId = res.postId;
+          setSettingObj(settingObj);
+        }
+      }
+    }
+    if (pinnedPost && !isLoading) {
+      setIsLoading(true);
+      callUpdatePinnedImage();
+    }
+    return () => {
+      check = false;
+    }
+  }, [pinnedPost])
+
+  const handleFileImport = () => {
+    launchImageLibrary(profilePictureOptions as ImageLibraryOptions, res => {
+      if (res.errorMessage) {
+        setUploadImageError(res.errorMessage);
+      } else if (res.assets?.length) {
+        const asset = res.assets[0];
+        if (!asset.fileSize || !asset.type) {
+          setUploadImageError('Corrupt file');    
+        } else if (asset.fileSize > maxImageSizeBytes) {
+          setUploadImageError('File size exceed 10mb');    
+        } else if (!allowedImageTypes.includes(asset.type)) {
+          setUploadImageError('File type not supported');    
+        } else {
+          setUploadImageError('');
+          setPinnedPost(asset);
+        }
+      }
+    });
+  }
+
+  const onUploadImageHandler = () => {
+    check(PERMISSIONS.IOS.PHOTO_LIBRARY).then(result => {
+      switch(result) {
+        case RESULTS.UNAVAILABLE:
+          break;
+        case RESULTS.DENIED:
+          request(PERMISSIONS.IOS.PHOTO_LIBRARY).then(result => {
+            if (environments.appEnv !== 'prod') {
+              console.log('request result', result)
+            }
+          }).catch(error => {
+            if (environments.appEnv !== 'prod') {
+              console.log('request error', error)
+            }
+          });
+        case RESULTS.LIMITED:
+        case RESULTS.GRANTED:
+          handleFileImport();
+          break;
+        case RESULTS.BLOCKED:
+          setUploadImageError('Please allow photos access from the settings');
+          break;
+        default: 
+          break;
+      }
+    }).catch(error => { 
+      if (environments.appEnv !== 'prod') {
+        console.log('upload image error', error)
+      }
+    });
+  }
+  
+  const maxScore = getNextMaxScore(settingObj.totalMatchScore);
+  const progressBarValue = () => {
+    return Number((settingObj.totalMatchScore / maxScore).toFixed(2));
+  }
+  
   return (
-    <SafeAreaView style={styles.noMatchContainer}> 
-      <View style={styles.noMatchMessageContainer}>
-        <FontAwesome name='info-circle' color='red' size={25} />
-        <Text numberOfLines={2} adjustsFontSizeToFit style={styles.noMatchText}>
-          We will notify you as soon as we find the Perfect Match for you.
-        </Text>
-      </View>
-      <View style={styles.tipsContainer}>
-        <LinearGradient colors={[COLOR_CODE.BRIGHT_BLUE, COLOR_CODE.BRIGHT_RED]} style={styles.gradient}>
-          <View style={styles.tipsTitleContainer}>
-            <Text style={styles.tipsTitle}>About the Game</Text>
+      isLoading ?
+      (<Loading />) :
+      (
+        <View style={styles.mainContainer}>
+          <View style={styles.noMatchInfoContainer}>
+            <FontAwesome name='info-circle' color='red' size={20} />
+            <Text numberOfLines={2} adjustsFontSizeToFit style={styles.noMatchText}>
+              We will notify you as soon as Conmecto Bot find a Match for you
+            </Text>
           </View>
-
-          <View style={styles.settingTipContainer}>
-            <View style={styles.settingIconContainer}>
-              <FontAwesome name='gear' color={COLOR_CODE.BLACK} size={30}/>
-            </View>
-            <View style={styles.settingInfoContainer}>
-              <Text numberOfLines={4} adjustsFontSizeToFit style={styles.settingInfo}>Try different settings to increase your chances for a match e.g. city or age</Text>
-            </View>
+          <View style={styles.uploadOrSearchingContainer}>
+            { 
+              settingObj?.pinnedPostId ? 
+              <Image source={NO_MATCH_GIF} style={styles.searchImage}/> : 
+              ( 
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                  <Text numberOfLines={2} adjustsFontSizeToFit style={styles.uploadErrorText}>{uploadImageError}</Text>
+                  <Text>{'\n'}</Text>
+                  <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={onUploadImageHandler} style={styles.uploadButton} labelStyle={styles.uploadButtonText}>
+                    Upload
+                  </Button>
+                  <Text>{'\n'}</Text>
+                  <Text numberOfLines={2} adjustsFontSizeToFit style={styles.uploadText}>Help Conmecto Bot find a connection for you.</Text>
+                  <Text numberOfLines={2} adjustsFontSizeToFit style={styles.uploadText}>Share a beautiful breathtaking shot! 📸</Text>
+                </View>
+              )
+            }
           </View>
-
-          <View style={styles.profileTipContainer}>
-            <View style={styles.profileIconContainer}>
-              <FontAwesome name='user' color={COLOR_CODE.BLACK} size={30}/>
+          <View style={styles.scoreContainer}>
+            <View style={styles.scoreFireContainer}>
+              <View style={styles.leftScoreFireContainer}>
+                <MaterialCommunityIcons name='fire' color={fireColorScoreBased(settingObj.totalMatchScore)} size={50}/> 
+                <Text numberOfLines={1} adjustsFontSizeToFit style={styles.scoreText}>{settingObj.totalMatchScore}</Text>
+              </View>
+              <View style={styles.rightScoreFireContainer}>
+                <MaterialCommunityIcons name='fire' color={fireColorScoreBased(maxScore)} size={50}/> 
+                <Text numberOfLines={1} adjustsFontSizeToFit style={styles.scoreText}>{maxScore}</Text>
+              </View>
             </View>
-            <View style={styles.profileInfoContainer}>
-              <Text numberOfLines={3} adjustsFontSizeToFit style={styles.profileInfo}>Upload posts & add other details for that hot profile</Text>
-            </View>
-          </View>
-
-          <View style={styles.exploreTipContainer}>
-            <View style={styles.exploreIconContainer}>
-              <FontAwesome name='search' color={COLOR_CODE.BLACK} size={30}/>
-            </View>
-            <View style={styles.exploreInfoContainer}>
-              <Text numberOfLines={2} adjustsFontSizeToFit style={styles.exploreInfo}>Explore other users and top matches</Text>
-            </View>
-          </View>
-          
-          <View style={styles.scoreTipContainer}>
-            <View style={styles.scoreIconContainer}>
-              <FontAwesome name='level-up' color={COLOR_CODE.BLACK} size={30}/>
-            </View>
-            <View style={styles.scoreInfoContainer}>
-              <Text numberOfLines={4} adjustsFontSizeToFit style={styles.scoreInfo}>When matched, keep the chatting game on to increase your match's score</Text>
+            <View style={{ flex: 1, justifyContent: 'center', paddingLeft: 20, paddingRight: 20 }}>
+              <ProgressBar animatedValue={progressBarValue() || 0.05} color={COLOR_CODE.GREEN} style={styles.barStyle}/>
             </View>
           </View>
-
-        </LinearGradient>
-      </View>
-    </SafeAreaView>
+        </View>
+      )
   );
 }
 
 export default NoMatchScreen;
 
 const styles = StyleSheet.create({
-  noMatchContainer: {
+  mainContainer: {
     flex: 1,
-    alignItems: 'center',
+    //borderWidth: 1,
     backgroundColor: COLOR_CODE.OFF_WHITE
   },
-
-  noMatchMessageContainer: {
+  noMatchInfoContainer: {
     flex: 1,
-    flexDirection: 'row',
+    //borderWidth: 1,
     padding: 10,
-    alignItems: 'center', 
-    justifyContent: 'space-evenly',
-//    borderWidth: 1
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  uploadOrSearchingContainer: {
+    flex: 3,
+    //borderWidth: 1
+  },
+  scoreContainer: {
+    flex: 2,
+    //borderWidth: 1
+  },
+  searchImage: {
+    //borderWidth: 1,
+    height: '100%',
+    width: '75%',
+    alignSelf: 'center'
+  },
+  uploadText: { 
+    color: COLOR_CODE.GREY, 
+    fontSize: 15, 
+    alignSelf: 'center', 
+    fontWeight: 'bold' 
+  },
+  uploadButton: {
+    height: 60,
+    width: 150,
+    borderRadius: 30,
+    justifyContent: 'center',
+  },
+  uploadButtonText: {
+    fontSize: 20
+  },
+  uploadErrorText: {
+    color: COLOR_CODE.BRIGHT_RED, 
+    fontSize: 15, 
+    alignSelf: 'center', 
+    fontWeight: 'bold' 
+  },
+  gradient: {
+    height: '50%',
+    width: '90%',
+    borderRadius: 30,
+    backgroundColor: COLOR_CODE.BRIGHT_BLUE,
+    padding: 10,
+    justifyContent: 'space-evenly'
   },
   noMatchText: {
     color: COLOR_CODE.BRIGHT_BLUE,
     paddingLeft: 10,
-    fontSize: 15,
-    fontWeight: '800'
+    fontSize: 12,
+    fontWeight: 'bold'
   },
-
-  tipsContainer: {
-    flex: 10,
-    width: '90%',
-    borderRadius: 30,
-    marginBottom: height * 0.01,
+  scoreText: { 
+    paddingLeft: 10, 
+    paddingRight: 10,
+    fontSize: 20, 
+    fontWeight: 'bold'
   },
-  gradient: {
-    flex: 1,
-    borderRadius: 30,
-    marginBottom: height * 0.01,
-  },
-
-  tipsTitleContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  tipsTitle: {
-    color: COLOR_CODE.OFF_WHITE,
-    fontSize: height * 0.03,
-    fontWeight: '900',
-    textDecorationLine: 'underline'
-  },
-  
-  settingTipContainer: {
-    flex: 2,
+  scoreFireContainer: { 
+    flex: 2, 
+    //borderWidth: 1, 
     flexDirection: 'row'
   },
-  settingIconContainer: {
-    flex: 1,
-    alignItems: 'center',
+  leftScoreFireContainer: { 
+    flex: 1, 
+    //borderWidth: 1, 
     justifyContent: 'center',
+    paddingLeft: 10
   },
-  settingInfoContainer: {
-    flex: 3,
-    padding: 5,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
+  rightScoreFireContainer: { 
+    flex: 1, 
+    //borderWidth: 1, 
+    justifyContent: 'center', 
+    alignItems: 'flex-end',
+    paddingRight: 10
   },
-  settingInfo: {
-    color: COLOR_CODE.OFF_WHITE,
-    fontSize: height * 0.025,
-    fontWeight: '900',
-  },
-
-  profileTipContainer: {
-    flex: 2,
-    flexDirection: 'row'
-  },
-  profileIconContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  profileInfoContainer: {
-    flex: 3,
-    padding: 5,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-  },
-  profileInfo: {
-    color: COLOR_CODE.OFF_WHITE,
-    fontSize: height * 0.025,
-    fontWeight: '900',
-  },
-
-  exploreTipContainer: {
-    flex: 2,
-    flexDirection: 'row',
-  },
-  exploreIconContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  exploreInfoContainer: {
-    flex: 3,
-    padding: 5,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-  },
-  exploreInfo: {
-    color: COLOR_CODE.OFF_WHITE,
-    fontSize: height * 0.025,
-    fontWeight: '900',
-  },
-
-  scoreTipContainer: {
-    flex: 2,
-    flexDirection: 'row',
-  },
-  scoreIconContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scoreInfoContainer: {
-    flex: 3,
-    padding: 5,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-  },
-  scoreInfo: {
-    color: COLOR_CODE.OFF_WHITE,
-    fontSize: height * 0.025,
-    fontWeight: '900',
-  },
+  barStyle: { 
+    height: '60%',
+    borderRadius: 30, 
+    borderWidth: 2, 
+    backgroundColor: COLOR_CODE.OFF_WHITE 
+  }
 });

@@ -10,7 +10,7 @@ const MatchStack = createNativeStackNavigator();
 
 const MatchNavigator = ({ params }: any) => {
   return (
-    <MatchStack.Navigator initialRouteName={params.userMatchRes ? 'MatchHomeScreen' : 'NoMatchScreen'}>
+    <MatchStack.Navigator initialRouteName={params.userMatchRes?.matchId ? 'MatchHomeScreen' : 'NoMatchScreen'}>
       <MatchStack.Screen name='MatchHomeScreen' component={MatchHomeScreen} options={{ headerShown: false }} initialParams={params} />
       <MatchStack.Screen name='MatchChatScreen' component={MatchChatScreen} options={{ headerShown: false }} initialParams={params}/>
       <MatchStack.Screen name='CommonProfileScreen' component={CommonProfileScreen} options={{ headerShown: false }} initialParams={params}/>
