@@ -5,6 +5,7 @@ import MatchChatScreen from '../screens/match.chat';
 import CommonProfileScreen from '../screens/common.profile';
 import ViewPostScreen from '../screens/view.post';
 import NoMatchScreen from '../screens/no.match';
+import CameraScreen from '../screens/camera';
 
 const MatchStack = createNativeStackNavigator();
 
@@ -16,6 +17,7 @@ const MatchNavigator = ({ params }: any) => {
       <MatchStack.Screen name='CommonProfileScreen' component={CommonProfileScreen} options={{ headerShown: false }} initialParams={params}/>
       <MatchStack.Screen name='ViewPostScreen' component={ViewPostScreen} options={{ headerShown: false }} initialParams={params}/>
       <MatchStack.Screen name='NoMatchScreen' component={NoMatchScreen} options={{ headerShown: false }} initialParams={params}/>
+      <MatchStack.Screen name='CameraScreen' component={CameraScreen} options={{ headerShown: false }} initialParams={params}/>
     </MatchStack.Navigator>
   );
 }

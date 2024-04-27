@@ -17,10 +17,11 @@ type UserMatchRes = {
   settingId: number,
   userId: number,
   totalMatchScore: number,
-  pinnedPostId?: number
+  pinnedPostId?: number,
+  chatNotification?: boolean
 }
 
-const MatchScreen = ({ navigation, route }: any) => {
+const MatchScreen = ({ route }: any) => {
   const [isLoading, setIsLoading] = useState(true);
   const [userMatchRes, setUserMatchRes] = useState<UserMatchRes | null>(null);
   const userId = getUserId() as number;

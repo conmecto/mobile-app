@@ -14,7 +14,8 @@ type UserMatchRes = {
   settingId: number,
   userId: number,
   totalMatchScore: number,
-  pinnedPostId?: number
+  pinnedPostId?: number,
+  chatNotification?: boolean
 }
 const getUserMatch = async (userId: number, callIfUnauthorized: boolean = true): Promise<UserMatchRes | undefined> => {
   try {

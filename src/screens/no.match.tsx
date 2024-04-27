@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { check, PERMISSIONS, RESULTS, request } from 'react-native-permissions';
 import { launchImageLibrary, ImageLibraryOptions, Asset } from 'react-native-image-picker';
-import { Button, ProgressBar } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLOR_CODE } from '../utils/enums';
 import environments from '../utils/environments';
@@ -11,7 +11,8 @@ import { profilePictureOptions, maxImageSizeBytes, allowedImageTypes } from '../
 import { NO_MATCH_GIF } from '../files';
 import Loading from '../components/loading';
 import updatePinnedPost from '../api/update.pinned.post';
-import { getNextMaxScore, fireColorScoreBased } from '../utils/helpers';
+import { getNextMaxScore } from '../utils/helpers';
+import ScoreProgressBar from '../components/score.progress';
 
 FontAwesome.loadFont();
 MaterialCommunityIcons.loadFont();
@@ -109,12 +110,7 @@ const NoMatchScreen = ({ route }: any) => {
       }
     });
   }
-  
-  const maxScore = getNextMaxScore(settingObj.totalMatchScore);
-  const progressBarValue = () => {
-    return Number((settingObj.totalMatchScore / maxScore).toFixed(2));
-  }
-  
+    
   return (
       isLoading ?
       (<Loading />) :
@@ -145,19 +141,7 @@ const NoMatchScreen = ({ route }: any) => {
             }
           </View>
           <View style={styles.scoreContainer}>
-            <View style={styles.scoreFireContainer}>
-              <View style={styles.leftScoreFireContainer}>
-                <MaterialCommunityIcons name='fire' color={fireColorScoreBased(settingObj.totalMatchScore)} size={50}/> 
-                <Text numberOfLines={1} adjustsFontSizeToFit style={styles.scoreText}>{settingObj.totalMatchScore}</Text>
-              </View>
-              <View style={styles.rightScoreFireContainer}>
-                <MaterialCommunityIcons name='fire' color={fireColorScoreBased(maxScore)} size={50}/> 
-                <Text numberOfLines={1} adjustsFontSizeToFit style={styles.scoreText}>{maxScore}</Text>
-              </View>
-            </View>
-            <View style={{ flex: 1, justifyContent: 'center', paddingLeft: 20, paddingRight: 20 }}>
-              <ProgressBar animatedValue={progressBarValue() || 0.05} color={COLOR_CODE.GREEN} style={styles.barStyle}/>
-            </View>
+            <ScoreProgressBar totalMatchScore={settingObj.totalMatchScore} />
           </View>
         </View>
       )

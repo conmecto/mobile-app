@@ -16,7 +16,8 @@ type UserProfileRes = {
   interests?: string,
   profilePicture?: string,
   userId: number,
-  name: string
+  name: string,
+  age: number
 }
 
 const getUserProfile = async (userId: number, callIfUnauthorized: boolean = true): Promise<UserProfileRes | undefined> => {
