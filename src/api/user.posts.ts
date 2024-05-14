@@ -11,7 +11,8 @@ type UserPost = {
   fileMetadataId: number,
   createdAt: Date,
   updatedAt: Date,
-  deletedAt?: Date | null
+  deletedAt?: Date | null,
+  pinned: boolean
 }
 
 type PaginationOptions = {

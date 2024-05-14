@@ -15,7 +15,8 @@ enum COLOR_CODE {
   FIRE_YELLOW = '#FEDE17',
   FIRE_GREEN = '#00D100',
   FIRE_PURPLE = '#702963',
-  FIRE_SILVER = '#C0C0C0'
+  FIRE_SILVER = '#C0C0C0',
+  RED = 'red'
 }
 
 enum ERROR_CODES {
@@ -47,6 +48,7 @@ enum ERROR_CODES {
 
 enum ChatSocketEvents {
   SAVE_MESSAGE = 'save-message',
+  SAVE_FILE = 'save-file',
   MARK_MESSAGES_AS_READ = 'mark-messages-as-read',
   MESSAGE_RECEIVED = 'message-received'
 }
