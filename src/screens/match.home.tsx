@@ -8,7 +8,6 @@ import getUserProfile from '../api/user.profile';
 import { createChatSocketConnection, getChatSocketInstance } from '../sockets/chat.socket';
 import updateChatsRead from '../api/update.chats.read';
 import { getUserId } from '../utils/user.id'; 
-import ScoreProgressBar from '../components/score.progress';
 import MatchedUser from '../components/matched.user';
 
 type UserProfileRes = {
@@ -48,7 +47,7 @@ MaterialCommunityIcons.loadFont();
 const MatchHomeScreen = ({ route, navigation }: any) => {
   const setting: UserMatchRes = route?.params?.userMatchRes;
   const userId = getUserId() as number;
-  const matchedUserId = setting?.matchedUserId || 46;
+  const matchedUserId = setting?.matchedUserId;
   const matchId = setting?.matchId;
   const [matchedUserProfile, setMatchedUserProfile] = useState<UserProfileRes>();
   const [markChatsRead, setMarkChatsRead] = useState(false);
@@ -105,37 +104,32 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
  
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.scoreContainer}>
-        <ScoreProgressBar totalMatchScore={(setting?.totalMatchScore || 5)} />
-      </View>
-      <View style={{ flex: 2 }}>
-        <View style={styles.matchedUserContainer}> 
-        {
-          setting?.chatNotification ?
-          (  
-            <LinearGradient colors={[COLOR_CODE.BRIGHT_RED, COLOR_CODE.OFF_WHITE]} style={styles.gradient}>
-              { 
-                matchedUserProfile ? 
-                <MatchedUser matchedUserProfile={matchedUserProfile} matchScore={setting.score as number} onPressMatchedUser={onPressMatchedUser}/> : 
-                (<Text style={{ alignSelf: 'center'}}>Profile load failed</Text>) 
-              }
-            </LinearGradient>       
-          ) : (
-            <View style={styles.noNotificationContainer}>
-              { 
-                matchedUserProfile ? 
-                <MatchedUser matchedUserProfile={matchedUserProfile} matchScore={setting.score as number} onPressMatchedUser={onPressMatchedUser}/> : 
-                (<Text style={{ alignSelf: 'center'}}>Profile load failed</Text>) 
-              }
-            </View>
-          )
-        }
-        </View>    
-        <View style={styles.cameraContainer}>
-          <TouchableOpacity onPress={onPressCamera} style={styles.cameraTouchable}>
-            <Ionicons name='camera' size={40} color={COLOR_CODE.OFF_WHITE}/> 
-          </TouchableOpacity>
-        </View>
+      <View style={styles.matchedUserContainer}> 
+      {
+        setting?.chatNotification ?
+        (  
+          <LinearGradient colors={[COLOR_CODE.BRIGHT_RED, COLOR_CODE.OFF_WHITE]} style={styles.gradient}>
+            { 
+              matchedUserProfile ? 
+              <MatchedUser matchedUserProfile={matchedUserProfile} matchScore={setting.score as number} onPressMatchedUser={onPressMatchedUser}/> : 
+              (<Text style={{ alignSelf: 'center'}}>Profile load failed</Text>) 
+            }
+          </LinearGradient>       
+        ) : (
+          <View style={styles.noNotificationContainer}>
+            { 
+              matchedUserProfile ? 
+              <MatchedUser matchedUserProfile={matchedUserProfile} matchScore={setting.score as number} onPressMatchedUser={onPressMatchedUser}/> : 
+              (<Text style={{ alignSelf: 'center'}}>Profile load failed</Text>) 
+            }
+          </View>
+        )
+      }
+      </View>    
+      <View style={styles.cameraContainer}>
+        <TouchableOpacity onPress={onPressCamera} style={styles.cameraTouchable}>
+          <Ionicons name='camera' size={40} color={COLOR_CODE.OFF_WHITE}/> 
+        </TouchableOpacity>
       </View>
     </View>
   )
@@ -166,10 +160,6 @@ const styles = StyleSheet.create({
     }, 
     shadowOpacity: 0.5, 
     backgroundColor: COLOR_CODE.OFF_WHITE 
-  },
-  scoreContainer: {
-    flex: 1,
-    //borderWidth: 1
   },
   cameraContainer: { 
     flex: 1, 

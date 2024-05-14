@@ -3,14 +3,17 @@ import { Dimensions } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Foundation from 'react-native-vector-icons/Foundation';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import MatchScreen from '../screens/match';
 import SettingScreen from '../screens/setting';
 import { COLOR_CODE } from '../utils/enums';
-import ExploreNavigator from './explore';
+// import ExploreNavigator from './explore';
 import ProfileNavigator from './profile';
+import FeedScreen from '../screens/feed';
 
-FontAwesome.loadFont();
 Foundation.loadFont();
+FontAwesome.loadFont();
+Ionicons.loadFont();
 
 const Tab = createBottomTabNavigator();
 
@@ -32,17 +35,23 @@ const HomeTabNavigator = (data: any) => {
         unmountOnBlur: true
       }}>
 
-      <Tab.Screen name='MatchScreen' component={MatchScreen} options={{ 
+      <Tab.Screen name='FeedScreen' component={FeedScreen} options={{ 
         tabBarLabel: 'Match', headerShown: false, 
         tabBarIcon: ({focused, color, size}) => (<Foundation name='home' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={30} />)
         }} 
         initialParams={data.params} />
 
-      <Tab.Screen name='ExploreNavigator' component={ExploreNavigator} options={{ 
+      <Tab.Screen name='MatchScreen' component={MatchScreen} options={{ 
+        tabBarLabel: 'Match', headerShown: false, 
+        tabBarIcon: ({focused, color, size}) => (<Ionicons name='chatbubble-ellipses-outline' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={30} />)
+        }} 
+        initialParams={data.params} />
+
+      {/* <Tab.Screen name='ExploreNavigator' component={ExploreNavigator} options={{ 
         tabBarLabel: 'Explore', headerShown: false,
         tabBarIcon: ({focused, color, size}) => (<FontAwesome name='search' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={25}/>)
         }} 
-        initialParams={data.params} />
+        initialParams={data.params} /> */}
 
       <Tab.Screen name='ProfileNavigator' component={ProfileNavigator} options={{ 
         tabBarLabel: 'Profile', headerShown: false,
