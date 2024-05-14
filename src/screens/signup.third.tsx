@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Dimensions, StyleSheet, FlatList } from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Provider, Portal, Modal, Button } from 'react-native-paper';
 import TopBar from '../components/top.bar';
 import { COLOR_CODE, ERROR_CODES } from '../utils/enums';
@@ -24,8 +23,6 @@ type SignupObj = {
   searchFor?: string,
   gender?: string
 }
-
-FontAwesome.loadFont();
 
 const { height, width } = Dimensions.get('window');
 
@@ -173,7 +170,6 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
           </View>
         </View>
       </Provider>
-      
     </View>
   );
 }

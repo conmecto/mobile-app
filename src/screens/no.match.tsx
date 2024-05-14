@@ -7,11 +7,10 @@ import { Button } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLOR_CODE } from '../utils/enums';
 import environments from '../utils/environments';
-import { profilePictureOptions, maxImageSizeBytes, allowedImageTypes } from '../utils/constants';
+import { pinnedPostOptions, maxImageSizeBytes, allowedImageTypes } from '../utils/constants';
 import { NO_MATCH_GIF } from '../files';
 import Loading from '../components/loading';
-import updatePinnedPost from '../api/update.pinned.post';
-import { getNextMaxScore } from '../utils/helpers';
+//import updatePinnedPost from '../api/update.pinned.post';
 import ScoreProgressBar from '../components/score.progress';
 
 FontAwesome.loadFont();
@@ -40,15 +39,15 @@ const NoMatchScreen = ({ route }: any) => {
   useEffect(() => {
     let check = true;
     const callUpdatePinnedImage = async () => {
-      const res = await updatePinnedPost(settingObj.userId, pinnedPost as Asset);
-      if (check) {
-        setIsLoading(false);
-        setPinnedPost(undefined);
-        if (res && res.postId) {
-          settingObj.pinnedPostId = res.postId;
-          setSettingObj(settingObj);
-        }
-      }
+      // const res = await updatePinnedPost(settingObj.userId, pinnedPost as Asset);
+      // if (check) {
+      //   setIsLoading(false);
+      //   setPinnedPost(undefined);
+      //   if (res && res.postId) {
+      //     settingObj.pinnedPostId = res.postId;
+      //     setSettingObj(settingObj);
+      //   }
+      // }
     }
     if (pinnedPost && !isLoading) {
       setIsLoading(true);
@@ -57,10 +56,10 @@ const NoMatchScreen = ({ route }: any) => {
     return () => {
       check = false;
     }
-  }, [pinnedPost])
+  }, [pinnedPost]);
 
   const handleFileImport = () => {
-    launchImageLibrary(profilePictureOptions as ImageLibraryOptions, res => {
+    launchImageLibrary(pinnedPostOptions as ImageLibraryOptions, res => {
       if (res.errorMessage) {
         setUploadImageError(res.errorMessage);
       } else if (res.assets?.length) {
@@ -141,7 +140,7 @@ const NoMatchScreen = ({ route }: any) => {
             }
           </View>
           <View style={styles.scoreContainer}>
-            <ScoreProgressBar totalMatchScore={settingObj.totalMatchScore} />
+            <ScoreProgressBar totalMatchScore={settingObj?.totalMatchScore} />
           </View>
         </View>
       )

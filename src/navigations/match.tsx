@@ -6,6 +6,8 @@ import CommonProfileScreen from '../screens/common.profile';
 import ViewPostScreen from '../screens/view.post';
 import NoMatchScreen from '../screens/no.match';
 import CameraScreen from '../screens/camera';
+import CapturedCameraScreen from '../screens/captured.camera';
+import UploadFileScreen from '../screens/upload.file';
 
 const MatchStack = createNativeStackNavigator();
 
@@ -18,6 +20,8 @@ const MatchNavigator = ({ params }: any) => {
       <MatchStack.Screen name='ViewPostScreen' component={ViewPostScreen} options={{ headerShown: false }} initialParams={params}/>
       <MatchStack.Screen name='NoMatchScreen' component={NoMatchScreen} options={{ headerShown: false }} initialParams={params}/>
       <MatchStack.Screen name='CameraScreen' component={CameraScreen} options={{ headerShown: false }} initialParams={params}/>
+      <MatchStack.Screen name='CapturedCameraScreen' component={CapturedCameraScreen} options={{ headerShown: false, gestureEnabled: false }}/>
+      <MatchStack.Screen name='UploadFileScreen' component={UploadFileScreen} options={{ headerShown: false, gestureEnabled: false }}/>
     </MatchStack.Navigator>
   );
 }

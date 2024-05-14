@@ -113,7 +113,7 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
         {
           setting?.chatNotification ?
           (  
-            <LinearGradient colors={[COLOR_CODE.OFF_WHITE, COLOR_CODE.BRIGHT_RED]} style={styles.gradient}>
+            <LinearGradient colors={[COLOR_CODE.BRIGHT_RED, COLOR_CODE.OFF_WHITE]} style={styles.gradient}>
               { 
                 matchedUserProfile ? 
                 <MatchedUser matchedUserProfile={matchedUserProfile} matchScore={setting.score as number} onPressMatchedUser={onPressMatchedUser}/> : 

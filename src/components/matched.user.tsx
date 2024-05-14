@@ -1,9 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { fireColorScoreBased, formatText } from '../utils/helpers';
 import { DEFAULT_PROFILE_PIC } from '../files';
+import { COLOR_CODE } from '../utils/enums';
 
+FontAwesome.loadFont();
 MaterialCommunityIcons.loadFont();
 
 type UserProfileRes = {
@@ -42,13 +45,20 @@ const MatchedUser = ({ matchedUserProfile, matchScore, onPressMatchedUser }: pro
         <View style={styles.profilePicContainer}>
           <Image source={profilePictureSource} style={styles.profilePic}/>
         </View>
-        <View style={styles.scoreContainer}>
-          <MaterialCommunityIcons name='fire' color={fireColorScoreBased(matchScore)} size={70}/> 
-          <Text numberOfLines={2} adjustsFontSizeToFit style={styles.scoreText}>{matchScore}</Text>
+        <View style={styles.detailsContainer}>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{formatText(matchedUserProfile.name)}</Text>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{matchedUserProfile.age}</Text>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}><FontAwesome name='map-pin' color={COLOR_CODE.BRIGHT_RED} /> {formatText(matchedUserProfile.city)}</Text>
         </View>
       </View>
       <View style={styles.secondRow}>
-        <Text numberOfLines={1} adjustsFontSizeToFit style={styles.scoreText}>{formatText(matchedUserProfile.name)},  {matchedUserProfile.age}</Text>
+        <View style={styles.scoreHeaderContainer}>
+          <Text style={styles.headerText}>Match Streak</Text>
+        </View>
+        <View style={styles.scoreContainer}>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{matchScore}</Text>
+          <MaterialCommunityIcons name='fire' color={fireColorScoreBased(matchScore)} size={50}/> 
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -69,10 +79,10 @@ const styles = StyleSheet.create({
   secondRow: { 
     flex: 1, 
     alignItems: 'center', 
-    justifyContent: 'center' 
+    justifyContent: 'center'
   },
   profilePicContainer: { 
-    flex: 1.5, 
+    flex: 1, 
     alignItems: 'center', 
     justifyContent: 'center' 
   },
@@ -82,13 +92,28 @@ const styles = StyleSheet.create({
     borderRadius: 100, 
     borderWidth: 1 
   },
+  detailsContainer: { 
+    flex: 1.5, 
+    alignItems: 'flex-start', 
+    justifyContent: 'center' 
+  },
+  commonText: { 
+    fontSize: 25, 
+    fontWeight: 'bold' 
+  },
   scoreContainer: { 
+    flex: 4, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center' 
+  },
+  scoreHeaderContainer: { 
     flex: 1, 
     alignItems: 'center', 
     justifyContent: 'center' 
   },
-  scoreText: { 
-    fontSize: 25, 
-    fontWeight: '900' 
+  headerText: { 
+    fontSize: 10, 
+    fontWeight: 'bold' 
   }
 });
