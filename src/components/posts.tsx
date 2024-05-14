@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Image } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Entypo from 'react-native-vector-icons/Entypo';
 import { check, PERMISSIONS, RESULTS, request } from 'react-native-permissions';
 import { launchImageLibrary, ImageLibraryOptions, Asset } from 'react-native-image-picker';
-import Video from 'react-native-video';
 import { COLOR_CODE } from '../utils/enums';
 import { postOptions, maxFileSizeBytes, allowedFileTypes } from '../utils/constants';
 import addPost from '../api/add.post';
@@ -17,10 +17,12 @@ type UserPost = {
   fileMetadataId: number,
   createdAt: Date,
   updatedAt: Date,
-  deletedAt?: Date | null
+  deletedAt?: Date | null,
+  pinned: boolean
 }
 
 FontAwesome.loadFont();
+Entypo.loadFont();
 
 const { width, height } = Dimensions.get('window');
 
@@ -167,12 +169,10 @@ const Posts = ({ navigation, posts, userId, setPostPagination, setIsPostLoading,
                 <View style={styles.postContainer}>
                   <TouchableOpacity style={styles.pressableThumbnail} onPress={() => onPressPostHandler(post[0])}>
                     { 
-                      post[0].type === 'image' ? 
-                      (
-                        <Image source={{ uri: post[0].location }} style={styles.postThumbnail} />    
-                      ) : (
-                        <Video source={{ uri: post[0].location }} style={styles.postThumbnail} paused={true} />
-                      )
+                      <Image source={{ uri: post[0].location }} style={styles.postThumbnail} />    
+                    }
+                    {
+                      post[0].pinned && <Entypo name='pin' color={COLOR_CODE.OFF_WHITE} size={30} style={styles.pinIcon}/>
                     }
                     <FontAwesome name={post[0].type === 'image' ? 'camera' : 'video-camera'} color={COLOR_CODE.OFF_WHITE} size={height * 0.03} style={styles.fileTypeIcon} />        
                   </TouchableOpacity>
@@ -183,12 +183,7 @@ const Posts = ({ navigation, posts, userId, setPostPagination, setIsPostLoading,
                     (
                       <TouchableOpacity style={styles.pressableThumbnail} onPress={() => onPressPostHandler(post[1])}>
                         { 
-                          post[1].type === 'image' ? 
-                          (
-                            <Image source={{ uri: post[1].location }} style={styles.postThumbnail} />
-                          ) : (
-                            <Video source={{ uri: post[1].location }} style={styles.postThumbnail} paused={true} />
-                          )
+                          <Image source={{ uri: post[1].location }} style={styles.postThumbnail} />
                         }
                         <FontAwesome name={post[1].type === 'image' ? 'camera' : 'video-camera'} color={COLOR_CODE.OFF_WHITE} size={height * 0.03} style={styles.fileTypeIcon}/>        
                       </TouchableOpacity>
@@ -301,7 +296,13 @@ const styles = StyleSheet.create({
   fileTypeIcon: { 
     position: 'absolute', 
     alignSelf: 'flex-end', 
-    paddingTop: height * 0.2, 
-    paddingRight: 10 
-  }
+    paddingTop: '100%', 
+    paddingRight: '5%'
+  },
+  pinIcon: { 
+    position: 'absolute',
+    alignSelf: 'flex-end',
+    paddingRight: '5%',
+    paddingBottom: '100%'
+  },
 });

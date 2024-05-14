@@ -1,9 +1,14 @@
 import * as Keychain from 'react-native-keychain';
+import { check, PERMISSIONS, RESULTS, request } from 'react-native-permissions';
+import { launchImageLibrary, ImageLibraryOptions, Asset } from 'react-native-image-picker';
 import logout from '../api/logout';
 import { COLOR_CODE } from './enums';
+import { pinnedPostOptions, allowedImageTypes, maxImageSizeBytes } from './constants';
 import authenticateRefreshToken from '../api/auth';
 import { setAccessToken, resetToken } from './token';
 import Environments from './environments'
+import { allowedFileTypes } from './constants';
+
 
 const formatPayloadDob = (dob: string): string => {
   const newDate = new Date(dob);
@@ -126,7 +131,63 @@ const updateTokens = async (userId: number) => {
   return false;
 }
 
+const handleFileImport = (setUploadImageError: any, setPinnedPost: any) => {
+  launchImageLibrary(pinnedPostOptions as ImageLibraryOptions, res => {
+    if (res.errorMessage) {
+      setUploadImageError(res.errorMessage);
+    } else if (res.assets?.length) {
+      const asset = res.assets[0];
+      if (!asset.fileSize || !asset.type) {
+        setUploadImageError('Corrupt file');    
+      } else if (asset.fileSize > maxImageSizeBytes) {
+        setUploadImageError('File size exceed 10mb');    
+      } else if (!allowedImageTypes.includes(asset.type)) {
+        setUploadImageError('File type not supported');    
+      } else {
+        setUploadImageError('');
+        setPinnedPost(asset);
+      }
+    }
+  });
+}
+
+const onUploadImageHandler = (setUploadImageError: any, setPinnedPost: any) => {
+  check(PERMISSIONS.IOS.PHOTO_LIBRARY).then(result => {
+    switch(result) {
+      case RESULTS.UNAVAILABLE:
+        break;
+      case RESULTS.DENIED:
+        request(PERMISSIONS.IOS.PHOTO_LIBRARY).then(result => {
+          if (Environments.appEnv !== 'prod') {
+            console.log('request result', result)
+          }
+        }).catch(error => {
+          if (Environments.appEnv !== 'prod') {
+            console.log('request error', error)
+          }
+        });
+      case RESULTS.LIMITED:
+      case RESULTS.GRANTED:
+        handleFileImport(setUploadImageError, setPinnedPost);
+        break;
+      case RESULTS.BLOCKED:
+        setUploadImageError('Please allow photos access from the settings');
+        break;
+      default: 
+        break;
+    }
+  }).catch(error => { 
+    if (Environments.appEnv !== 'prod') {
+      console.log('upload image error', error)
+    }
+  });
+}
+
+const getFileType = (key: string) => {
+  return allowedFileTypes.find(type => type.split('/').pop() === key);
+}
+
 export { 
   formatPayloadDob, saveToken, getToken, getAge, deleteToken, formatText, fireColorScoreBased, updateTokens, 
-  getNextMaxScore 
+  getNextMaxScore, onUploadImageHandler, handleFileImport, getFileType
 }

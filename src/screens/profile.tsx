@@ -7,6 +7,7 @@ import getUserProfile from '../api/user.profile';
 import getUserPosts from '../api/user.posts';
 import Loading from '../components/loading';
 import { getUserId } from '../utils/user.id';
+import { COLOR_CODE } from '../utils/enums';
 
 type UserProfileRes = {
   id: number,
@@ -33,7 +34,8 @@ type UserPost = {
   fileMetadataId: number,
   createdAt: Date,
   updatedAt: Date,
-  deletedAt?: Date | null
+  deletedAt?: Date | null,
+  pinned: boolean
 }
 
 const ProfileScreen = (props: any) => {
@@ -124,7 +126,7 @@ const ProfileScreen = (props: any) => {
         {
           isProfileLoading ?
           (<Loading flex={3} />) :
-          (<ProfileDetails profileDetails={profileDetails} navigation={props.navigation} />)
+          (<ProfileDetails profileDetails={profileDetails as UserProfileRes} navigation={props.navigation} />)
         }
         {
           isPostLoading ?
@@ -148,6 +150,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   mainContainer: {
-    flex: 1
+    flex: 1,
+    backgroundColor: COLOR_CODE.OFF_WHITE
   }
 });

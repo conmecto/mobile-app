@@ -1,69 +1,72 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+import React from 'react';
+import { View, Text, StyleSheet, Image } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { Button } from 'react-native-paper';
+import { fireColorScoreBased, formatText } from '../utils/helpers';
 import { COLOR_CODE } from '../utils/enums';
-import { formatText } from '../utils/helpers';
 
 FontAwesome.loadFont();
-const { width, height } = Dimensions.get('window');
+MaterialCommunityIcons.loadFont();
 
-const ProfileDetails = ({ profileDetails, navigation }: any) => {
+type UserProfileRes = {
+  id: number,
+  userName?: string,
+  description?: string,
+  city?: string,
+  country?: string,
+  school?: string,
+  work?: string,
+  igId?: string,
+  snapId?: string,
+  interests?: string,
+  profilePicture?: string,
+  userId: number,
+  name: string,
+  age?: number
+}
+
+type props = {
+  profileDetails: UserProfileRes,
+  navigation: any
+}
+
+const ProfileDetails = ({ profileDetails, navigation }: props) => {
   const onPressEditProfile = () => {
     navigation.navigate('EditProfileScreen', { profileDetails });
   }
 
   return (
     <View style={styles.mainContainer}>
-      <LinearGradient colors={[COLOR_CODE.BRIGHT_BLUE, COLOR_CODE.BRIGHT_RED]} style={styles.gradient}>
-        <View style={styles.basicDetailsContainer}>
-          <View style={styles.detailsContainer}>
-            <View style={styles.imageContainer}>
-              <Image source={{uri: profileDetails?.profilePicture}} style={styles.profileImage} />
-            </View>
-            <View style={styles.nameContainer}>
-              <Text numberOfLines={2} adjustsFontSizeToFit style={styles.name}>{formatText(profileDetails?.name)}</Text>
-            </View>
-            <View style={styles.userNameContainer}>
-              <View style={styles.userNameIconContainer}>
-                <FontAwesome name='user' size={width * 0.05} color={COLOR_CODE.OFF_WHITE} />
-              </View>
-              <View style={styles.userNameTextContainer}>
-                <Text numberOfLines={2} adjustsFontSizeToFit style={styles.userName}>{formatText(profileDetails?.userName)}</Text>
-              </View>
-            </View>
-            <View style={styles.locationContainer}>
-              <View style={styles.locationIconContainer}>
-                <FontAwesome name='map-pin' size={width * 0.05} color={COLOR_CODE.OFF_WHITE} />
-              </View>
-              <View style={styles.locationTextContainer}>
-                <Text numberOfLines={2} adjustsFontSizeToFit style={styles.location}>{formatText(profileDetails?.city)}, {formatText(profileDetails?.country)}</Text>
-              </View>
-            </View>
+      <View style={styles.headerContainer}>
+        <View style={styles.streakContainer}>
+          <View style={styles.scoreHeaderContainer}>
+            <Text style={styles.headerText}>Conmecto Streak</Text>
           </View>
-
-          <View style={styles.editProfileContainer}>
-            <TouchableOpacity style={styles.editProfileButton} onPress={onPressEditProfile}>
-              <FontAwesome name='edit' color={COLOR_CODE.OFF_WHITE} size={width * 0.08} />
-            </TouchableOpacity>
+          <View style={styles.scoreContainer}>
+            <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{5}<MaterialCommunityIcons name='fire' color={fireColorScoreBased(5)}/></Text>
           </View>
         </View>
-        <View style={styles.fullDetailsContainer}>
-          <View style={styles.aboutContainer}>
-            <Text style={styles.aboutTitle}>About</Text>
-            <View style={styles.aboutDetails}>
-              <Text numberOfLines={10} adjustsFontSizeToFit style={styles.aboutText}>{profileDetails?.description?.length ? profileDetails?.description : 'Empty'}</Text>
-            </View>
-          </View>
-
-          <View style={styles.interestsContainer}>
-            <Text style={styles.interestsTitle}>Interests</Text>
-            <View style={styles.interestsDetails}>
-              <Text numberOfLines={10} adjustsFontSizeToFit style={styles.interestText}>{profileDetails?.interests?.length ? profileDetails.interests : 'Empty'}</Text>
-            </View>
-          </View>
+        <View style={styles.editButtonContainer}>
+          <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={onPressEditProfile}>
+            Edit
+          </Button>
         </View>
-      </LinearGradient>
+      </View>
+      <View style={styles.userInfoContainer}>
+        <View style={styles.profilePicContainer}>
+          <Image source={{ uri: profileDetails.profilePicture}} style={styles.profilePic}/>
+        </View>
+        <View style={styles.detailsContainer}>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{formatText(profileDetails.name)}</Text>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{profileDetails.age}</Text>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}><FontAwesome name='map-pin' color={COLOR_CODE.BRIGHT_RED} /> {formatText(profileDetails.city)}</Text>
+        </View>
+      </View>
+      <View style={styles.aboutContainer}>
+        <Text style={{ fontSize: 12, fontWeight: 'bold' }}>About</Text>
+        <Text numberOfLines={4} adjustsFontSizeToFit style={{ fontSize: 12 }}>{profileDetails?.description ? profileDetails.description?.substring(0, Math.min(profileDetails.description?.length, 180)) : '-'}</Text>
+        </View>      
     </View>
   );
 }
@@ -72,159 +75,72 @@ export default ProfileDetails;
 
 const styles = StyleSheet.create({
   mainContainer: {
-    flex: 3,
-    alignItems: 'center',
-    justifyContent: 'center'
+    flex: 3
   },
-
-  gradient: {
-    height: '95%',
-    width: '95%',
-    borderRadius: 30,
+  headerContainer: { 
+    flex: 1, 
+    //borderWidth: 1,
     flexDirection: 'row'
   },
-
-  basicDetailsContainer: {
-    flex: 1
-  },
-  fullDetailsContainer: {
-    flex: 1
-  },
-
-  detailsContainer: {
-    flex: 4,
-  //  borderWidth: 1,
-  },
-  editProfileContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-   // borderWidth: 1,
-  },
-
-  imageContainer: {
-   // borderWidth: 1,
-    flex: 2,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  profileImage: {
-    height: width * 0.15,
-    width: width * 0.15,
-    borderRadius: 100,
-    borderWidth: 1,
-    borderColor: COLOR_CODE.OFF_WHITE
-  },
-
-  nameContainer: {
-    //borderWidth: 1,
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  name: {
-    color: COLOR_CODE.OFF_WHITE,
-    fontWeight: '600',
-    fontSize: 20,
-  },
-
-  userNameContainer: {
-   // borderWidth: 1,
-    flex: 1,
+  userInfoContainer: { 
+    flex: 3, 
     flexDirection: 'row',
-  },
-  userNameIconContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     //borderWidth: 1
   },
-  userNameTextContainer: {
-    flex: 5,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
+  streakContainer: { 
+    flex: 3, 
+    // alignItems: 'center', 
+    // justifyContent: 'center',
     //borderWidth: 1
   },
-  userName: {
-    color: COLOR_CODE.OFF_WHITE,
-    fontWeight: '600',
-    fontSize: 15,
-  },
-
-  locationContainer: {
-    //borderWidth: 1,
+  editButtonContainer: {
     flex: 1,
-    flexDirection: 'row'
+    alignItems: 'center', 
+    justifyContent: 'flex-start',
   },
-  locationIconContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-   // borderWidth: 1
-  },
-  locationTextContainer: {
-    flex: 5,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
+  aboutContainer: { 
+    flex: 1, 
+    paddingLeft: 10,
+    alignItems: 'flex-start', 
+    justifyContent: 'flex-start',
     //borderWidth: 1
   },
-  location: {
-    color: COLOR_CODE.OFF_WHITE,
-    fontWeight: '600',
-    fontSize: width * 0.04,
+  profilePicContainer: { 
+    flex: 1, 
+    alignItems: 'center', 
+    justifyContent: 'center' 
   },
-
-  editProfileButton: {
-    padding: 5,
-    height: width * 0.13,
-    width: width * 0.13,
-    alignItems: 'center',
-    justifyContent: 'center'
+  profilePic: { 
+    height: 100, 
+    width: 100, 
+    borderRadius: 100, 
+    borderWidth: 1 
   },
-
-  aboutContainer: {
-    flex: 1,
-    padding: 10,
+  detailsContainer: { 
+    flex: 1.5, 
+    alignItems: 'flex-start', 
+    justifyContent: 'center' 
   },
-  aboutTitle: {
-    color: COLOR_CODE.OFF_WHITE,
-    fontWeight: '600',
-    fontSize: width * 0.04,
+  commonText: { 
+    fontSize: 25, 
+    fontWeight: 'bold' 
   },
-  aboutDetails: {
-    height: '70%',
-    width: '100%',
-    marginTop: height * 0.01,
-    backgroundColor: COLOR_CODE.OFF_WHITE,
-    borderRadius: 30,
-    padding: 10,
+  scoreContainer: { 
+    flex: 4, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'flex-start',
+    paddingLeft: 10
   },
-  aboutText: {
-    color: COLOR_CODE.BLACK,
-    fontWeight: '500',
-    fontSize: width * 0.03,
+  scoreHeaderContainer: { 
+    flex: 1, 
+    alignItems: 'flex-start', 
+    justifyContent: 'flex-start',
+    paddingLeft: 10
+    //borderWidth: 1
   },
-
-  interestsContainer: {
-    flex: 1,
-    padding: 10,
-  },
-  interestsTitle: {
-    color: COLOR_CODE.OFF_WHITE,
-    fontWeight: '600',
-    fontSize: width * 0.04,
-  },
-  interestsDetails: {
-    height: '70%',
-    width: '100%',
-    marginTop: height * 0.01,
-    backgroundColor: COLOR_CODE.OFF_WHITE,
-    borderRadius: 30,
-    padding: 10,
-  },
-  interestText: {
-    color: COLOR_CODE.BLACK,
-    fontWeight: '500',
-    fontSize: width * 0.03,
+  headerText: { 
+    fontSize: 10, 
+    fontWeight: 'bold' 
   },
 });

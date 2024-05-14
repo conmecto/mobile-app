@@ -191,11 +191,11 @@ const EditProfileScreen = (props: any) => {
                 <TextInput style={styles.commonInput} placeholder={formatText(profileObj.name)} defaultValue={formatText(profileObj.name)} onChangeText={text => onHandleChangeText(text, 'name')} />
                 <Text></Text>
                 
-                <Text style={styles.uploadText}>
+                {/* <Text style={styles.uploadText}>
                   Username { fieldErrors?.userName ? (<Text style={styles.errorText}>{fieldErrors.userName}</Text>) : '' }
                 </Text>
                 <TextInput style={styles.commonInput} placeholder={formatText(profileObj.userName)} defaultValue={formatText(profileObj.userName)} onChangeText={text => onHandleChangeText(text, 'userName')} />
-                <Text></Text>
+                <Text></Text> */}
                 
                 <Text style={styles.uploadText}>
                   About { fieldErrors?.description ? (<Text style={styles.errorText}>{fieldErrors.description}</Text>) : '' }
@@ -203,11 +203,11 @@ const EditProfileScreen = (props: any) => {
                 <TextInput style={styles.commonInput} placeholder={profileObj.description} defaultValue={profileObj.description} onChangeText={text => onHandleChangeText(text, 'description')} />
                 <Text></Text>
                 
-                <Text style={styles.uploadText}>
+                {/* <Text style={styles.uploadText}>
                   Interests { fieldErrors?.interests ? (<Text style={styles.errorText}>{fieldErrors.interests}</Text>) : '' }
                 </Text>
                 <TextInput style={styles.commonInput} placeholder={profileObj.interests} defaultValue={profileObj.interests} onChangeText={text => onHandleChangeText(text, 'interests')} />
-                <Text></Text>
+                <Text></Text> */}
                 
                 <Text style={styles.uploadText}>
                   City { fieldErrors?.city ? (<Text style={styles.errorText}>{fieldErrors.city}</Text>) : '' }

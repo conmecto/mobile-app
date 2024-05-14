@@ -107,7 +107,7 @@ const CommonProfileScreen = (props: any) => {
       {
         isLoadingProfile ?
         (<Loading />) :
-        ( <CommonProfileDetails profileDetails={profileDetails} navigation={props.navigation} />)
+        ( <CommonProfileDetails profileDetails={profileDetails as UserProfileRes} />)
       }
       {
           isPostLoading ?

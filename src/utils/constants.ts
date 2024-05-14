@@ -5,8 +5,19 @@ const Days = ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat']
 
 const postOptions = {
   mediaType: 'photo',	
-  maxWidth: 675,	
-  maxHeight: 1200,
+  maxWidth: 720,	
+  maxHeight: 1280,
+  //quality: 0.8,
+  //durationLimit: 60,
+  includeBase64: false,
+  includeExtra: false,
+  selectionLimit: 1
+}
+
+const pinnedPostOptions = {
+  mediaType: 'photo',	
+  maxWidth: 720,	
+  maxHeight: 1280,
   //quality: 0.8,
   //durationLimit: 60,
   includeBase64: false,
@@ -16,8 +27,8 @@ const postOptions = {
 
 const profilePictureOptions = {
   mediaType: 'photo',	
-  maxWidth: 320,	
-  maxHeight: 320,
+  maxWidth: 420,	
+  maxHeight: 420,
   //quality: 1,
   // videoQuality
   //durationLimit
@@ -50,5 +61,5 @@ const initialLogoScreenTimeMilli = 2000;
 
 export { 
   SEARCH_FOR, profilePictureOptions, postOptions, maxFileSizeBytes, allowedFileTypes, allowedImageTypes,
-  maxImageSizeBytes, Days, initialLogoScreenTimeMilli, GENDER
+  maxImageSizeBytes, Days, initialLogoScreenTimeMilli, GENDER, pinnedPostOptions
 };
