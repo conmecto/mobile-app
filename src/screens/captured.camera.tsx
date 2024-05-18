@@ -32,8 +32,8 @@ const CapturedCameraScreen = ({ route, navigation }: any) => {
 
   const onChangeText = (key: string, value: string) => {
     if (key === 'caption') {
-      if (value.length > 30) {
-        setError('Caption character limit is 30');
+      if (value.length > 100) {
+        setError('Caption character limit is 100');
       } else {
         setError('');
         setPolaroidDetail({ ...polaroidDetail, caption: value });

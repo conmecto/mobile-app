@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Text } from 'react-native';
-
-const FeedScreen = (props: any) => {  
+import React from 'react';
+import FeedNavigator from '../navigations/feed';
+  
+const FeedScreen = () => {
   return (
-    <Text>Feed</Text>
+    <FeedNavigator />
   );
 }
 

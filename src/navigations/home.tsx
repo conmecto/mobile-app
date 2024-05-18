@@ -31,8 +31,7 @@ const HomeTabNavigator = (data: any) => {
         tabBarStyle: { marginBottom, marginLeft, marginRight, borderRadius: 50, height: barHeight, backgroundColor: COLOR_CODE.OFF_WHITE }, 
         tabBarItemStyle: { marginBottom, borderRadius: 50, height: barHeight },
         tabBarActiveBackgroundColor: COLOR_CODE.OFF_WHITE, 
-        tabBarInactiveBackgroundColor: COLOR_CODE.OFF_WHITE,
-        unmountOnBlur: true
+        tabBarInactiveBackgroundColor: COLOR_CODE.OFF_WHITE
       }}>
 
       <Tab.Screen name='FeedScreen' component={FeedScreen} options={{ 
