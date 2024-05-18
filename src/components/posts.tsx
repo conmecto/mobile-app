@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Image, FlatList } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { check, PERMISSIONS, RESULTS, request } from 'react-native-permissions';
@@ -8,6 +8,7 @@ import { COLOR_CODE } from '../utils/enums';
 import { postOptions, maxFileSizeBytes, allowedFileTypes } from '../utils/constants';
 import addPost from '../api/add.post';
 import Environments from '../utils/environments';
+import { getUserId } from '../utils/user.id';
 
 type UserPost = {
   id: number,
@@ -17,196 +18,64 @@ type UserPost = {
   fileMetadataId: number,
   createdAt: Date,
   updatedAt: Date,
-  deletedAt?: Date | null,
-  pinned: boolean
+  deletedAt?: Date | null
 }
+
+type PostObj = {
+  posts: UserPost[],
+  isLoading: boolean,
+  page: number,
+  hasMore: boolean,
+  isRefreshing: boolean
+}
+
+type params = { postObj: PostObj, setPostObj: React.Dispatch<React.SetStateAction<PostObj>>, navigation: any }
 
 FontAwesome.loadFont();
 Entypo.loadFont();
 
 const { width, height } = Dimensions.get('window');
-
-const Posts = ({ navigation, posts, userId, setPostPagination, setIsPostLoading, setPosts, postPagination }: any) => {
-  const [postFields, setPostFields] = useState<{
-    postError: string,
-    addPost: boolean,
-    newPost: Asset | null
-  }>({
-    postError: '',
-    addPost: false,
-    newPost: null
-  });
+const polaroidHeight = height * 0.25;
   
-  useEffect(() => {
-    const uploadPost = async () => {
-      const res = await addPost(userId, postFields.newPost as Asset);
-      let postError = '';
-      if (res?.error) {
-        //handle this
-        postError = '';
-      } else if (res) {
-        setPosts([[]]);
-        setPostPagination({ 
-          isPostFetchComplete: false,
-          isPostScrollAtEnd: true,
-          page: 1
-        });
-      }
-      setPostFields({
-        postError,
-        addPost: false,
-        newPost: null
-      });
-      setIsPostLoading(false);
-    }
-    if (postFields.addPost) {
-      setIsPostLoading(true);
-      uploadPost();
-    }
-  }, [postFields.addPost]);
-
-  useEffect(() => {
-    if (postFields.postError.length) {
-      let timerId = setTimeout(() => {
-        setPostFields({ ...postFields, postError: '' });
-      }, 5000);
-      return () => {
-        clearTimeout(timerId);
-      }
-    }
-  }, [postFields.postError]);
-
-  const handleFileImport = () => {
-    if (posts.length === 3 && posts[2].length === 2) {
-      setPostFields({ newPost: null, addPost: false, postError:  'Great, you have reached the max limit for adding posts' });
-      return;
-    }
-    launchImageLibrary(postOptions as ImageLibraryOptions, res => {
-      if (res.errorMessage) {
-        setPostFields({ newPost: null, addPost: false, postError: res.errorMessage });
-      } else if (res.assets?.length) {
-        const asset = res.assets[0];
-        if (!asset.fileSize || !asset.type) {
-          setPostFields({ newPost: null, addPost: false, postError:  'Corrupt file' });
-        } else if (asset.fileSize > maxFileSizeBytes) {
-          setPostFields({ newPost: null, addPost: false, postError: 'File size exceed 10mb' });
-        } else if (!allowedFileTypes.includes(asset.type)) {
-          setPostFields({ newPost: null, addPost: false, postError: 'File type not supported' });
-        } else {
-          setPostFields({ newPost: asset, addPost: true, postError: '' });
-        }
-      }
-    });
+const Posts = ({ navigation, postObj, setPostObj }: params) => {
+  const onPressPolaroid = (post: UserPost) => {
+    navigation.navigate('ViewPostScreen', { post });
   }
 
-  const onAddPostHandler = () => {
-    check(PERMISSIONS.IOS.PHOTO_LIBRARY).then(result => {
-      switch(result) {
-        case RESULTS.UNAVAILABLE:
-          break;
-        case RESULTS.DENIED:
-          request(PERMISSIONS.IOS.PHOTO_LIBRARY).then(result => {
-            if (Environments.appEnv !== 'prod') {
-              console.log('request result', result)
-            }
-          }).catch(error => {
-            if (Environments.appEnv !== 'prod') {
-              console.log('request error', error)
-            }
-          });
-        case RESULTS.LIMITED:
-        case RESULTS.GRANTED:
-          handleFileImport();
-          break;
-        case RESULTS.BLOCKED:
-          setPostFields({ newPost: null, addPost: false, postError: 'Please update your settings to allow photos access' });
-          break;
-        default: 
-          break;
-      }
-    }).catch(error => { 
-      if (Environments.appEnv !== 'prod') {
-        console.log('upload post error', error)
-      }
-    });
+  const Polaroid =  ({ item }: { item: UserPost}) => {
+    return (
+      <View style={styles.polaroidContainer}>
+        <TouchableOpacity style={styles.polaroidTouchable} onPress={() => onPressPolaroid(item)}>
+          <Image source={{ uri: item.location }} style={styles.polaroidImage}/>
+        </TouchableOpacity>
+      </View>
+    );
   }
 
-  const onPressPostHandler = (post: UserPost) => {
-    navigation.navigate('ViewPostScreen', { post })
-  }
-
-  const onLoadMorePostHandler = () => {
-    if (!postPagination.isPostFetchComplete) {
-      setIsPostLoading(true);
-      setPostPagination({
-        isPostFetchComplete: false,
-        isPostScrollAtEnd: true,
-        page: postPagination.page
-      });
+  const onLoadMorePost = ({ distanceFromEnd }: { distanceFromEnd: number }) => {
+    if (postObj.hasMore) {
+      setPostObj({ ...postObj, isLoading: true, page: postObj.page + 1 });
     }
   }
 
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.addPostContainer}>
-        <View style={styles.addPostErrorContainer}>
-          <Text numberOfLines={2} adjustsFontSizeToFit style={styles.postErrorText}>{postFields.postError}</Text> 
-        </View>
-        <View style={styles.addPostPressableContainer}>
-          <TouchableOpacity style={styles.pressableAddPost} onPress={onAddPostHandler}>
-            <FontAwesome name='plus-circle' color={COLOR_CODE.BRIGHT_BLUE} size={height * 0.04} />        
-          </TouchableOpacity>
-        </View>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>Polaroids</Text> 
       </View>
-      <ScrollView style={{ flex: 1 }}>
-        {
-          posts.map((post: any, index: number) => {
-            if (!post.length) {
-              return;
-            }
-            return (
-              <View style={styles.postMainContainer} key={index+1}>
-                <View style={styles.postContainer}>
-                  <TouchableOpacity style={styles.pressableThumbnail} onPress={() => onPressPostHandler(post[0])}>
-                    { 
-                      <Image source={{ uri: post[0].location }} style={styles.postThumbnail} />    
-                    }
-                    {
-                      post[0].pinned && <Entypo name='pin' color={COLOR_CODE.OFF_WHITE} size={30} style={styles.pinIcon}/>
-                    }
-                    <FontAwesome name={post[0].type === 'image' ? 'camera' : 'video-camera'} color={COLOR_CODE.OFF_WHITE} size={height * 0.03} style={styles.fileTypeIcon} />        
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.postContainer}>
-                  {
-                    post.length === 2 ?
-                    (
-                      <TouchableOpacity style={styles.pressableThumbnail} onPress={() => onPressPostHandler(post[1])}>
-                        { 
-                          <Image source={{ uri: post[1].location }} style={styles.postThumbnail} />
-                        }
-                        <FontAwesome name={post[1].type === 'image' ? 'camera' : 'video-camera'} color={COLOR_CODE.OFF_WHITE} size={height * 0.03} style={styles.fileTypeIcon}/>        
-                      </TouchableOpacity>
-                    ) : (<Text></Text>)
-                  }
-                </View>
-              </View>
-            );
-          })
-        }
-        {
-          posts.length && posts[0].length ? 
-          ( 
-            <View style={styles.loadMorePostContainer}>
-              <TouchableOpacity style={styles.loadMorePostPressable} onPress={onLoadMorePostHandler}>
-                <FontAwesome name='refresh' color={COLOR_CODE.BRIGHT_BLUE} size={height * 0.04} />        
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View></View>
-          )
-        }
-      </ScrollView>
+      <View style={{ flex: 1 }}>
+        <FlatList 
+          data={postObj?.posts || []}
+          renderItem={({ item }) => <Polaroid item={item} />}
+          keyExtractor={(item: any, index: number) => item.id?.toString()}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          onEndReached={onLoadMorePost}
+          onEndReachedThreshold={0}
+          refreshing={postObj.isRefreshing}
+          onRefresh={() => setPostObj({ page: 1, isLoading: true, isRefreshing: true, posts: [], hasMore: true })}
+        />
+      </View>
     </View>
   );
 }
@@ -215,94 +84,23 @@ export default Posts;
 
 const styles = StyleSheet.create({
   mainContainer: {
-    flex: 4
-  },
-
-  addPostContainer: {
-    height: height * 0.05,
-    width: width,
-    flexDirection: 'row',
-  },
-  addPostErrorContainer: {
     flex: 4,
-    paddingLeft: 10,
-    alignItems: 'flex-end',
-  },
-  addPostPressableContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  postErrorText: {
-    alignSelf: 'center',
-    fontWeight: '600',
-    fontSize: 20,
-    color: COLOR_CODE.BRIGHT_RED,
-  },
-  pressableAddPost: {
-    height: height * 0.05,
-    width: height * 0.05,
-    alignItems: 'center',
-    justifyContent: 'center'
+    // borderWidth: 1
   },
 
-  postMainContainer: {
-    height: height * 0.3,
-    width: width,
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-  },
-  postContainer: {
-    height: '95%',
-    width: '45%',
+  headerContainer: {
+    flex: 0,
     alignItems: 'center',
     justifyContent: 'center',
+    // borderWidth: 1
   },
-  pressableThumbnail: {
-    height: '100%',
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  postThumbnail: {
-    height: '100%',
-    width: '100%',
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: COLOR_CODE.OFF_WHITE,
-    backgroundColor: 'black'
+  headerText: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    fontFamily: 'SavoyeLetPlain'
   },
 
-  loadMorePostContainer: {
-    height: height * 0.05,
-    width: width,
-    alignItems: 'center'
-  },
-  loadMorePostPressable: {
-    height: height * 0.04,
-    width: height * 0.04,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-
-  deleteIcon: {
-    position: 'absolute', 
-    alignSelf: 'flex-end', 
-    paddingBottom: height * 0.25, 
-    paddingRight: 15
-  },
-
-  fileTypeIcon: { 
-    position: 'absolute', 
-    alignSelf: 'flex-end', 
-    paddingTop: '100%', 
-    paddingRight: '5%'
-  },
-  pinIcon: { 
-    position: 'absolute',
-    alignSelf: 'flex-end',
-    paddingRight: '5%',
-    paddingBottom: '100%'
-  },
+  polaroidContainer: { flex: 0.5, height: polaroidHeight, alignItems: 'center', justifyContent: 'center' },
+  polaroidTouchable: { height: '90%', width: '90%', alignItems: 'center', justifyContent: 'center' },
+  polaroidImage: { height: '100%', width: '100%', borderRadius: 30 }
 });

@@ -9,9 +9,9 @@ const ProfileStack = createNativeStackNavigator();
 const ProfileNavigator = (props: any) => {
   return (
     <ProfileStack.Navigator initialRouteName='ProfileScreen'>
-      <ProfileStack.Screen name='ProfileScreen' component={ProfileScreen} options={{ headerShown: false }} initialParams={props.route.params} />
-      <ProfileStack.Screen name='EditProfileScreen' component={EditProfileScreen} options={{ headerShown: false }} initialParams={props.route.params} />
-      <ProfileStack.Screen name='ViewPostScreen' component={ViewPostScreen} options={{ headerShown: false }} initialParams={props.route.params} />
+      <ProfileStack.Screen name='ProfileScreen' component={ProfileScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name='EditProfileScreen' component={EditProfileScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name='ViewPostScreen' component={ViewPostScreen} options={{ headerShown: false }} />
     </ProfileStack.Navigator>
   );
 }

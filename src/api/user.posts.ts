@@ -11,8 +11,12 @@ type UserPost = {
   fileMetadataId: number,
   createdAt: Date,
   updatedAt: Date,
-  deletedAt?: Date | null,
-  pinned: boolean
+  deletedAt?: Date | null
+}
+
+type UserPostRes = {
+  posts: UserPost[],
+  hasMore: boolean
 }
 
 type PaginationOptions = {
@@ -20,7 +24,7 @@ type PaginationOptions = {
   perPage: number
 }
 
-const getUserPosts = async (userId: number, paginationOptions: PaginationOptions, callIfUnauthorized: boolean = true): Promise<UserPost[] | undefined> => {
+const getUserPosts = async (userId: number, paginationOptions: PaginationOptions, callIfUnauthorized: boolean = true): Promise<UserPostRes | undefined> => {
   try {
     const token = getAccessToken();
     const response = await fetch(Environments.api.profileService.baseUrl + `/profile/users/${userId}/posts?page=${paginationOptions.page}&perPage=${paginationOptions.perPage}`, {

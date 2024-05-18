@@ -5,6 +5,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Button } from 'react-native-paper';
 import { fireColorScoreBased, formatText } from '../utils/helpers';
 import { COLOR_CODE } from '../utils/enums';
+import { DEFAULT_PROFILE_PIC } from '../files';
 
 FontAwesome.loadFont();
 MaterialCommunityIcons.loadFont();
@@ -55,17 +56,17 @@ const ProfileDetails = ({ profileDetails, navigation }: props) => {
       </View>
       <View style={styles.userInfoContainer}>
         <View style={styles.profilePicContainer}>
-          <Image source={{ uri: profileDetails.profilePicture}} style={styles.profilePic}/>
+          <Image source={profileDetails?.profilePicture ? { uri: profileDetails?.profilePicture} : DEFAULT_PROFILE_PIC} style={styles.profilePic}/>
         </View>
         <View style={styles.detailsContainer}>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{formatText(profileDetails.name)}</Text>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{profileDetails.age}</Text>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}><FontAwesome name='map-pin' color={COLOR_CODE.BRIGHT_RED} /> {formatText(profileDetails.city)}</Text>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{formatText(profileDetails?.name)}</Text>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{profileDetails?.age}</Text>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}><FontAwesome name='map-pin' color={COLOR_CODE.BRIGHT_RED} /> {formatText(profileDetails?.city)}</Text>
         </View>
       </View>
       <View style={styles.aboutContainer}>
         <Text style={{ fontSize: 12, fontWeight: 'bold' }}>About</Text>
-        <Text numberOfLines={4} adjustsFontSizeToFit style={{ fontSize: 12 }}>{profileDetails?.description ? profileDetails.description?.substring(0, Math.min(profileDetails.description?.length, 180)) : '-'}</Text>
+        <Text numberOfLines={4} adjustsFontSizeToFit style={{ fontSize: 12 }}>{profileDetails?.description ? profileDetails?.description?.substring(0, Math.min(profileDetails.description?.length, 180)) : '-'}</Text>
         </View>      
     </View>
   );

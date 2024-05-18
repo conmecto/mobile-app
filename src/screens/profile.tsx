@@ -26,6 +26,12 @@ type UserProfileRes = {
   age?: number
 }
 
+type ProfileObj = {
+  profile?: UserProfileRes,
+  isLoading: boolean,
+  error: string
+}
+
 type UserPost = {
   id: number,
   userId: number,
@@ -34,107 +40,133 @@ type UserPost = {
   fileMetadataId: number,
   createdAt: Date,
   updatedAt: Date,
-  deletedAt?: Date | null,
-  pinned: boolean
+  deletedAt?: Date | null
+}
+
+type PostObj = {
+  posts: UserPost[],
+  isLoading: boolean,
+  page: number,
+  hasMore: boolean,
+  isRefreshing: boolean
 }
 
 const ProfileScreen = (props: any) => {
   const userId = getUserId() as number;
-  const [isProfileLoading, setIsProfileLoading] = useState(true);
-  const [isPostLoading, setIsPostLoading] = useState(true);
-  const [postPagination, setPostPagination] = useState({
-    isPostFetchComplete: false,
-    isPostScrollAtEnd: true,
-    page: 1
+  const perPage = 10;
+  const [profileObj, setProfileObj] = useState<ProfileObj>({
+    error: '',
+    isLoading: true
   });
-  const [profileDetails, setProfileDetails] = useState<UserProfileRes>();
-  const [posts, setPosts] = useState<[UserPost[]]>([[]]);
-
-  useEffect(() => {
-    const unsubscribe = props.navigation.addListener('focus', () => {
-      setIsProfileLoading(true);
-      setIsPostLoading(true);
-      setPostPagination({
-        isPostFetchComplete: false,
-        isPostScrollAtEnd: true,
-        page: 1
-      });
-      setPosts([[]]);
-    });
-    return unsubscribe;
-  }, [props.navigation]);
+  const [postObj, setPostObj] = useState<PostObj>({
+    posts: [],
+    isLoading: true,
+    isRefreshing: false,
+    page: 1,
+    hasMore: true
+  });
  
   useEffect(() => {
     let check = true;
     const fetchProfile = async () => {
       const res = await getUserProfile(userId);
-      if (check && res) {
-        setProfileDetails(res);
+      const profileObjUpdate = {
+        profile: profileObj.profile,
+        isLoading: false,
+        error: ''
       }
-      setIsProfileLoading(false);
+      if (check && res) {
+        profileObjUpdate.profile = res;
+      } else if (check && !res) {
+        profileObjUpdate.error = 'Something went wrong! 😭';
+      }
+      setProfileObj(profileObjUpdate);
     }
-    if (isProfileLoading) {
+    if (profileObj.isLoading) {
       fetchProfile();
     }
     return () => {
       check = false;
     }
-  }, [isProfileLoading]);
-
+  }, []);
+  
   useEffect(() => {
     let check = true;
     const fetchPosts = async () => {
-      const res = await getUserPosts(userId, { page: postPagination.page, perPage: 10 });
-      let isPostFetchComplete = false;
-      if (check && res) {
-        if (res?.length) {
-          const formatted: [UserPost[]] = [...posts];
-          let k = posts[posts.length-1].length === 2 ? posts.length : posts.length-1;
-          for(let i = 0; i < res.length; i++) {
-            if (!formatted[k]?.length) {
-              formatted[k] = [];
-              formatted[k].push(res[i]);
-            } else {
-              formatted[k].push(res[i]);
-              k += 1;
-            }
-          }
-          setPosts(formatted);
-        } else {
-          isPostFetchComplete = true;
+      const res = await getUserPosts(userId, { page: postObj.page, perPage });
+      const postObjUpdated = {
+        ...postObj,
+        isLoading: false,
+        isRefreshing: false
+      }
+      if (check) {
+        if (res?.posts) {
+          postObjUpdated.posts.push(...res.posts);
+          postObjUpdated.hasMore = res.hasMore;
         }
       }
-      setIsPostLoading(false);
-      setPostPagination({
-        isPostFetchComplete,
-        isPostScrollAtEnd: false,
-        page: postPagination.page + (isPostFetchComplete ? 0 : 1)
-      });
+      setPostObj(postObjUpdated);
     }
-    if (postPagination.isPostScrollAtEnd && !postPagination.isPostFetchComplete && isPostLoading) {
+    if (postObj.isRefreshing) {
       fetchPosts();
     }
     return () => {
       check = false;
     }
-  }, [postPagination.isPostScrollAtEnd]);
+  }, [postObj.isRefreshing]);
+  
+  useEffect(() => {
+    let check = true;
+    const fetchPosts = async () => {
+      const res = await getUserPosts(userId, { page: postObj.page, perPage });
+      const postObjUpdated = {
+        ...postObj,
+        isLoading: false,
+        isRefreshing: false
+      }
+      if (check) {
+        if (res?.posts) {
+          postObjUpdated.posts.push(...res.posts);
+          postObjUpdated.hasMore = res.hasMore;
+        }
+      }
+      setPostObj(postObjUpdated);
+    }
+    if (postObj.hasMore && postObj.isLoading && !postObj.isRefreshing) {
+      fetchPosts();
+    }
+    return () => {
+      check = false;
+    }
+  }, [postObj.page]);
 
   return (
     <View style={styles.container}>
       <TopBar />
       <SafeAreaView style={styles.mainContainer}>
         {
-          isProfileLoading ?
+          profileObj.isLoading ?
           (<Loading flex={3} />) :
-          (<ProfileDetails profileDetails={profileDetails as UserProfileRes} navigation={props.navigation} />)
+          (
+            profileObj.error ?
+            (
+              <View style={{ flex: 3, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 20, color: COLOR_CODE.BRIGHT_RED, fontWeight: 'bold' }}>
+                  {profileObj.error}
+                </Text>
+              </View>
+            ) : 
+            (
+              <ProfileDetails profileDetails={profileObj.profile as UserProfileRes} navigation={props.navigation} />
+            )
+          )
         }
         {
-          isPostLoading ?
+          postObj.isLoading ?
           (<Loading flex={4} />) :
           (
             <Posts 
-              posts={posts} navigation={props.navigation} userId={userId} setPostPagination={setPostPagination} 
-              setIsPostLoading={setIsPostLoading} setPosts={setPosts} postPagination={postPagination}
+              postObj={postObj} navigation={props.navigation} setPostObj={setPostObj} 
             />
           )
         }
