@@ -187,7 +187,28 @@ const getFileType = (key: string) => {
   return allowedFileTypes.find(type => type.split('/').pop() === key);
 }
 
+const getPolaroidDate = (date: string) => {
+  try {
+    const polaroidDate = date?.split('T')[0]?.replace(/\-/g, ' . ');
+    return polaroidDate;
+  } catch(error) {
+  }
+}
+
+const getFormatedView = (views: number) => {
+  if (views < 1000) {
+    return [views, '']; 
+  }  
+  if (views < 1000000) {
+    return [Math.floor(views / 1000), 'K'];
+  }
+  if (views < 1000000000) {
+    return [Math.floor(views / 1000000), 'M'];
+  }
+  return [Math.floor(views / 1000000000), 'B'];
+}
+
 export { 
   formatPayloadDob, saveToken, getToken, getAge, deleteToken, formatText, fireColorScoreBased, updateTokens, 
-  getNextMaxScore, onUploadImageHandler, handleFileImport, getFileType
+  getNextMaxScore, onUploadImageHandler, handleFileImport, getFileType, getPolaroidDate, getFormatedView
 }

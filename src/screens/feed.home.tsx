@@ -98,6 +98,11 @@ const FeedScreen = () => {
             </View>
         )
     );
+              {/* <Modal visible={showSettingModal} onDismiss={() => setShowSettingModal(false)} contentContainerStyle={{ top: height * 0.3, right: 10, alignSelf: 'flex-end', borderRadius: 10, height: height * 0.05, width: width * 0.3, backgroundColor: COLOR_CODE.OFF_WHITE }}>
+            <TouchableOpacity style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={{ fontSize: 15, color: COLOR_CODE.BRIGHT_RED, fontWeight: 'bold' }}>{ showReportIcon ? 'Report Polaroid' : 'Delete' }</Text>
+            </TouchableOpacity>
+          </Modal> */}
 }
 
 export default FeedScreen;
