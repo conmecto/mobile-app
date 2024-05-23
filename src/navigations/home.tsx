@@ -7,7 +7,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MatchScreen from '../screens/match';
 import SettingScreen from '../screens/setting';
 import { COLOR_CODE } from '../utils/enums';
-// import ExploreNavigator from './explore';
 import ProfileNavigator from './profile';
 import FeedScreen from '../screens/feed';
 
@@ -45,13 +44,7 @@ const HomeTabNavigator = (data: any) => {
         tabBarIcon: ({focused, color, size}) => (<Ionicons name='chatbubble-ellipses-outline' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={30} />)
         }} 
         initialParams={data.params} />
-
-      {/* <Tab.Screen name='ExploreNavigator' component={ExploreNavigator} options={{ 
-        tabBarLabel: 'Explore', headerShown: false,
-        tabBarIcon: ({focused, color, size}) => (<FontAwesome name='search' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={25}/>)
-        }} 
-        initialParams={data.params} /> */}
-
+        
       <Tab.Screen name='ProfileNavigator' component={ProfileNavigator} options={{ 
         tabBarLabel: 'Profile', headerShown: false,
         tabBarIcon: ({focused, color, size}) => (<FontAwesome name='user' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={25}/>)
