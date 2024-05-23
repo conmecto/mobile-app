@@ -3,15 +3,20 @@ import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
 
-type UserProfileRes = {
+type ProfileRes = {
   id: number,
-  userName?: string,
-  profile_picture?: string,
+  city?: string,
+  profilePicture?: string,
   userId: number,
-  name: string
+  name: string,
+  age?: number
 }
 
-const getMultipleUsersProfile = async (userIds: number[], loggedInUserId: number, callIfUnauthorized: boolean = true): Promise<UserProfileRes[]> => {
+type UserProfileRes = {
+  [key: number]: ProfileRes
+}
+
+const getMultipleUsersProfile = async (userIds: number[], loggedInUserId: number, callIfUnauthorized: boolean = true): Promise<{ data: UserProfileRes } | undefined> => {
   try {
     const token = getAccessToken();
     const response = await fetch(Environments.api.profileService.baseUrl + `/profile/multiple-users?userIds=${userIds.join(',')}`, {
@@ -36,7 +41,6 @@ const getMultipleUsersProfile = async (userIds: number[], loggedInUserId: number
       console.log('Get multiple profiles by userIds api error', error);
     }
   }
-  return [];
 }
 
 export default getMultipleUsersProfile;

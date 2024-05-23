@@ -107,7 +107,7 @@ const ProfileScreen = (props: any) => {
       }
       setPostObj(postObjUpdated);
     }
-    if (postObj.isRefreshing) {
+    if (postObj.isRefreshing && postObj.hasMore && postObj.isLoading) {
       fetchPosts();
     }
     return () => {

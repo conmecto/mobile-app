@@ -4,11 +4,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Foundation from 'react-native-vector-icons/Foundation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import MatchScreen from '../screens/match';
 import SettingScreen from '../screens/setting';
 import { COLOR_CODE } from '../utils/enums';
 import ProfileNavigator from './profile';
 import FeedScreen from '../screens/feed';
+import MatchNavigator from './match';
 
 Foundation.loadFont();
 FontAwesome.loadFont();
@@ -39,7 +39,7 @@ const HomeTabNavigator = (data: any) => {
         }} 
         initialParams={data.params} />
 
-      <Tab.Screen name='MatchScreen' component={MatchScreen} options={{ 
+      <Tab.Screen name='MatchNavigator' component={MatchNavigator} options={{ 
         tabBarLabel: 'Match', headerShown: false, 
         tabBarIcon: ({focused, color, size}) => (<Ionicons name='chatbubble-ellipses-outline' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={30} />)
         }} 

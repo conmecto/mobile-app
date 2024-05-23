@@ -3,6 +3,15 @@ import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
 
+type UserProfileRes = {
+  id: number,
+  city?: string,
+  profilePicture?: string,
+  userId: number,
+  name: string,
+  age?: number
+}
+
 type UserMatchRes = {
   id?: number,
   userId1?: number,
@@ -11,16 +20,19 @@ type UserMatchRes = {
   createdAt?: Date,
   city?: string,
   country?: string,
-  settingId: number,
-  userId: number,
-  totalMatchScore: number,
-  pinnedPostId?: number,
   chatNotification?: boolean
+  profile?: UserProfileRes
 }
-const getUserMatch = async (userId: number, callIfUnauthorized: boolean = true): Promise<UserMatchRes | undefined> => {
+
+type PaginationOptions = {
+  page: number,
+  perPage: number
+}
+
+const getUserMatches = async (userId: number, paginationOptions: PaginationOptions, callIfUnauthorized: boolean = true): Promise<{ data: UserMatchRes[], hasMore: boolean } | undefined> => {
   try {
     const token = getAccessToken();
-    const response = await fetch(Environments.api.matchService.baseUrl + `/match/users/${userId}`, {
+    const response = await fetch(Environments.api.matchService.baseUrl + `/match/users/${userId}?page=${paginationOptions.page}&perPage=${paginationOptions.perPage}`, {
       method: 'GET',
       headers: {
         authorization: 'Bearer ' + token 
@@ -30,7 +42,7 @@ const getUserMatch = async (userId: number, callIfUnauthorized: boolean = true):
     if (response?.status === 401 && callIfUnauthorized) {
       const tokens = await updateTokens(userId);
       if (tokens) {
-        const res = await getUserMatch(userId, false);
+        const res = await getUserMatches(userId, paginationOptions, false);
         return res;
       }
     }
@@ -43,9 +55,9 @@ const getUserMatch = async (userId: number, callIfUnauthorized: boolean = true):
     }
   } catch(error) {
     if (Environments.appEnv !== 'prod') {
-      console.log('Get user match api error', error);
+      console.log('Get user matches api error', error);
     }
   }
 }
 
-export default getUserMatch;
+export default getUserMatches;
