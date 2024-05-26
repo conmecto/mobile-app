@@ -80,7 +80,9 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     if (pressedMatch?.chatNotification) {
       setMarkChatsRead(pressedMatch.id);
     }
-    navigation.navigate('MatchChatScreen', { matchId: pressedMatch.id, matchedUserId, matchedUserName: pressedMatch.profile?.name });
+    navigation.navigate('MatchChatScreen', { 
+      matchId: pressedMatch.id, matchedUserId, matchedUserName: pressedMatch.profile?.name 
+    });
   }
 
   // const onPressCamera = () => {
@@ -203,7 +205,7 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
       </View> 
     );
   }
- 
+
   return (
     <View style={styles.mainContainer}>
       <TopBar />

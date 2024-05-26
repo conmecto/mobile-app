@@ -16,6 +16,7 @@ import endMatch from '../api/end.match';
 import { getUserId } from '../utils/user.id';
 import { deleteChatSocketInstance } from '../sockets/chat.socket';
 import { formatText } from '../utils/helpers';
+import Loading from '../components/loading';
 
 type Chat = {
   id?: number,
@@ -46,6 +47,7 @@ type EndMatchType = {
   endMatch: boolean,
   openEndMatchModal: boolean,
   block: boolean,
+  isLoading: boolean
 }
 
 MaterialCommunityIcons.loadFont();
@@ -85,6 +87,7 @@ const MatchChatScreen = ({ navigation, route }: any) => {
   });
   const [endMatchObj, setEndMatchObj] = useState<EndMatchType>({
     error: '',
+    isLoading: false,
     endMatch: false,
     openEndMatchModal: false,
     block: false
@@ -116,45 +119,47 @@ const MatchChatScreen = ({ navigation, route }: any) => {
     }
   }, [chatObj.page]);
 
-  // useEffect(() => {
-  //   let check = true;
-  //   const callEndMatch = async () => {
-  //     const res = await endMatch(matchId, userId, endMatchObj.block);
-  //     if (check) {
-  //       if (res) {
-  //         setEndMatchObj({
-  //           error: '',
-  //           endMatch: false,
-  //           openEndMatchModal: false,
-  //           block: false
-  //         });
-  //         // deleteChatSocketInstance();
-  //         navigation.navigate('NoMatchScreen');
-  //       }
-  //     }
-  //   }
-  //   if (endMatchObj.endMatch) {
-  //     callEndMatch();
-  //   }
-  //   return () => {
-  //     check = false;
-  //   }
-  // }, [endMatchObj.endMatch]);
+  useEffect(() => {
+    let check = true;
+    const callEndMatch = async () => {
+      const res = await endMatch(matchId, userId, endMatchObj.block);
+      const endMatchObjUpdated = {
+        error: '',
+        endMatch: false,
+        openEndMatchModal: false,
+        block: false,
+        isLoading: false
+      }
+      if (check) {
+        if (res) {
+          deleteChatSocketInstance(matchId, userId);
+          navigation.replace('MatchHomeScreen');  
+        }
+        setEndMatchObj(endMatchObjUpdated);
+      }
+    }
+    if (endMatchObj.endMatch && !endMatchObj.error && endMatchObj.isLoading) {
+      callEndMatch();
+    }
+    return () => {
+      check = false;
+    }
+  }, [endMatchObj.endMatch]);
 
   const onPressViewProfile = () => {
     navigation.navigate('ProfileScreen', { commonScreen: true, matchedUserId });
   }
 
   const onPressEndMatch = () => {
-    setEndMatchObj({ error: '', endMatch: false, openEndMatchModal: true, block: false });
+    setEndMatchObj({ error: '', endMatch: false, openEndMatchModal: true, block: false, isLoading: false });
   }
 
   const onDismissEndMatchModal = () => {
-    setEndMatchObj({ error: '', endMatch: false, openEndMatchModal: false, block: false });
+    setEndMatchObj({ error: '', endMatch: false, openEndMatchModal: false, block: false, isLoading: false });
   }
 
-  const onPressConfirmOrCancelEndMatch = (check: boolean, block: boolean) => {
-    setEndMatchObj({ error: '', endMatch: check, openEndMatchModal: false, block });
+  const onPressConfirm = (block: boolean) => {
+    setEndMatchObj({ error: '', endMatch: true, openEndMatchModal: false, block, isLoading: true });
   }
 
   const handleLoadMoreChats = ({ distanceFromEnd }: { distanceFromEnd: number }) => {
@@ -209,68 +214,77 @@ const MatchChatScreen = ({ navigation, route }: any) => {
   return (
     <KeyboardAvoidingView style={styles.chatMainContainer} behavior='padding'>
       <Provider>
-        <SafeAreaView style={{ flex: 1 }}>
-          <Portal>
-            <Modal visible={endMatchObj.openEndMatchModal} onDismiss={() => onDismissEndMatchModal()} contentContainerStyle={styles.modalStyle}>
-              <View style={styles.modalContainer}>
-                <Text numberOfLines={2} adjustsFontSizeToFit style={styles.deleteTitle}>
-                  Are you sure you want to delete this post?
-                </Text>
-                <Button onPress={() => onPressEndMatch()} buttonColor={COLOR_CODE.BRIGHT_RED} textColor={COLOR_CODE.OFF_WHITE} labelStyle={{ fontSize: 15 }}>
-                  Confirm
-                </Button>
+        {
+          endMatchObj.isLoading ? 
+          <Loading /> : 
+          (
+            <SafeAreaView style={{ flex: 1 }}>
+              <Portal>
+                <Modal visible={endMatchObj.openEndMatchModal} onDismiss={() => onDismissEndMatchModal()} contentContainerStyle={styles.modalStyle}>
+                  <View style={styles.modalContainer}>
+                    <Text numberOfLines={2} adjustsFontSizeToFit style={styles.deleteTitle}>
+                      Are you sure you want to end the match?
+                    </Text>
+                    <Button onPress={() => onPressConfirm(false)} buttonColor={COLOR_CODE.BRIGHT_RED} textColor={COLOR_CODE.OFF_WHITE} labelStyle={{ fontSize: 12 }}>
+                      End Match
+                    </Button>
+                    <Button onPress={() => onPressConfirm(true)} buttonColor={COLOR_CODE.BLACK} textColor={COLOR_CODE.OFF_WHITE} labelStyle={{ fontSize: 12 }}>
+                      End Match and Block User
+                    </Button>
+                  </View>
+                </Modal>
+              </Portal>
+              <View style={{ flex: 1 }}>
+                <View style={styles.headerContainer}>
+                  <View style={styles.viewProfileContainer}>
+                    <TouchableOpacity style={styles.viewProfileTouchable} onPress={onPressViewProfile}>
+                      <Text numberOfLines={1} adjustsFontSizeToFit style={styles.headerText}>
+                        {formatText(matchedUserName) || 'View Profile'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.endMatchContainer}>
+                    <TouchableOpacity style={styles.endMatchPressable} onPress={onPressEndMatch}>
+                      <Text numberOfLines={1} adjustsFontSizeToFit style={styles.endMatchText}>
+                        End Match
+                      </Text>     
+                    </TouchableOpacity> 
+                  </View>     
+                </View>
+                <View style={styles.bodyContainer}>
+                  <View style={styles.chatsContainer}>     
+                    <FlatList 
+                      data={chatObj.chats}
+                      renderItem={({ item }) => <ChatView chat={item} />}
+                      keyExtractor={(chat: any, index) => index.toString()}
+                      scrollEnabled={true}
+                      inverted={true}
+                      style={{ flex: 1 }}
+                      onEndReached={handleLoadMoreChats}
+                      onEndReachedThreshold={0}
+                    />
+                  </View>
+                  <View style={styles.inputContainer}>     
+                    <View style={styles.textContainer}>     
+                      <TextInput 
+                        placeholder='Send message' 
+                        style={styles.textInput}
+                        numberOfLines={1}
+                        onChangeText={handleChangeText}
+                        defaultValue={message}
+                      />
+                    </View>
+                    <View style={styles.sendButtonContainer}>     
+                      <Button onPress={onPressSendHandler} buttonColor={COLOR_CODE.BRIGHT_BLUE} textColor={COLOR_CODE.OFF_WHITE}>
+                        Send
+                      </Button>
+                    </View>
+                  </View>
+                </View>
               </View>
-            </Modal>
-          </Portal>
-          <View style={{ flex: 1 }}>
-          <View style={styles.headerContainer}>
-            <View style={styles.viewProfileContainer}>
-              <TouchableOpacity style={styles.viewProfileTouchable} onPress={onPressViewProfile}>
-                <Text numberOfLines={1} adjustsFontSizeToFit style={styles.headerText}>
-                  {formatText(matchedUserName) || 'View Profile'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.endMatchContainer}>
-              <TouchableOpacity style={styles.endMatchPressable} onPress={onPressEndMatch}>
-                <Text numberOfLines={1} adjustsFontSizeToFit style={styles.endMatchText}>
-                  End Match
-                </Text>     
-              </TouchableOpacity> 
-            </View>     
-          </View>
-          <View style={styles.bodyContainer}>
-            <View style={styles.chatsContainer}>     
-              <FlatList 
-                data={chatObj.chats}
-                renderItem={({ item }) => <ChatView chat={item} />}
-                keyExtractor={(chat: any, index) => index.toString()}
-                scrollEnabled={true}
-                inverted={true}
-                style={{ flex: 1 }}
-                onEndReached={handleLoadMoreChats}
-                onEndReachedThreshold={0}
-              />
-            </View>
-            <View style={styles.inputContainer}>     
-              <View style={styles.textContainer}>     
-                <TextInput 
-                  placeholder='Send message' 
-                  style={styles.textInput}
-                  numberOfLines={1}
-                  onChangeText={handleChangeText}
-                  defaultValue={message}
-                />
-              </View>
-              <View style={styles.sendButtonContainer}>     
-                <Button onPress={onPressSendHandler} buttonColor={COLOR_CODE.BRIGHT_BLUE} textColor={COLOR_CODE.OFF_WHITE}>
-                  Send
-                </Button>
-              </View>
-            </View>
-          </View>
-          </View>
-        </SafeAreaView>
+            </SafeAreaView>
+          )
+        }
        </Provider>
     </KeyboardAvoidingView>
   );
@@ -309,14 +323,12 @@ const styles = StyleSheet.create({
   },
 
   viewProfileContainer: {
-    flex: 1,
-    alignItems: 'flex-start',
-    paddingLeft: 5
+    flex: 1
   },
   viewProfileTouchable: {
-    height: '90%',
-    width: '70%',
-    alignItems: 'center',
+    flex: 1,
+    paddingLeft: 10,
+    alignItems: 'flex-start',
     justifyContent: 'center',
   },
   headerText: {
@@ -344,10 +356,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLOR_CODE.BRIGHT_RED
   },
   bodyContainer: {
-    flex: 10,
+    flex: 14,
   },
   chatsContainer: {
-    flex: 9,
+    flex: 10,
     paddingBottom: 10,
   },
   chatContainer: {
@@ -389,7 +401,6 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 4,
-    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -404,15 +415,14 @@ const styles = StyleSheet.create({
   
   sendButtonContainer: {
     flex: 1,
-    borderWidth: 1,
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'center',
   },
 
-  modalStyle: { alignSelf: 'center', borderRadius: 30, height: height * 0.2, width: width * 0.6, backgroundColor: COLOR_CODE.OFF_WHITE},
+  modalStyle: { alignSelf: 'center', borderRadius: 30, height: height * 0.25, width: width * 0.6, backgroundColor: COLOR_CODE.OFF_WHITE},
   modalContainer: { flex: 1, padding: 5, alignItems: 'center', justifyContent: 'space-evenly' },
   deleteTitle: {
-    fontSize: 15,
+    fontSize: 12,
     fontWeight: 'bold',
   },
 });
