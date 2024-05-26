@@ -1,25 +1,32 @@
 import Environments from '../utils/environments';
 import { getAccessToken } from '../utils/token';
+import { getChatSocketKey } from '../utils/helpers';
 
-let chatSocket: WebSocket | null = null;
+let chatSockets: {
+  [key: string]: WebSocket | null
+} = {}
 
-const createChatSocketConnection = (userId: number) => {
+const createChatSocketConnection = (matchId: number, userId: number) => {
   try {
     const token = getAccessToken();
-    chatSocket = new WebSocket(Environments.socket.matchService.baseUrl + `?userId=${userId}` + `&accessToken=${token}`);
-    chatSocket.onerror = (error) => {
+    const ws = new WebSocket(Environments.socket.matchService.baseUrl + `?userId=${userId}&matchId=${matchId}&accessToken=${token}`);
+    ws.onerror = (error) => {
       if (Environments.appEnv !== 'prod') {
         console.log(`Chat socket connection error`, error.message);
       }
     }
-    
-    chatSocket.onopen = () => {
+    ws.onopen = () => {
       if (Environments.appEnv !== 'prod') {
-        console.log(`Chat socket connection established`);
+        console.log(`Chat socket connection established`, getChatSocketKey(matchId, userId));
       }
     }
-
-    return chatSocket;
+    ws.onclose = () => {
+      if (Environments.appEnv !== 'prod') {
+        console.log(`Chat socket connection closed`, getChatSocketKey(matchId, userId));
+      }
+    }
+    chatSockets[getChatSocketKey(matchId, userId)] = ws;
+    return ws;
   } catch(error) {
     if (Environments.appEnv !== 'prod') {
       console.log(`Socket error`, error);
@@ -27,12 +34,12 @@ const createChatSocketConnection = (userId: number) => {
   }
 }
 
-const getChatSocketInstance = () => {
-  return chatSocket;
+const getChatSocketInstance = (matchId: number, userId: number) => {
+  return chatSockets[getChatSocketKey(matchId, userId)];
 }
 
-const deleteChatSocketInstance = () => {
-  chatSocket = null;
+const deleteChatSocketInstance = (matchId: number, userId: number) => {
+  chatSockets[getChatSocketKey(matchId, userId)] = null;
 }
 
 export { createChatSocketConnection, getChatSocketInstance, deleteChatSocketInstance }

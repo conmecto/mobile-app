@@ -23,10 +23,10 @@ type params = {
   page: number
 }
 
-const getChats = async ({ matchId, userId, page }: params, callIfUnauthorized: boolean = true): Promise<Chats[] | undefined> => {
+const getChats = async ({ matchId, userId, page }: params, callIfUnauthorized: boolean = true): Promise<{ data: Chats[], hasMoreChats: boolean } | undefined> => {
   try {
     const token = getAccessToken();
-    const response = await fetch(Environments.api.matchService.baseUrl + `/match/${matchId}/chats?userId=${userId}&page=${page}&perPage=20`, {
+    const response = await fetch(Environments.api.matchService.baseUrl + `/match/${matchId}/chats?userId=${userId}&page=${page}&perPage=10`, {
       method: 'GET',
       headers: {
         authorization: 'Bearer ' + token
