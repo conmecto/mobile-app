@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { fireColorScoreBased, formatText } from '../utils/helpers';
+import { fireColorScoreBased, formatText, getFormatedView } from '../utils/helpers';
 import { DEFAULT_PROFILE_PIC } from '../files';
 import { COLOR_CODE } from '../utils/enums';
 
+Ionicons.loadFont();
 FontAwesome.loadFont();
 MaterialCommunityIcons.loadFont();
 
@@ -52,12 +54,21 @@ const MatchedUser = ({ matchedUserProfile, matchScore, onPressMatchedUser }: pro
         </View>
       </View>
       <View style={styles.secondRow}>
-        <View style={styles.scoreHeaderContainer}>
-          <Text style={styles.headerText}>Match Streak</Text>
+        <View style={{ flex: 2 }}>
+          <View style={styles.scoreHeaderContainer}>
+            <Text style={styles.headerText}>Match Streak</Text>
+          </View>
+          <View style={styles.scoreContainer}>
+            <Text numberOfLines={1} adjustsFontSizeToFit style={styles.scoreText}>
+              {getFormatedView(matchScore)}
+              <MaterialCommunityIcons name='fire' color={fireColorScoreBased(matchScore)}/>
+            </Text>
+          </View>
         </View>
-        <View style={styles.scoreContainer}>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{matchScore}</Text>
-          <MaterialCommunityIcons name='fire' color={fireColorScoreBased(matchScore)} size={50}/> 
+        <View style={styles.cameraContainer}>
+          <TouchableOpacity onPress={() => console.log('camera')} style={styles.cameraTouchable}>
+            <Ionicons name='camera' size={40} color={COLOR_CODE.BLACK}/> 
+          </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>
@@ -73,13 +84,12 @@ const styles = StyleSheet.create({
     borderRadius: 30 
   },
   firstRow: { 
-    flex: 2, 
+    flex: 3, 
     flexDirection: 'row' 
   },
   secondRow: { 
-    flex: 1, 
-    alignItems: 'center', 
-    justifyContent: 'center'
+    flex: 1,
+    flexDirection: 'row'
   },
   profilePicContainer: { 
     flex: 1, 
@@ -97,23 +107,37 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start', 
     justifyContent: 'center' 
   },
+  scoreText: {
+    fontSize: 20, 
+    fontWeight: 'bold'
+  },
   commonText: { 
     fontSize: 25, 
     fontWeight: 'bold' 
   },
   scoreContainer: { 
     flex: 4, 
-    flexDirection: 'row', 
     alignItems: 'center', 
-    justifyContent: 'center' 
+    justifyContent: 'center',
   },
   scoreHeaderContainer: { 
     flex: 1, 
     alignItems: 'center', 
-    justifyContent: 'center' 
+    justifyContent: 'center', 
   },
   headerText: { 
     fontSize: 10, 
     fontWeight: 'bold' 
+  },
+  cameraContainer: { 
+    flex: 1, 
+    alignItems: 'flex-start', 
+    justifyContent: 'flex-start',
+  },
+  cameraTouchable: { 
+    height: 50, 
+    width: 50, 
+    alignItems: 'center', 
+    justifyContent: 'center'
   }
 });

@@ -14,8 +14,9 @@ enum COLOR_CODE {
   LIGHT_SILVER = '#e5eeef',
   FIRE_YELLOW = '#FEDE17',
   FIRE_GREEN = '#00D100',
-  FIRE_PURPLE = '#702963',
+  FIRE_PURPLE = '#800080',
   FIRE_SILVER = '#C0C0C0',
+  FIRE_BLUE = '#3D88FF',
   RED = 'red'
 }
 

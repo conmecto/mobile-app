@@ -89,9 +89,9 @@ const fireColorScoreBased = (score: number) => {
   } else if (score >= 500 && score < 1000) {
     return COLOR_CODE.FIRE_GREEN;
   } else if (score >= 1000 && score <= 5000) {
-    return COLOR_CODE.FIRE_PURPLE;
+    return COLOR_CODE.FIRE_BLUE;
   } else {
-    return COLOR_CODE.FIRE_SILVER;
+    return COLOR_CODE.FIRE_PURPLE;
   }
 }
 
@@ -208,7 +208,12 @@ const getFormatedView = (views: number) => {
   return [Math.floor(views / 1000000000), 'B'];
 }
 
+const getChatSocketKey = (matchId: number, userId: number) => {
+  return `${matchId}:${userId}`;
+}
+
 export { 
   formatPayloadDob, saveToken, getToken, getAge, deleteToken, formatText, fireColorScoreBased, updateTokens, 
-  getNextMaxScore, onUploadImageHandler, handleFileImport, getFileType, getPolaroidDate, getFormatedView
+  getNextMaxScore, onUploadImageHandler, handleFileImport, getFileType, getPolaroidDate, getFormatedView,
+  getChatSocketKey
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, Dimensions } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -45,8 +45,10 @@ type MatchObj = {
 Ionicons.loadFont();
 MaterialCommunityIcons.loadFont();
 
+const { height } = Dimensions.get('window');
+
 const MatchHomeScreen = ({ route, navigation }: any) => {
-  // const [markChatsRead, setMarkChatsRead] = useState(false);
+  const [markChatsRead, setMarkChatsRead] = useState<number>();
   const userId = getUserId() as number;
   const perPage = 2;
   const [matchObj, setMatchObj] = useState<MatchObj>({
@@ -57,33 +59,29 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     hasMore: true
   });
   
-  // const socket = getChatSocketInstance();
-  // if (!socket || socket.readyState !== 1) {
-  //   createChatSocketConnection(userId);
-  // }
+  useEffect(() => {
+    let check = true;
+    const callMarkChatsRead = async () => {
+      await updateChatsRead(markChatsRead as number, userId);
+      if (check) {
+        setMarkChatsRead(undefined);
+      }
+    }
+    if (markChatsRead) {
+      callMarkChatsRead();
+    }
+    return () => {
+      check = false;
+    }
+  }, [markChatsRead]);
 
-  // useEffect(() => {
-  //   let check = true;
-  //   const callMarkChatsRead = async () => {
-  //     await updateChatsRead(matchId as number, userId);
-  //     if (check) {
-  //       setMarkChatsRead(false);
-  //     }
-  //   }
-  //   if (markChatsRead) {
-  //     callMarkChatsRead();
-  //   }
-  //   return () => {
-  //     check = false;
-  //   }
-  // }, [markChatsRead]);
-
-  // const onPressMatchedUser = () => {
-  //   if (setting?.chatNotification) {
-  //     setMarkChatsRead(true);
-  //   }
-  //   navigation.navigate('MatchChatScreen', { matchId, matchedUserId });
-  // }
+  const onPressMatchedUser = (pressedMatch: UserMatchRes) => {
+    const matchedUserId = userId === pressedMatch.userId1 ? pressedMatch.userId2 : pressedMatch.userId1;
+    if (pressedMatch?.chatNotification) {
+      setMarkChatsRead(pressedMatch.id);
+    }
+    navigation.navigate('MatchChatScreen', { matchId: pressedMatch.id, matchedUserId, matchedUserName: pressedMatch.profile?.name });
+  }
 
   // const onPressCamera = () => {
   //   navigation.navigate('CameraScreen');
@@ -158,8 +156,8 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
 
   const NoMatch = ({ item }: any) => {
     return (
-      <View style={{ height: 500, alignItems: 'center', justifyContent: 'center' }}>
-        <Text numberOfLines={2} style={{ fontSize: 20, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE }}>
+      <View style={styles.noMatchContainer}>
+        <Text numberOfLines={2} style={styles.noMatchText}>
           Finding matches, keep adding more Polaroids 😃
           {'\n'}
         </Text>
@@ -167,11 +165,42 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
       </View>
     );
   } 
-  const MatchItem = ({ item }: any) => {
+  const MatchItem = ({ item }: { item: UserMatchRes }) => {
+    const socket = getChatSocketInstance(item.id as number, userId);
+    if (!socket || socket.readyState !== 1) {
+      createChatSocketConnection(item.id as number, userId);
+    }
+    
     return (
-      <View>
-
-      </View>
+      <View style={styles.matchedUserContainer}> 
+      {
+        item?.chatNotification ?
+        (  
+          <LinearGradient colors={[COLOR_CODE.BRIGHT_RED, COLOR_CODE.OFF_WHITE]} style={styles.gradient}>
+            { 
+              item.profile ? 
+              <MatchedUser 
+                matchedUserProfile={item.profile} matchScore={item.score as number} 
+                onPressMatchedUser={() => onPressMatchedUser(item)}
+              /> : 
+              (<Text style={{ alignSelf: 'center'}}>Profile load failed</Text>) 
+            }
+          </LinearGradient>       
+        ) : (
+          <View style={styles.noNotificationContainer}>
+            { 
+              item.profile ? 
+              <MatchedUser 
+                matchedUserProfile={item.profile} 
+                matchScore={item.score as number} 
+                onPressMatchedUser={() => onPressMatchedUser(item)}
+              /> : 
+              (<Text style={{ alignSelf: 'center'}}>Profile load failed</Text>) 
+            }
+          </View>
+        )
+      }
+      </View> 
     );
   }
  
@@ -185,17 +214,20 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
             <FlatList 
               data={matchObj.matches}
               renderItem={({ item }) => <MatchItem item={item} />}
+              keyExtractor={(item: any, index: number) => item.id?.toString()}
+              showsVerticalScrollIndicator={false}
+              onEndReached={onLoadMoreMatches}
+              onEndReachedThreshold={0}
               refreshing={matchObj.isRefreshing}
+              onRefresh={() => setMatchObj({ page: 1, isLoading: true, isRefreshing: true, matches: [], hasMore: true })}
               
             />
           ) : (
             <FlatList 
               data={[{}]}
               renderItem={({ item }) => <NoMatch item={item}/>}
-              keyExtractor={(item: any, index: number) => item.id?.toString()}
+              keyExtractor={(item: any, index: number) => ''}
               showsVerticalScrollIndicator={false}
-              onEndReached={onLoadMoreMatches}
-              onEndReachedThreshold={0}
               refreshing={matchObj.isRefreshing}
               onRefresh={() => setMatchObj({ page: 1, isLoading: true, isRefreshing: true, matches: [], hasMore: true })}
             />
@@ -205,34 +237,6 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     </View>
   )
 }
-
-{/* <View style={styles.matchedUserContainer}> 
-      {
-        setting?.chatNotification ?
-        (  
-          <LinearGradient colors={[COLOR_CODE.BRIGHT_RED, COLOR_CODE.OFF_WHITE]} style={styles.gradient}>
-            { 
-              matchedUserProfile ? 
-              <MatchedUser matchedUserProfile={matchedUserProfile} matchScore={setting.score as number} onPressMatchedUser={onPressMatchedUser}/> : 
-              (<Text style={{ alignSelf: 'center'}}>Profile load failed</Text>) 
-            }
-          </LinearGradient>       
-        ) : (
-          <View style={styles.noNotificationContainer}>
-            { 
-              matchedUserProfile ? 
-              <MatchedUser matchedUserProfile={matchedUserProfile} matchScore={setting.score as number} onPressMatchedUser={onPressMatchedUser}/> : 
-              (<Text style={{ alignSelf: 'center'}}>Profile load failed</Text>) 
-            }
-          </View>
-        )
-      }
-      </View>    
-      <View style={styles.cameraContainer}>
-        <TouchableOpacity onPress={onPressCamera} style={styles.cameraTouchable}>
-          <Ionicons name='camera' size={40} color={COLOR_CODE.OFF_WHITE}/> 
-        </TouchableOpacity>
-      </View> */}
       
 const styles = StyleSheet.create({
   mainContainer: { 
@@ -240,17 +244,17 @@ const styles = StyleSheet.create({
     backgroundColor: COLOR_CODE.OFF_WHITE 
   },
   matchedUserContainer: { 
-    flex: 3, 
+    height: Math.floor(height * 0.35), 
     alignItems: 'center', 
     justifyContent: 'center'
   },
   gradient: { 
-    height: '70%', 
+    height: '80%', 
     width: '90%', 
     borderRadius: 30 
   },
   noNotificationContainer: { 
-    height: '70%', 
+    height: '80%', 
     width: '90%', 
     borderRadius: 30, 
     shadowRadius: 3, 
@@ -279,7 +283,9 @@ const styles = StyleSheet.create({
     }, 
     shadowOpacity: 0.5, 
     shadowRadius: 2 
-  }
+  },
+  noMatchContainer: { height: 500, alignItems: 'center', justifyContent: 'center' },
+  noMatchText: { fontSize: 20, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE }
 });
 
 export default MatchHomeScreen;
