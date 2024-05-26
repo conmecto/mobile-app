@@ -51,8 +51,12 @@ type PostObj = {
   isRefreshing: boolean
 }
 
-const ProfileScreen = (props: any) => {
-  const userId = getUserId() as number;
+const ProfileScreen = ({ navigation, route }: any) => {
+  const { commonScreen, matchedUserId }: { commonScreen: boolean, matchedUserId: number } = route?.params;
+  let userId = getUserId() as number;
+  if (commonScreen) {
+    userId = matchedUserId;
+  }
   const perPage = 10;
   const [profileObj, setProfileObj] = useState<ProfileObj>({
     error: '',
@@ -157,7 +161,7 @@ const ProfileScreen = (props: any) => {
               </View>
             ) : 
             (
-              <ProfileDetails profileDetails={profileObj.profile as UserProfileRes} navigation={props.navigation} />
+              <ProfileDetails profileDetails={profileObj.profile as UserProfileRes} navigation={navigation} commonScreen={!!commonScreen} />
             )
           )
         }
@@ -166,7 +170,7 @@ const ProfileScreen = (props: any) => {
           (<Loading flex={4} />) :
           (
             <Posts 
-              postObj={postObj} navigation={props.navigation} setPostObj={setPostObj} 
+              postObj={postObj} navigation={navigation} setPostObj={setPostObj} 
             />
           )
         }

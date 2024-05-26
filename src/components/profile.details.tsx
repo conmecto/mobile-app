@@ -29,10 +29,11 @@ type UserProfileRes = {
 
 type props = {
   profileDetails: UserProfileRes,
-  navigation: any
+  navigation: any,
+  commonScreen: boolean
 }
 
-const ProfileDetails = ({ profileDetails, navigation }: props) => {
+const ProfileDetails = ({ profileDetails, navigation, commonScreen }: props) => {
   const onPressEditProfile = () => {
     navigation.navigate('EditProfileScreen', { profileDetails });
   }
@@ -49,9 +50,12 @@ const ProfileDetails = ({ profileDetails, navigation }: props) => {
           </View>
         </View>
         <View style={styles.editButtonContainer}>
-          <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={onPressEditProfile}>
-            Edit
-          </Button>
+          {
+            !commonScreen && 
+            <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={onPressEditProfile}>
+              Edit
+            </Button>
+          }
         </View>
       </View>
       <View style={styles.userInfoContainer}>
