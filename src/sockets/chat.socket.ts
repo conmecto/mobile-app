@@ -1,6 +1,22 @@
 import Environments from '../utils/environments';
 import { getAccessToken } from '../utils/token';
 import { getChatSocketKey } from '../utils/helpers';
+import { ChatSocketEvents } from '../utils/enums';
+
+type SendFileData = {
+  key: string,
+  location: string,
+  name: string,
+  mimetype: string,
+  size: number, 
+  height: number,
+  width: number,
+  message: string,
+  event: ChatSocketEvents,
+  matchId: number,
+  matchedUserId: number,
+  userId: number
+}
 
 let chatSockets: {
   [key: string]: WebSocket | null
@@ -42,4 +58,11 @@ const deleteChatSocketInstance = (matchId: number, userId: number) => {
   chatSockets[getChatSocketKey(matchId, userId)] = null;
 }
 
-export { createChatSocketConnection, getChatSocketInstance, deleteChatSocketInstance }
+const sendFileAsMessage = (data: SendFileData) => {
+  const chatSocket = getChatSocketInstance(data.matchId, data.userId);
+  if (chatSocket && chatSocket.readyState === 1) {
+    chatSocket.send(JSON.stringify(data));
+  }
+}
+
+export { createChatSocketConnection, getChatSocketInstance, deleteChatSocketInstance, sendFileAsMessage }

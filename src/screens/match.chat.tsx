@@ -9,7 +9,6 @@ import { Provider, Modal, Portal, Button } from 'react-native-paper';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { getChatSocketInstance } from '../sockets/chat.socket';
 import { COLOR_CODE, ChatSocketEvents } from '../utils/enums';
-import { Days } from '../utils/constants';
 import { useHeaderHeight } from '@react-navigation/elements';
 import getChats from '../api/get.chats';
 import endMatch from '../api/end.match';
@@ -17,6 +16,7 @@ import { getUserId } from '../utils/user.id';
 import { deleteChatSocketInstance } from '../sockets/chat.socket';
 import { formatText } from '../utils/helpers';
 import Loading from '../components/loading';
+import ChatMessageComponent from '../components/chat.message';
 
 type Chat = {
   id?: number,
@@ -178,7 +178,7 @@ const MatchChatScreen = ({ navigation, route }: any) => {
     }
   }
   
-  chatSocket.onmessage = (wsMessage) => {
+  chatSocket.onmessage = (wsMessage: any) => {
     const parsedData = JSON.parse(wsMessage.data);
     if (parsedData?.event === ChatSocketEvents.MESSAGE_RECEIVED) {
       setChatObj({ ...chatObj, chats: [ omit(parsedData, ['event']) as Chat, ...chatObj.chats] });
@@ -189,26 +189,20 @@ const MatchChatScreen = ({ navigation, route }: any) => {
     setMessage(text);
   }
 
+  const onPressViewChatFile = (chat: Chat) => {
+    navigation.navigate('ViewChatFile', { chat });
+  }
+
   const ChatView = ({ chat }: { chat: Chat }) => {
-    const { message, sender, createdAt } = chat;
-    const chatDate = new Date(createdAt);  
-    const isSender = sender === userId;
-    const hours = chatDate.getHours();
-    const minutes = chatDate.getMinutes(); 
+    const isSender = chat.sender === userId;
+    const chatMessageData = {
+      isSender,
+      chat,
+      onPressViewChatFile
+    }
     return (
-      <View style={[ styles.chatContainer, ( isSender ? { alignItems: 'flex-end' } : { alignItems: 'flex-start' } )]}>
-        <View style={( isSender ? styles.chatMessageSenderContainer : styles.chatMessageContainer )}>
-          <Text style={[ styles.messageText, ( isSender ? { color: COLOR_CODE.BLACK } : { color: COLOR_CODE.OFF_WHITE })]}>
-            {message}
-          </Text>
-        </View>
-        <View style={styles.chatTimeContainer}>
-          <Text style={styles.chatTimeText}>
-            {Days[chatDate.getDay()]}, { hours < 10 ? '0' + hours : hours }:{minutes < 10 ? '0' + minutes : minutes}
-          </Text>
-        </View>
-      </View>
-    );
+      <ChatMessageComponent chatMessageData={chatMessageData} />
+    )
   }
 
   return (
@@ -256,7 +250,7 @@ const MatchChatScreen = ({ navigation, route }: any) => {
                     <FlatList 
                       data={chatObj.chats}
                       renderItem={({ item }) => <ChatView chat={item} />}
-                      keyExtractor={(chat: any, index) => index.toString()}
+                      keyExtractor={(chat: any, index) => index?.toString()}
                       scrollEnabled={true}
                       inverted={true}
                       style={{ flex: 1 }}
@@ -362,39 +356,7 @@ const styles = StyleSheet.create({
     flex: 10,
     paddingBottom: 10,
   },
-  chatContainer: {
-    justifyContent: 'center',
-    padding: 10
-  },
-  chatMessageSenderContainer: {
-    borderTopLeftRadius: 20,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-    backgroundColor: COLOR_CODE.LIGHT_GREY
-  },
-  chatMessageContainer: {
-    borderTopRightRadius: 20,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-    backgroundColor: COLOR_CODE.BRIGHT_BLUE
-  },
-  messageText: {
-    fontSize: 15
-  },
-  chatTimeContainer: {
-    justifyContent: 'center',
-    padding: 5
-  },
-  chatTimeText: {
-    fontSize: 11,
-    fontWeight: 'bold'
-  },
+  
   inputContainer: {
     flex: 1,
     flexDirection: 'row',

@@ -64,6 +64,7 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     const callMarkChatsRead = async () => {
       await updateChatsRead(markChatsRead as number, userId);
       if (check) {
+        setMatchObj(matchObj);
         setMarkChatsRead(undefined);
       }
     }
@@ -75,9 +76,12 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     }
   }, [markChatsRead]);
 
-  const onPressMatchedUser = (pressedMatch: UserMatchRes) => {
+  const onPressMatchedUser = (pressedMatch: UserMatchRes, matchIndex: number) => {
     const matchedUserId = userId === pressedMatch.userId1 ? pressedMatch.userId2 : pressedMatch.userId1;
     if (pressedMatch?.chatNotification) {
+      if (!isNaN(Number(matchIndex))) {
+        matchObj.matches[matchIndex].chatNotification = false;
+      }
       setMarkChatsRead(pressedMatch.id);
     }
     navigation.navigate('MatchChatScreen', { 
@@ -85,9 +89,9 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     });
   }
 
-  // const onPressCamera = () => {
-  //   navigation.navigate('CameraScreen');
-  // }
+  const onPressCamera = (matchId: number, matchedUserId: number) => {
+    navigation.navigate('CameraScreen', { commonScreen: true, matchId, matchedUserId });
+  }
 
   const getMatchObject = async () => {
     const res = await getUserMatches(userId, { page: matchObj.page, perPage });
@@ -167,12 +171,12 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
       </View>
     );
   } 
-  const MatchItem = ({ item }: { item: UserMatchRes }) => {
+  const MatchItem = ({ item, matchIndex }: { item: UserMatchRes, matchIndex: number }) => {
     const socket = getChatSocketInstance(item.id as number, userId);
     if (!socket || socket.readyState !== 1) {
       createChatSocketConnection(item.id as number, userId);
     }
-    
+    const matchedUserId = item.userId1 === userId ? item.userId2 : item.userId1;
     return (
       <View style={styles.matchedUserContainer}> 
       {
@@ -183,7 +187,8 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
               item.profile ? 
               <MatchedUser 
                 matchedUserProfile={item.profile} matchScore={item.score as number} 
-                onPressMatchedUser={() => onPressMatchedUser(item)}
+                onPressMatchedUser={() => onPressMatchedUser(item, matchIndex)}
+                onPressCamera={() => onPressCamera(item.id as number, matchedUserId as number)}
               /> : 
               (<Text style={{ alignSelf: 'center'}}>Profile load failed</Text>) 
             }
@@ -195,7 +200,8 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
               <MatchedUser 
                 matchedUserProfile={item.profile} 
                 matchScore={item.score as number} 
-                onPressMatchedUser={() => onPressMatchedUser(item)}
+                onPressMatchedUser={() => onPressMatchedUser(item, matchIndex)}
+                onPressCamera={() => onPressCamera(item.id as number, matchedUserId as number)}
               /> : 
               (<Text style={{ alignSelf: 'center'}}>Profile load failed</Text>) 
             }
@@ -215,7 +221,7 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
           (
             <FlatList 
               data={matchObj.matches}
-              renderItem={({ item }) => <MatchItem item={item} />}
+              renderItem={({ item, index }) => <MatchItem item={item} matchIndex={index} />}
               keyExtractor={(item: any, index: number) => item.id?.toString()}
               showsVerticalScrollIndicator={false}
               onEndReached={onLoadMoreMatches}

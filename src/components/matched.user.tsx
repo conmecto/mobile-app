@@ -32,9 +32,10 @@ type props = {
   matchedUserProfile: UserProfileRes,
   matchScore: number,
   onPressMatchedUser: () => void,
+  onPressCamera: () => void
 }
 
-const MatchedUser = ({ matchedUserProfile, matchScore, onPressMatchedUser }: props) => {
+const MatchedUser = ({ matchedUserProfile, matchScore, onPressMatchedUser, onPressCamera }: props) => {
   let profilePictureSource = DEFAULT_PROFILE_PIC;
   if (matchedUserProfile?.profilePicture) {
     profilePictureSource = { 
@@ -66,7 +67,7 @@ const MatchedUser = ({ matchedUserProfile, matchScore, onPressMatchedUser }: pro
           </View>
         </View>
         <View style={styles.cameraContainer}>
-          <TouchableOpacity onPress={() => console.log('camera')} style={styles.cameraTouchable}>
+          <TouchableOpacity onPress={onPressCamera} style={styles.cameraTouchable}>
             <Ionicons name='camera' size={40} color={COLOR_CODE.BLACK}/> 
           </TouchableOpacity>
         </View>

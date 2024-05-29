@@ -9,10 +9,17 @@ import { Linking } from 'react-native';
 import { COLOR_CODE } from '../utils/enums';
 import environments from '../utils/environments';
 
+type RouteParams = {
+  commonScreen: boolean,
+  matchId: number,
+  matchedUserId: number
+}
+
 Ionicons.loadFont();
 const { height, width } = Dimensions.get('window');
 
-const CameraScreen = ({ navigation }: any) => {
+const CameraScreen = ({ navigation, route }: any) => {
+  const { commonScreen, matchId, matchedUserId }: RouteParams = route.params;
   const camera = useRef<Camera>(null);
   const [flash, setFlash] = useState(false);
   const [cameraPos, setCameraPos] = useState('back');
@@ -42,13 +49,25 @@ const CameraScreen = ({ navigation }: any) => {
         if (flash) {
           setFlash(false);
         }
-        navigation.navigate('CapturedCameraScreen', { 
-          capturedPhoto: { 
-            path: capturedPhoto.path, 
-            height: capturedPhoto.height, 
-            width: capturedPhoto.width 
-          } 
-        });
+        if (commonScreen) {
+          navigation.navigate('ChatCapturedCameraScreen', { 
+            matchId, 
+            matchedUserId,
+            capturedPhoto: { 
+              path: capturedPhoto.path, 
+              height: capturedPhoto.height, 
+              width: capturedPhoto.width 
+            } 
+          });
+        } else {
+          navigation.navigate('CapturedCameraScreen', { 
+            capturedPhoto: { 
+              path: capturedPhoto.path, 
+              height: capturedPhoto.height, 
+              width: capturedPhoto.width 
+            } 
+          });
+        }
       }
     }
   }
