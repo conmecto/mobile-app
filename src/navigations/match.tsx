@@ -18,7 +18,7 @@ const MatchNavigator = ({ params }: any) => {
       <MatchStack.Screen name='ProfileScreen' component={ProfileScreen} options={{ headerShown: false }} />
       <MatchStack.Screen name='ViewPostScreen' component={ViewPostScreen} options={{ headerShown: false }} />
       <MatchStack.Screen name='CameraScreen' component={CameraScreen} options={{ headerShown: false }} 
-        initialParams={{ commonScreen: false, matchId: null, matchedUserId: null}}/>
+        initialParams={{ commonScreen: false, matchId: null, matchedUserId: null }}/>
       <MatchStack.Screen name='ChatCapturedCameraScreen' component={ChatCapturedCameraScreen} options={{ headerShown: false, gestureEnabled: false }} />
       <MatchStack.Screen name='ViewChatFile' component={ViewChatFile} options={{ headerShown: false }} />
     </MatchStack.Navigator>

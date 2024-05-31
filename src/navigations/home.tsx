@@ -9,6 +9,7 @@ import { COLOR_CODE } from '../utils/enums';
 import ProfileNavigator from './profile';
 import FeedScreen from '../screens/feed';
 import MatchNavigator from './match';
+import CameraNavigator from './camera';
 
 Foundation.loadFont();
 FontAwesome.loadFont();
@@ -34,7 +35,7 @@ const HomeTabNavigator = (data: any) => {
       }}>
 
       <Tab.Screen name='FeedScreen' component={FeedScreen} options={{ 
-        tabBarLabel: 'Match', headerShown: false, 
+        tabBarLabel: 'Feed', headerShown: false, 
         tabBarIcon: ({focused, color, size}) => (<Foundation name='home' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={30} />)
         }} 
         initialParams={data.params} />
@@ -42,6 +43,12 @@ const HomeTabNavigator = (data: any) => {
       <Tab.Screen name='MatchNavigator' component={MatchNavigator} options={{ 
         tabBarLabel: 'Match', headerShown: false, 
         tabBarIcon: ({focused, color, size}) => (<Ionicons name='chatbubble-ellipses-outline' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={30} />)
+        }} 
+        initialParams={data.params} />
+
+      <Tab.Screen name='CameraNavigator' component={CameraNavigator} options={{ 
+        tabBarLabel: 'Camera', headerShown: false, 
+        tabBarIcon: ({focused, color, size}) => (<Ionicons name='camera' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={30} />)
         }} 
         initialParams={data.params} />
         

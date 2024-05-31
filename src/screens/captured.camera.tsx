@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
-import { View, Image, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Image, Text, TextInput, StyleSheet, SafeAreaView,
+  KeyboardAvoidingView
+} from 'react-native';
 import { Button, Switch } from 'react-native-paper';
 import { unlink } from 'react-native-fs';
 import { COLOR_CODE } from '../utils/enums';
 import environments from '../utils/environments';
+
+type CapturedPhoto = {
+  path: string,
+  height: number,
+  width: number
+}
 
 type polaroidDetail = {
   caption: string,
@@ -12,12 +20,13 @@ type polaroidDetail = {
 }
 
 const CapturedCameraScreen = ({ route, navigation }: any) => { 
-  const capturedPhoto = route.params.capturedPhoto;
+  const capturedPhoto: CapturedPhoto = route.params.capturedPhoto;
   const [polaroidDetail, setPolaroidDetail] = useState<polaroidDetail>({
     caption: '',
     match: true
   });
   const [error, setError] = useState('');
+  const [keyboardEnabled, setKeyboardEnabled] = useState(false);
   
   const onPressRetake = () => {
     unlink(capturedPhoto.path)
@@ -55,52 +64,68 @@ const CapturedCameraScreen = ({ route, navigation }: any) => {
   }
 
   return (
-    <View style={styles.mainContainer}>
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: capturedPhoto.path }} style={styles.image} />
-      </View>
-      <View style={styles.detailsContainer}>
-        <View style={{ flex: 0, alignItems: 'center' }}>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.errorText}>
-            {error}
-          </Text>
+    <SafeAreaView style={styles.mainContainer}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding' enabled={keyboardEnabled}>       
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: capturedPhoto.path }} style={styles.image} />
         </View>
-        <View style={{ flex: 2, flexDirection: 'row' }}>
-          <View style={{ flex: 3 }}>
-          <View style={styles.commonContainer}>
-            <TextInput
-              placeholder='Caption'
-              value={polaroidDetail.caption}
-              onChangeText={text => onChangeText('caption', text)}
-              style={styles.captionInput}
-            />
-          </View>
-          <View style={styles.commonContainer}>
-            <TextInput
-              placeholder='Reference (Optional)'
-              value={polaroidDetail.link}
-              onChangeText={text => onChangeText('link', text)}
-              style={styles.linkInput}
-            />
-          </View>
-          </View>
-          <View style={styles.considerContainer}>
-            <Text numberOfLines={2} adjustsFontSizeToFit style={{ fontSize: 12, fontWeight: 'bold' }}>
-              Consider For a Match
+        <View style={styles.detailsContainer}>
+          <View style={{ flex: 0, alignItems: 'center' }}>
+            <Text numberOfLines={1} adjustsFontSizeToFit style={styles.errorText}>
+              {error}
             </Text>
-            <Switch value={polaroidDetail.match} onValueChange={onToggleChange} color={COLOR_CODE.BRIGHT_BLUE} />
+          </View>
+          <View style={{ flex: 2, flexDirection: 'row' }}>
+            <View style={{ flex: 3 }}>
+            <View style={styles.commonContainer}>
+              <TextInput
+                placeholder='Caption'
+                value={polaroidDetail.caption}
+                onChangeText={text => onChangeText('caption', text)}
+                style={styles.captionInput}
+                onFocus={() => setKeyboardEnabled(true)}
+                onSubmitEditing={() => setKeyboardEnabled(false)}
+              />
+            </View>
+            <View style={styles.commonContainer}>
+              <TextInput
+                placeholder='Reference (Optional)'
+                value={polaroidDetail.link}
+                onChangeText={text => onChangeText('link', text)}
+                style={styles.linkInput}
+                onFocus={() => setKeyboardEnabled(true)}
+                onSubmitEditing={() => setKeyboardEnabled(false)}
+              />
+            </View>
+            </View>
+            <View style={styles.considerContainer}>
+              <Text numberOfLines={2} adjustsFontSizeToFit style={{ fontSize: 12, fontWeight: 'bold' }}>
+                Consider For a Match
+              </Text>
+              <Switch value={polaroidDetail.match} onValueChange={onToggleChange} color={COLOR_CODE.BRIGHT_BLUE} />
+            </View>
+          </View>
+          <View style={styles.actionContainer}>
+            {
+              !keyboardEnabled && 
+              (
+                <Button mode='contained' buttonColor={COLOR_CODE.RED} onPress={() => onPressRetake()}>
+                  Retake
+                </Button>
+              )
+            }
+            {
+              !keyboardEnabled && 
+              (
+                <Button mode='contained' buttonColor={COLOR_CODE.BLACK} onPress={() => onPressShare()}>
+                  Share Polaroid
+                </Button>
+              )
+            }
           </View>
         </View>
-        <View style={styles.actionContainer}>
-          <Button mode='contained' buttonColor={COLOR_CODE.RED} onPress={() => onPressRetake()}>
-            Retake
-          </Button>
-          <Button mode='contained' buttonColor={COLOR_CODE.BLACK} onPress={() => onPressShare()}>
-            Share Polaroid
-          </Button>
-        </View>
-      </View>
-    </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 

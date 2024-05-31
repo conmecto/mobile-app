@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, FlatList, Dimensions, Image, TouchableOpacity } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { COLOR_CODE } from '../utils/enums';
 import { getUserId } from '../utils/user.id';
@@ -24,6 +25,7 @@ type UserPost = {
 
 const { width, height } = Dimensions.get('window');
 Entypo.loadFont();
+Ionicons.loadFont();
 
 const FeedScreen = () => {  
     const userId = getUserId() as number;

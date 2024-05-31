@@ -7,7 +7,7 @@ import { unlink } from 'react-native-fs';
 import requestSignedUrl from '../api/request.signed.url';
 import { getUserId } from '../utils/user.id';
 import { getFileType } from '../utils/helpers';
-import addPinnedPost from '../api/add.pinned.post';
+import uploadPost from '../api/upload.post';
 import { COLOR_CODE } from '../utils/enums';
 
 FontAwesome.loadFont();
@@ -62,13 +62,14 @@ const UploadFileScreen = ({ route, navigation }: any) => {
                             size: file.size, 
                             height: capturedPhoto.height,
                             width: capturedPhoto.width,
-                            match: polaroidDetail.match
+                            match: polaroidDetail.match,
+                            caption: polaroidDetail.caption
                         }
-                        const addPostRes = await addPinnedPost(userId, data);
+                        const addPostRes = await uploadPost(userId, data);
                         if (addPostRes?.message) {
                             timerId = setTimeout(() => {
-                                navigation.navigate('MatchHomeScreen');
-                            }, 5000);
+                                navigation.navigate('CameraScreen');
+                            }, 2000);
                         } else {
                             setShowError(true);
                         }

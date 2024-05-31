@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Camera, CameraDevice, CameraPosition, getCameraDevice, useCameraFormat } from 'react-native-vision-camera';
 import { Modal, Provider, Portal, Button } from 'react-native-paper';
 import { useAppState } from '@react-native-community/hooks';
@@ -16,6 +17,7 @@ type RouteParams = {
 }
 
 Ionicons.loadFont();
+MaterialCommunityIcons.loadFont();
 const { height, width } = Dimensions.get('window');
 
 const CameraScreen = ({ navigation, route }: any) => {
@@ -31,6 +33,12 @@ const CameraScreen = ({ navigation, route }: any) => {
   const format = useCameraFormat(device, [
     { photoResolution: { height: 720, width: 1280 } }
   ]);
+
+  const onPressImage = () => {
+    setFlash(false);
+    navigation.navigate('AddFileScreen');
+  }
+
   const onPressFlash = () => {
     setFlash(!flash);
   }
@@ -136,6 +144,15 @@ const CameraScreen = ({ navigation, route }: any) => {
             </TouchableOpacity>
           </View>
         }
+        {
+          !showSettingModal && 
+          !commonScreen && 
+          <View style={styles.uploadIconContainer}>
+            <TouchableOpacity onPress={() => onPressImage()} style={styles.plusIcon}>
+              <Ionicons name='images' color={COLOR_CODE.OFF_WHITE} size={35} />  
+            </TouchableOpacity>
+          </View>
+        }
       </Provider>
     </View>
   );
@@ -167,5 +184,18 @@ const styles = StyleSheet.create({
   },
   flashIcon: { height: 50, width: 50, borderRadius: 100, alignItems: 'center', justifyContent: 'center', backgroundColor: COLOR_CODE.OFF_WHITE, borderWidth: 2, borderColor: COLOR_CODE.LIGHT_GREY },
   captureIcon: { height: 75, width: 75, borderRadius: 100, alignItems: 'center', justifyContent: 'center', backgroundColor: COLOR_CODE.OFF_WHITE, borderWidth: 5, borderColor: COLOR_CODE.LIGHT_GREY },
-  syncIcon: { height: 50, width: 50, borderRadius: 100, alignItems: 'center', justifyContent: 'center', backgroundColor: COLOR_CODE.OFF_WHITE, borderWidth: 2, borderColor: COLOR_CODE.LIGHT_GREY }
+  syncIcon: { height: 50, width: 50, borderRadius: 100, alignItems: 'center', justifyContent: 'center', backgroundColor: COLOR_CODE.OFF_WHITE, borderWidth: 2, borderColor: COLOR_CODE.LIGHT_GREY },
+  uploadIconContainer: { 
+    flex: 0, 
+    position: 'absolute', 
+    width: 50, 
+    height: 50, 
+    top: 50, 
+    right: 10,
+  },
+  plusIcon: { 
+    flex: 1,
+    alignItems: 'center', 
+    justifyContent: 'center',
+  },
 });

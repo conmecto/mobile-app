@@ -7,7 +7,9 @@ const FeedStack = createNativeStackNavigator();
 const FeedNavigator = ({ params }: any) => {
   return (
     <FeedStack.Navigator initialRouteName='FeedHomeScreen'>
-      <FeedStack.Screen name='FeedHomeScreen' component={FeedHomeScreen} options={{ headerShown: false, gestureEnabled: false }}/>
+      <FeedStack.Screen name='FeedHomeScreen' 
+        component={FeedHomeScreen} options={{ headerShown: false, gestureEnabled: false }}
+      />
     </FeedStack.Navigator>
   );
 }

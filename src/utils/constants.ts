@@ -14,17 +14,6 @@ const postOptions = {
   selectionLimit: 1
 }
 
-const pinnedPostOptions = {
-  mediaType: 'photo',	
-  maxWidth: 720,	
-  maxHeight: 1280,
-  //quality: 0.8,
-  //durationLimit: 60,
-  includeBase64: false,
-  includeExtra: false,
-  selectionLimit: 1
-}
-
 const profilePictureOptions = {
   mediaType: 'photo',	
   maxWidth: 420,	
@@ -61,5 +50,5 @@ const initialLogoScreenTimeMilli = 2000;
 
 export { 
   SEARCH_FOR, profilePictureOptions, postOptions, maxFileSizeBytes, allowedFileTypes, allowedImageTypes,
-  maxImageSizeBytes, Days, initialLogoScreenTimeMilli, GENDER, pinnedPostOptions
+  maxImageSizeBytes, Days, initialLogoScreenTimeMilli, GENDER
 };
