@@ -21,11 +21,11 @@ type AddPinnedPostRes = {
   path?: string
 }
 
-const addPinnedPost = async (userId: number, pinnedPostObj: PostObj, callIfUnauthorized: boolean = true): Promise<AddPinnedPostRes | undefined> => {
+const uploadPost = async (userId: number, pinnedPostObj: PostObj, callIfUnauthorized: boolean = true): Promise<AddPinnedPostRes | undefined> => {
   try {
     const token = getAccessToken();
     const body = JSON.stringify(pinnedPostObj);
-    const response = await fetch(Environments.api.profileService.baseUrl + `/profile/users/${userId}/pinned/post`, {
+    const response = await fetch(Environments.api.profileService.baseUrl + `/profile/users/${userId}/post`, {
       method: 'POST',
       body,
       headers: {
@@ -37,7 +37,7 @@ const addPinnedPost = async (userId: number, pinnedPostObj: PostObj, callIfUnaut
     if (response?.status === 401 && callIfUnauthorized) {
       const tokens = await updateTokens(userId);
       if (tokens) {
-        const res = await addPinnedPost(userId, pinnedPostObj, false);
+        const res = await uploadPost(userId, pinnedPostObj, false);
         return res;
       }
     }
@@ -55,4 +55,4 @@ const addPinnedPost = async (userId: number, pinnedPostObj: PostObj, callIfUnaut
   }
 }
 
-export default addPinnedPost;
+export default uploadPost;

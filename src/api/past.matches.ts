@@ -47,22 +47,18 @@ const getPastMatches = async (userId: number, callIfUnauthorized: boolean = true
 
       if (userIds.length) {
         const profilesRes = await getMultipleUsersProfile([...new Set(userIds)], userId);
-        const profileMap = new Map();
-        profilesRes.forEach(profile => {
-          if(!profileMap.has(profile.userId)) {
-            profileMap.set(profile.userId, profile);
-          }
-        });
-        
-        return jsonResponse.map(match => {
-          if (profileMap.has(match.userId1)) {
-            match.profileUserId1 = profileMap.get(match.userId1);
-          }
-          if (profileMap.has(match.userId2)) {
-            match.profileUserId2 = profileMap.get(match.userId2);
-          }
-          return match;
-        });
+        const profileData = profilesRes?.data;
+        if (profileData) {
+          return jsonResponse.map(match => {
+            if (profileData[match.userId1]) {
+              match.profileUserId1 = profileData[match.userId1];
+            }
+            if (profileData[match.userId2]) {
+              match.profileUserId2 = profileData[match.userId2];
+            }
+            return match;
+          });
+        }
       }
     }
   } catch(error) {
