@@ -51,7 +51,7 @@ const EditProfileScreen = (props: any) => {
   const userId = getUserId() as number;
   const profileObj: UserProfileRes = params?.profileDetails;
   const defaultUpdateObj: UpdateProfileObj = {
-    description: profileObj.description,
+    description: profileObj.description || '',
     city: formatText(profileObj.city),
     name: formatText(profileObj.name),
     error: '',
