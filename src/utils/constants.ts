@@ -5,7 +5,7 @@ const Days = ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat']
 
 const postOptions = {
   mediaType: 'photo',	
-  maxWidth: 720,	
+  maxWidth: 720,
   maxHeight: 1280,
   //quality: 0.8,
   //durationLimit: 60,

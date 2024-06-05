@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Button, Modal, Portal, Provider } from 'react-native-paper';
 import { COLOR_CODE } from '../utils/enums';
 import Loading from '../components/loading';
@@ -42,6 +43,7 @@ type UserPost = {
 
 FontAwesome.loadFont();
 Entypo.loadFont();
+MaterialIcons.loadFont();
 const { width, height } = Dimensions.get('window');
     
 const ViewPostScreen = ({ navigation, route }: any) => {
@@ -165,7 +167,7 @@ const ViewPostScreen = ({ navigation, route }: any) => {
                         </View>
                         <View style={styles.viewsContainer}>
                           <Text numberOfLines={1} style={{ fontSize: 15, fontWeight: '200' }}>
-                            {views} {symbol} ✨
+                            {views} {symbol} <MaterialIcons name='reviews' color={COLOR_CODE.GOLDEN} size={20} />
                           </Text>
                         </View>
                     </View>

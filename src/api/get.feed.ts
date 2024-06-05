@@ -8,14 +8,12 @@ type UserPost = {
   userId: number,
   location: string,
   type: string,
-  fileMetadataId: number,
-  createdAt: Date,
-  updatedAt: Date,
-  deletedAt?: Date | null,
-  profilePic?: string,
+  createdAt: string,
+  profilePicture?: string,
   name: string,
   caption: string,
-  refLink?: string
+  match: boolean,
+  reported?: boolean
 }
 
 type PaginationOptions = {

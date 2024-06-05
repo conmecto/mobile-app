@@ -17,7 +17,8 @@ enum COLOR_CODE {
   FIRE_PURPLE = '#800080',
   FIRE_SILVER = '#C0C0C0',
   FIRE_BLUE = '#3D88FF',
-  RED = 'red'
+  RED = 'red',
+  GOLDEN = '#FFD700'
 }
 
 enum ERROR_CODES {
