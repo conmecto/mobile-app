@@ -16,12 +16,17 @@ type UserPost = {
   reported?: boolean
 }
 
+type UserPostRes = {
+  feed: UserPost[],
+  hasMore: boolean
+}
+
 type PaginationOptions = {
   page: number,
   perPage: number
 }
 
-const getFeed = async (userId: number, paginationOptions: PaginationOptions, callIfUnauthorized: boolean = true): Promise<{ feed: UserPost[] } | undefined> => {
+const getFeed = async (userId: number, paginationOptions: PaginationOptions, callIfUnauthorized: boolean = true): Promise<UserPostRes | undefined> => {
   try {
     const token = getAccessToken();
     const response = await fetch(Environments.api.profileService.baseUrl + `/profile/users/${userId}/feed?page=${paginationOptions.page}&perPage=${paginationOptions.perPage}`, {

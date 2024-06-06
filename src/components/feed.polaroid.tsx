@@ -6,6 +6,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { COLOR_CODE } from '../utils/enums';
 import { DEFAULT_PROFILE_PIC } from '../files';
 import { getPolaroidDate, getFormatedView, formatText } from '../utils/helpers';
+import { getUserId } from '../utils/user.id';
+import { getPost, setPost } from '../utils/post';
 import reportUserPost from '../api/report.post';
 
 type UserPost = {
@@ -28,9 +30,8 @@ type PostOptions = {
 }
 
 type PolaroidItemParameters = {
-    item: UserPost,
-    userId: number,
-    onPressViewProfile: (userId: number) => void
+    postId: number,
+    navigate: any
 }
 
 const { width, height } = Dimensions.get('window');
@@ -39,7 +40,9 @@ const polaroidHeight = Math.floor(height * 0.9);
 Entypo.loadFont();
 MaterialIcons.loadFont();
 
-const PolaroidItem = ({ item, onPressViewProfile, userId }: PolaroidItemParameters) => {
+const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) => {
+    const userId = getUserId() as number;
+    const item = getPost(postId);
     const [postOptions, setPostOptions] = useState<PostOptions>({
         openOptionsModal: false,
         openReportModal: false,
@@ -47,6 +50,10 @@ const PolaroidItem = ({ item, onPressViewProfile, userId }: PolaroidItemParamete
     });
     const polaroidDate = getPolaroidDate(item?.createdAt);
     const [views, symbol] = getFormatedView(100000);
+    
+    const onPressViewProfile = () => {
+        navigate('ProfileScreen', { commonScreen: true, matchedUserId: item.userId });
+    }
 
     useEffect(() => {
         let check = true;
@@ -61,6 +68,7 @@ const PolaroidItem = ({ item, onPressViewProfile, userId }: PolaroidItemParamete
         }
         if (postOptions.reportPost && !item.reported) { 
             item.reported = true;
+            setPost(postId, item);
             callReportPostApi();
         }
         return () => {
@@ -172,7 +180,9 @@ const PolaroidItem = ({ item, onPressViewProfile, userId }: PolaroidItemParamete
                             </View>
                             <View style={{ flex: 1 }}>
                                 <View style={styles.profileContainer}>
-                                    <TouchableOpacity style={styles.profileTouchable} onPress={() => onPressViewProfile(item.userId)}>
+                                    <TouchableOpacity style={styles.profileTouchable} 
+                                        onPress={() => onPressViewProfile()}
+                                    >
                                         <Image 
                                             source={item.profilePicture ? { uri: item.profilePicture } : DEFAULT_PROFILE_PIC} 
                                             style={styles.profilePicture}
@@ -196,8 +206,8 @@ const PolaroidItem = ({ item, onPressViewProfile, userId }: PolaroidItemParamete
                 </TouchableOpacity>
             </Provider>
         </View>
-    )
-}
+    );
+})
 
 const styles = StyleSheet.create({
     polaroidMainContainer: { height: polaroidHeight },
