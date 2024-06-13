@@ -13,7 +13,9 @@ type UserPost = {
   name: string,
   caption: string,
   match: boolean,
-  reported?: boolean
+  reported?: boolean,
+  reactCount: number,
+  reacted: boolean
 }
 
 type UserPostRes = {

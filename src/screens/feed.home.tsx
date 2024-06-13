@@ -18,7 +18,9 @@ type UserPost = {
     name: string,
     caption: string,
     match: boolean,
-    reported?: boolean
+    reported?: boolean,
+    reactCount: number,
+    reacted: boolean
 }
 
 type PostObj = {
@@ -31,12 +33,12 @@ type PostObj = {
 Entypo.loadFont();
 MaterialIcons.loadFont();
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 const polaroidHeight = Math.floor(height * 0.9);
 
 const FeedScreen = ({ navigation }: any) => {  
     const userId = getUserId() as number;
-    const perPage = 10;
+    const perPage = 2;
     const [data, setData] = useState<number[]>([]);
     const [postObj, setPostObj] = useState<PostObj>({
         isLoading: true,
@@ -71,14 +73,13 @@ const FeedScreen = ({ navigation }: any) => {
         return () => {
             check = false;
         }
-    }, [postObj.page]);    
+    }, [postObj.page]);   
 
     const onLoadMorePost = ({ distanceFromEnd }: { distanceFromEnd: number }) => {
         if (postObj.hasMore) {
           setPostObj(prevState => ({ ...prevState, isLoading: true, page: postObj.page + 1 }));
         }
     }
-
 
     return (
         <View style={{ flex: 1, backgroundColor: COLOR_CODE.BLACK }}>

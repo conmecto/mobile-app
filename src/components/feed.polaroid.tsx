@@ -9,6 +9,7 @@ import { getPolaroidDate, getFormatedView, formatText } from '../utils/helpers';
 import { getUserId } from '../utils/user.id';
 import { getPost, setPost } from '../utils/post';
 import reportUserPost from '../api/report.post';
+import reactUserPost from '../api/react.post';
 
 type UserPost = {
     id: number,
@@ -20,13 +21,16 @@ type UserPost = {
     name: string,
     caption: string,
     match: boolean,
-    reported?: boolean
+    reported?: boolean,
+    reactCount: number,
+    reacted: boolean
 }
 
 type PostOptions = {
     openOptionsModal: boolean,
     openReportModal: boolean,
     reportPost: boolean,
+    reactToPost: boolean
 }
 
 type PolaroidItemParameters = {
@@ -46,11 +50,11 @@ const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) =
     const [postOptions, setPostOptions] = useState<PostOptions>({
         openOptionsModal: false,
         openReportModal: false,
-        reportPost: false
+        reportPost: false,
+        reactToPost: false
     });
     const polaroidDate = getPolaroidDate(item?.createdAt);
-    const [views, symbol] = getFormatedView(100000);
-    
+    const [views, symbol] = getFormatedView(item.reactCount);
     const onPressViewProfile = () => {
         navigate('ProfileScreen', { commonScreen: true, matchedUserId: item.userId });
     }
@@ -75,6 +79,28 @@ const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) =
           check = false;
         }
     }, [postOptions.reportPost]);
+
+    useEffect(() => {
+        let check = true;
+        const callReactPostApi = async () => {
+            await reactUserPost(item.id, userId);
+            if (check) {
+                setPostOptions(prevState => ({
+                    ...prevState,
+                    reactToPost: false
+                }));
+            }
+        }
+        if (postOptions.reactToPost && !item.reacted) { 
+            item.reacted = true;
+            item.reactCount += 1;
+            setPost(postId, item);
+            callReactPostApi();
+        }
+        return () => {
+          check = false;
+        }
+    }, [postOptions.reactToPost]);
 
     const onPressPostOptions = () => {
         if (!postOptions.openOptionsModal) {
@@ -110,6 +136,15 @@ const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) =
         }));
     }
 
+    const onPressReact = () => {
+        if (!item.reacted) {
+            setPostOptions(prevState => ({
+                ...prevState,
+                reactToPost: true
+            }));
+        }
+    }
+
     return (
         <View style={styles.polaroidMainContainer}>
             <Provider>
@@ -119,45 +154,57 @@ const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) =
                         contentContainerStyle={styles.optionsModalStyle}
                     >
                         <View style={{ flex: 1 }}>
-                            <TouchableOpacity 
-                                onPress={onPressReportButton}
-                                style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-                            >
-                                <Text style={{ fontSize: 15, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_RED }}>
-                                    Report Polaroid
-                                </Text>
-                            </TouchableOpacity>
+                            {
+                                item.reacted ? 
+                                (
+                                    <View style={styles.reactContainer}>
+                                        <Text style={styles.reactText}>
+                                            Starred <MaterialIcons name='reviews' color={COLOR_CODE.GOLDEN} size={20} />
+                                        </Text>
+                                    </View>
+                                ) : (
+                                    <TouchableOpacity onPress={onPressReact} style={styles.reactTouchable}>
+                                        <Text style={styles.reactText}>
+                                            Give a Star <MaterialIcons name='reviews' color={COLOR_CODE.GOLDEN} size={20} />
+                                        </Text>
+                                    </TouchableOpacity>
+                                )
+                            }
+                            {
+                                item.reported ? 
+                                (
+                                    <View style={styles.reportContainer}>
+                                        <Text style={styles.reportText}>
+                                            Reported ✅
+                                        </Text>
+                                    </View>
+                                ) : (
+                                    <TouchableOpacity onPress={onPressReportButton} style={styles.reportTouchable}>
+                                        <Text style={styles.reportText}>
+                                            Report Polaroid
+                                        </Text>
+                                    </TouchableOpacity>
+                                )
+                            }
                         </View>
                     </Modal>
                     <Modal visible={postOptions.openReportModal} 
                         onDismiss={onDismissReportModal} contentContainerStyle={styles.modalStyle}
                     >
-                        {
-                            item.reported ? 
-                            (
-                                <View style={styles.reportedModalContainer}>
-                                    <Text style={{ fontSize: 20, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_RED }}>
-                                        Reported ✅
-                                    </Text>
-                                </View>
-                            ) :
-                            (
-                                <View style={styles.modalContainer}>
-                                    <Text numberOfLines={2} adjustsFontSizeToFit style={styles.reportTitle}>
-                                        Report if you find this content to be
-                                    </Text>
-                                    <Text style={styles.reportTitleOptions}>
-                                        Hateful or Violent or Abusive or Sexual or Explicit or Harmful or Dangerous or 
-                                        Spam or Misleading or Child abuse
-                                    </Text>
-                                    <Button onPress={onPressReport} buttonColor={COLOR_CODE.BRIGHT_RED} 
-                                        textColor={COLOR_CODE.OFF_WHITE} labelStyle={{ fontSize: 12 }}
-                                    >
-                                        Confirm
-                                    </Button>
-                                </View>
-                            )
-                        }
+                        <View style={styles.modalContainer}>
+                            <Text numberOfLines={2} adjustsFontSizeToFit style={styles.reportTitle}>
+                                Report if you find this content to be
+                            </Text>
+                            <Text style={styles.reportTitleOptions}>
+                                Hateful or Violent or Abusive or Sexual or Explicit or Harmful or Dangerous or 
+                                Spam or Misleading or Child abuse
+                            </Text>
+                            <Button onPress={onPressReport} buttonColor={COLOR_CODE.BRIGHT_RED} 
+                                textColor={COLOR_CODE.OFF_WHITE} labelStyle={{ fontSize: 12 }}
+                            >
+                                Confirm
+                            </Button>
+                        </View>
                     </Modal>
                 </Portal>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -231,7 +278,7 @@ const styles = StyleSheet.create({
         right: 10,
         position: 'absolute', 
         borderRadius: 10, 
-        height: height * 0.05, 
+        height: height * 0.1, 
         width: width * 0.4, 
         backgroundColor: COLOR_CODE.OFF_WHITE
     },
@@ -247,6 +294,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: COLOR_CODE.GREY
     },
+    reactContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: COLOR_CODE.LIGHT_GREY },
+    reactTouchable: { flex: 1, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: COLOR_CODE.LIGHT_GREY },
+    reactText: { fontSize: 15, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE },
+    reportText: { fontSize: 15, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_RED },
+    reportTouchable: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    reportContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });
 
 export default PolaroidItem;
