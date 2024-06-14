@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Image, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, FlatList } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
-import { check, PERMISSIONS, RESULTS, request } from 'react-native-permissions';
-import { launchImageLibrary, ImageLibraryOptions, Asset } from 'react-native-image-picker';
-import { COLOR_CODE } from '../utils/enums';
-import { postOptions, maxFileSizeBytes, allowedFileTypes } from '../utils/constants';
-import addPost from '../api/add.post';
-import Environments from '../utils/environments';
-import { getUserId } from '../utils/user.id';
+import getUserPosts from '../api/user.posts';
 
 type UserPost = {
   id: number,
@@ -22,34 +16,105 @@ type UserPost = {
 }
 
 type PostObj = {
-  posts: UserPost[],
   isLoading: boolean,
   page: number,
   hasMore: boolean,
   isRefreshing: boolean
 }
 
-type params = { postObj: PostObj, setPostObj: React.Dispatch<React.SetStateAction<PostObj>>, navigation: any }
+type params = { 
+  navigate: any,
+  userId: number 
+}
 
 FontAwesome.loadFont();
 Entypo.loadFont();
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 const polaroidHeight = height * 0.25;
-  
-const Posts = ({ navigation, postObj, setPostObj }: params) => {
-  const onPressPolaroid = (post: UserPost) => {
-    navigation.navigate('ViewPostScreen', { post });
-  }
 
-  const Polaroid =  ({ item }: { item: UserPost}) => {
-    return (
-      <View style={styles.polaroidContainer}>
-        <TouchableOpacity style={styles.polaroidTouchable} onPress={() => onPressPolaroid(item)}>
-          <Image source={{ uri: item.location }} style={styles.polaroidImage}/>
-        </TouchableOpacity>
-      </View>
-    );
+const Polaroid =  React.memo(({ item, navigate }: { item: UserPost, navigate: any }) => {
+  const onPressPolaroid = (post: UserPost) => {
+    navigate('ViewPostScreen', { post });
+  }
+  return (
+    <View style={styles.polaroidContainer}>
+      <TouchableOpacity style={styles.polaroidTouchable} onPress={() => onPressPolaroid(item)}>
+        <Image source={{ uri: item.location }} style={styles.polaroidImage}/>
+      </TouchableOpacity>
+    </View>
+  );
+});
+  
+const Posts = ({ navigate, userId }: params) => {
+  const perPage = 4;
+  const [postData, setPostData] = useState<UserPost[]>([]);
+  const [postObj, setPostObj] = useState<PostObj>({
+    isLoading: true,
+    isRefreshing: false,
+    page: 1,
+    hasMore: true
+  });
+
+  useEffect(() => {
+    let check = true;
+    const fetchPosts = async () => {
+      const res = await getUserPosts(userId, { page: postObj.page, perPage });
+      const postObjUpdated = {
+        ...postObj,
+        isLoading: false,
+        isRefreshing: false
+      }
+      if (check) {
+        if (res?.posts) {
+          setPostData(prevData => { 
+            prevData.push(...res.posts); 
+            return prevData;
+          });
+          postObjUpdated.hasMore = res.hasMore;
+        }
+        setPostObj(postObjUpdated);
+      }
+    }
+    if (postObj.isRefreshing && postObj.hasMore && postObj.isLoading) {
+      fetchPosts();
+    }
+    return () => {
+      check = false;
+    }
+  }, [postObj.isRefreshing]);
+  
+  useEffect(() => {
+    let check = true;
+    const fetchPosts = async () => {
+      const res = await getUserPosts(userId, { page: postObj.page, perPage });
+      const postObjUpdated = {
+        ...postObj,
+        isLoading: false,
+        isRefreshing: false
+      }
+      if (check) {
+        if (res?.posts) {
+          setPostData(prevData => { 
+            prevData.push(...res.posts); 
+            return prevData;
+          });
+          postObjUpdated.hasMore = res.hasMore;
+        }
+        setPostObj(postObjUpdated);
+      }
+    }
+    if (postObj.hasMore && postObj.isLoading && !postObj.isRefreshing) {
+      fetchPosts();
+    }
+    return () => {
+      check = false;
+    }
+  }, [postObj.page]);
+
+  const onRefreshPosts = () => {
+    setPostData([]);
+    setPostObj({ page: 1, isLoading: true, isRefreshing: true, hasMore: true });
   }
 
   const onLoadMorePost = ({ distanceFromEnd }: { distanceFromEnd: number }) => {
@@ -65,15 +130,15 @@ const Posts = ({ navigation, postObj, setPostObj }: params) => {
       </View>
       <View style={{ flex: 1 }}>
         <FlatList 
-          data={postObj?.posts || []}
-          renderItem={({ item }) => <Polaroid item={item} />}
+          data={postData}
+          renderItem={({ item }) => <Polaroid item={item} navigate={navigate} />}
           keyExtractor={(item: any, index: number) => item.id?.toString()}
           numColumns={2}
           showsVerticalScrollIndicator={false}
           onEndReached={onLoadMorePost}
           onEndReachedThreshold={0}
           refreshing={postObj.isRefreshing}
-          onRefresh={() => setPostObj({ page: 1, isLoading: true, isRefreshing: true, posts: [], hasMore: true })}
+          onRefresh={onRefreshPosts}
         />
       </View>
     </View>

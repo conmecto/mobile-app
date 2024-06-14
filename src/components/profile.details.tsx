@@ -29,13 +29,13 @@ type UserProfileRes = {
 
 type props = {
   profileDetails: UserProfileRes,
-  navigation: any,
+  navigate: any,
   commonScreen: boolean
 }
 
-const ProfileDetails = ({ profileDetails, navigation, commonScreen }: props) => {
+const ProfileDetails = ({ profileDetails, navigate, commonScreen }: props) => {
   const onPressEditProfile = () => {
-    navigation.navigate('EditProfileScreen', { profileDetails });
+    navigate('EditProfileScreen', { profileDetails });
   }
 
   return (

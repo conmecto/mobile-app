@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import TopBar from '../components/top.bar';
 import ProfileDetails from '../components/profile.details';
 import Posts from '../components/posts';
 import getUserProfile from '../api/user.profile';
-import getUserPosts from '../api/user.posts';
 import Loading from '../components/loading';
 import { getUserId } from '../utils/user.id';
 import { COLOR_CODE } from '../utils/enums';
@@ -43,33 +42,17 @@ type UserPost = {
   deletedAt?: Date | null
 }
 
-type PostObj = {
-  posts: UserPost[],
-  isLoading: boolean,
-  page: number,
-  hasMore: boolean,
-  isRefreshing: boolean
-}
-
 const ProfileScreen = ({ navigation, route }: any) => {
   const { commonScreen, matchedUserId }: { commonScreen: boolean, matchedUserId: number } = route?.params;
   let userId = getUserId() as number;
   if (commonScreen) {
     userId = matchedUserId;
   }
-  const perPage = 10;
   const [profileObj, setProfileObj] = useState<ProfileObj>({
     error: '',
     isLoading: true
   });
-  const [postObj, setPostObj] = useState<PostObj>({
-    posts: [],
-    isLoading: true,
-    isRefreshing: false,
-    page: 1,
-    hasMore: true
-  });
- 
+  
   useEffect(() => {
     let check = true;
     const fetchProfile = async () => {
@@ -93,56 +76,6 @@ const ProfileScreen = ({ navigation, route }: any) => {
       check = false;
     }
   }, []);
-  
-  useEffect(() => {
-    let check = true;
-    const fetchPosts = async () => {
-      const res = await getUserPosts(userId, { page: postObj.page, perPage });
-      const postObjUpdated = {
-        ...postObj,
-        isLoading: false,
-        isRefreshing: false
-      }
-      if (check) {
-        if (res?.posts) {
-          postObjUpdated.posts.push(...res.posts);
-          postObjUpdated.hasMore = res.hasMore;
-        }
-      }
-      setPostObj(postObjUpdated);
-    }
-    if (postObj.isRefreshing && postObj.hasMore && postObj.isLoading) {
-      fetchPosts();
-    }
-    return () => {
-      check = false;
-    }
-  }, [postObj.isRefreshing]);
-  
-  useEffect(() => {
-    let check = true;
-    const fetchPosts = async () => {
-      const res = await getUserPosts(userId, { page: postObj.page, perPage });
-      const postObjUpdated = {
-        ...postObj,
-        isLoading: false,
-        isRefreshing: false
-      }
-      if (check) {
-        if (res?.posts) {
-          postObjUpdated.posts.push(...res.posts);
-          postObjUpdated.hasMore = res.hasMore;
-        }
-      }
-      setPostObj(postObjUpdated);
-    }
-    if (postObj.hasMore && postObj.isLoading && !postObj.isRefreshing) {
-      fetchPosts();
-    }
-    return () => {
-      check = false;
-    }
-  }, [postObj.page]);
 
   return (
     <View style={styles.container}>
@@ -161,19 +94,11 @@ const ProfileScreen = ({ navigation, route }: any) => {
               </View>
             ) : 
             (
-              <ProfileDetails profileDetails={profileObj.profile as UserProfileRes} navigation={navigation} commonScreen={!!commonScreen} />
+              <ProfileDetails profileDetails={profileObj.profile as UserProfileRes} navigate={navigation.navigate} commonScreen={!!commonScreen} />
             )
           )
         }
-        {
-          postObj.isLoading ?
-          (<Loading flex={4} />) :
-          (
-            <Posts 
-              postObj={postObj} navigation={navigation} setPostObj={setPostObj} 
-            />
-          )
-        }
+        <Posts navigate={navigation.navigate} userId={userId} />
       </SafeAreaView>
     </View>
   );
