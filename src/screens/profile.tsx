@@ -31,17 +31,6 @@ type ProfileObj = {
   error: string
 }
 
-type UserPost = {
-  id: number,
-  userId: number,
-  location: string,
-  type: string,
-  fileMetadataId: number,
-  createdAt: Date,
-  updatedAt: Date,
-  deletedAt?: Date | null
-}
-
 const ProfileScreen = ({ navigation, route }: any) => {
   const { commonScreen, matchedUserId }: { commonScreen: boolean, matchedUserId: number } = route?.params;
   let userId = getUserId() as number;

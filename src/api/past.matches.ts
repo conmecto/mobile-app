@@ -27,7 +27,7 @@ type UserMatchRes = {
 const getPastMatches = async (userId: number, callIfUnauthorized: boolean = true): Promise<UserMatchRes[]> => {
   try {
     const token = getAccessToken();
-    const response = await fetch(Environments.api.matchService.baseUrl + `/match/past?count=10&userId=${userId}`, {
+    const response = await fetch(Environments.api.matchService.baseUrl + `/match/past?count=5&userId=${userId}`, {
       method: 'GET',
       headers: {
         authorization: 'Bearer ' + token 

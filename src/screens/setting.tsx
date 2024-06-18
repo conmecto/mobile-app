@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import TopBar from '../components/top.bar';
 import { COLOR_CODE } from '../utils/enums';
 import getUserMatchSettings from '../api/user.match.setting';
 import updateMatchSetting from '../api/update.match.setting';
-import getPastMatches from '../api/past.matches';
 import Loading from '../components/loading';
-import { deleteToken, formatText, fireColorScoreBased } from '../utils/helpers';
+import { deleteToken, formatText } from '../utils/helpers';
 import getCities from '../api/get.cities';
-import { deleteChatSocketInstance } from '../sockets/chat.socket';
+import { deleteAllChatSocketInstance } from '../sockets/chat.socket';
 import Environments from '../utils/environments';
 
 import { getUserId } from '../utils/user.id';
@@ -67,8 +66,6 @@ const SettingScreen = ({ navigation, route }: any) => {
     updateSettings: '',
     modal: ''
   });
-  const [pastMatches, setPastMatches] = useState<UserMatchRes[]>([]);
-  const [isLoadingPastMatches, setIsLoadingPastMatches] = useState(true);
   
   useEffect(() => {
     let check = true;
@@ -76,15 +73,6 @@ const SettingScreen = ({ navigation, route }: any) => {
       const res = await getCities('india');
       if (check && res) {
         setCities(res);
-      }
-    }
-    const callPastMatches = async () => {
-      const res = await getPastMatches(userId);
-      if (check && res) {
-        setIsLoadingPastMatches(false);
-        if (res) {
-          setPastMatches(res);
-        } 
       }
     }
     const callSettings = async () => {
@@ -103,9 +91,6 @@ const SettingScreen = ({ navigation, route }: any) => {
     }
     if (!cities.length) {
       callCities();
-    }
-    if (isLoadingPastMatches) {
-      callPastMatches();
     }
     if (!searchSettings.id) {
       callSettings();
@@ -197,7 +182,7 @@ const SettingScreen = ({ navigation, route }: any) => {
   const onPressLogout = () => {
     deleteToken(userId).then(res => {
       if (res) {
-        deleteChatSocketInstance();
+        deleteAllChatSocketInstance();
         navigation.navigate('WelcomeScreen');
       }
     }).catch(error => {
@@ -212,26 +197,6 @@ const SettingScreen = ({ navigation, route }: any) => {
       <TouchableOpacity style={styles.selectSettingPressable} onPress={() => onPressSelectModalOption(item?.toString())} key={index}>
         <Text style={{ fontSize: 25, fontWeight: '600', color: COLOR_CODE.BRIGHT_BLUE }}>{formatText(item?.toString())}</Text>
       </TouchableOpacity>
-    );
-  }
-
-  const renderItemsPastMatches = (item: UserMatchRes, index: number) => {
-    const profile = userId === item.userId1 ? item.profileUserId1 : item.profileUserId2;
-    return (
-      <View style={styles.matchContainer} key={index}>
-        <View style={styles.matchImageContainer}>
-          <Image source={{ uri: profile?.profilePicture }} style={styles.profilePicture}/>
-        </View>
-        <View style={styles.matchNameContainer}>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.nameText}>{formatText(profile?.name)}</Text>
-        </View>
-        <View style={styles.matchScoreContainer}>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.scoreText}>{item.score}</Text>
-        </View>
-        <View style={styles.matchIconContainer}>
-          <MaterialCommunityIcons name='fire' color={fireColorScoreBased(item.score)} size={30}/> 
-        </View>
-      </View>
     );
   }
 
@@ -327,23 +292,6 @@ const SettingScreen = ({ navigation, route }: any) => {
 
         <Text>{'\n\n'}</Text>
 
-        <View style={styles.pastMatchMainContainer}>
-          <View style={styles.pastMatchHeader}>
-            <Text style={styles.pastMatchText}>Past Matches</Text>
-          </View>
-
-          <View style={styles.pastMatchBody}>
-            {
-              isLoadingPastMatches ? 
-              (<Loading />) : 
-              (
-                <ScrollView style={{ flex: 1 }}>
-                  {pastMatches.map(renderItemsPastMatches)}
-                </ScrollView>
-              )
-            }
-          </View>
-        </View>
       </ScrollView>
     </View>
   );
@@ -433,23 +381,6 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
 
-  pastMatchMainContainer: {
-    height: height * 0.3
-  },
-  pastMatchHeader: {
-    height: height * 0.05,
-    backgroundColor: COLOR_CODE.LIGHT_GREY,
-    paddingLeft: 10,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  pastMatchText: {
-    fontSize: 20,
-    fontWeight: '600'
-  },
-  pastMatchBody: {
-    flex: 1,
-  },
   matchContainer: {
     height: height * 0.05,
     flexDirection: 'row',

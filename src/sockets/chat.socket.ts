@@ -58,6 +58,10 @@ const deleteChatSocketInstance = (matchId: number, userId: number) => {
   chatSockets[getChatSocketKey(matchId, userId)] = null;
 }
 
+const deleteAllChatSocketInstance = () => {
+  chatSockets = {}
+}
+
 const sendFileAsMessage = (data: SendFileData) => {
   const chatSocket = getChatSocketInstance(data.matchId, data.userId);
   if (chatSocket && chatSocket.readyState === 1) {
@@ -65,4 +69,7 @@ const sendFileAsMessage = (data: SendFileData) => {
   }
 }
 
-export { createChatSocketConnection, getChatSocketInstance, deleteChatSocketInstance, sendFileAsMessage }
+export { 
+  createChatSocketConnection, getChatSocketInstance, deleteChatSocketInstance, sendFileAsMessage,
+  deleteAllChatSocketInstance
+}
