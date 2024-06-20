@@ -75,54 +75,35 @@ const CapturedCameraScreen = ({ route, navigation }: any) => {
               {error}
             </Text>
           </View>
-          <View style={{ flex: 2, flexDirection: 'row' }}>
-            <View style={{ flex: 3 }}>
-            <View style={styles.commonContainer}>
-              <TextInput
-                placeholder='Caption'
-                value={polaroidDetail.caption}
-                onChangeText={text => onChangeText('caption', text)}
-                style={styles.captionInput}
-                onFocus={() => setKeyboardEnabled(true)}
-                onSubmitEditing={() => setKeyboardEnabled(false)}
-              />
-            </View>
-            <View style={styles.commonContainer}>
-              <TextInput
-                placeholder='Reference (Optional)'
-                value={polaroidDetail.link}
-                onChangeText={text => onChangeText('link', text)}
-                style={styles.linkInput}
-                onFocus={() => setKeyboardEnabled(true)}
-                onSubmitEditing={() => setKeyboardEnabled(false)}
-              />
-            </View>
-            </View>
-            <View style={styles.considerContainer}>
-              <Text numberOfLines={2} adjustsFontSizeToFit style={{ fontSize: 12, fontWeight: 'bold' }}>
-                Consider For a Match
-              </Text>
-              <Switch value={polaroidDetail.match} onValueChange={onToggleChange} color={COLOR_CODE.BRIGHT_BLUE} />
-            </View>
+          <View style={styles.commonContainer}>
+            <TextInput
+              placeholder='Caption'
+              value={polaroidDetail.caption}
+              onChangeText={text => onChangeText('caption', text)}
+              style={styles.captionInput}
+              onFocus={() => setKeyboardEnabled(true)}
+              onSubmitEditing={() => setKeyboardEnabled(false)}
+            />
           </View>
-          <View style={styles.actionContainer}>
-            {
-              !keyboardEnabled && 
-              (
+          <View style={styles.considerContainer}>
+            <Text numberOfLines={1} adjustsFontSizeToFit style={{ fontSize: 15, fontWeight: 'bold' }}>
+              Consider For a Match {'\t'}
+            </Text>
+            <Switch value={polaroidDetail.match} onValueChange={onToggleChange} color={COLOR_CODE.BRIGHT_BLUE} />
+          </View>
+          {
+            !keyboardEnabled && 
+            (
+              <View style={styles.actionContainer}>
                 <Button mode='contained' buttonColor={COLOR_CODE.RED} onPress={() => onPressRetake()}>
                   Retake
                 </Button>
-              )
-            }
-            {
-              !keyboardEnabled && 
-              (
                 <Button mode='contained' buttonColor={COLOR_CODE.BLACK} onPress={() => onPressShare()}>
                   Share Polaroid
                 </Button>
-              )
-            }
-          </View>
+              </View>
+            )
+          }
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -147,7 +128,7 @@ const styles = StyleSheet.create({
   },
   detailsContainer: { flex: 1, borderTopLeftRadius: 30, borderTopRightRadius: 30, backgroundColor: COLOR_CODE.OFF_WHITE },
   errorText: { color: COLOR_CODE.BRIGHT_RED, fontSize: 10, fontWeight: 'bold' },
-  commonContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  considerContainer: { flex: 1, justifyContent: 'space-evenly', alignItems: 'center' },
-  actionContainer: { flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }
+  commonContainer: { flex: 1.5, alignItems: 'center', justifyContent: 'center' },
+  considerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row' },
+  actionContainer: { flex: 2, flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }
 });
