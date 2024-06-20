@@ -80,7 +80,7 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
           setUserId(userId);
           setAccessToken(res.data[0].access as string);
           setSignupError('');
-          navigation.navigate('HomeScreen');
+          navigation.replace('HomeTabNavigator');
         } else {
           setSignupError('');
           navigation.navigate('ContactAdminScreen');
@@ -100,7 +100,14 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
     return ({ item }: any) => {
       return (
         <View style={{ padding: 5 }}>
-          <Button mode='text' buttonColor={COLOR_CODE.OFF_WHITE} onPress={() => onSelectField(item)} style={{ width: '90%', alignSelf: 'center' }} labelStyle={{ color: COLOR_CODE.GREY }}>{item}</Button>
+          <Button mode='text' 
+            buttonColor={COLOR_CODE.OFF_WHITE} 
+            onPress={() => onSelectField(item)} 
+            style={{ width: '90%', alignSelf: 'center' }} 
+            labelStyle={{ color: COLOR_CODE.GREY }}
+          >
+              {item}
+          </Button>
         </View>
       );
     }
@@ -148,7 +155,6 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
         <Portal>
           <Modal visible={Boolean(modalField)} onDismiss={() => setModalField('')} contentContainerStyle={styles.modalContainer}>
             <FlatList
-              //style={{ flex: 1, padding: 5 }}
               data={getFlatListData()}
               renderItem={renderItem()}
               keyExtractor={(item, index) => index.toString()}

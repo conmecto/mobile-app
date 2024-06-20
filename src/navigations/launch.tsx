@@ -5,7 +5,7 @@ import WelcomeScreen from '../screens/welcome';
 import LoginScreen from '../screens/login';
 import SignupHomeScreen from '../screens/signup.home';
 import SignupSecondScreen from '../screens/signup.second';
-import HomeScreen from '../screens/home';
+import HomeTabNavigator from './home';
 import ContactAdminScreen from '../screens/contact.admin';
 import { getToken, updateTokens } from '../utils/helpers';
 import { initialLogoScreenTimeMilli } from '../utils/constants';
@@ -26,7 +26,7 @@ const LaunchStackNavigator = () => {
       setUserId(userId);
       const authCheckRes = await updateTokens(userId);
       if (authCheckRes) {
-        setInitialScreen('HomeScreen');
+        setInitialScreen('HomeTabNavigator');
       }
     }
     setTimeout(() => setLoading(false), initialLogoScreenTimeMilli);
@@ -54,7 +54,7 @@ const LaunchStackNavigator = () => {
             <Stack.Screen name='SignupHomeScreen' component={SignupHomeScreen} options={{headerShown: false}}/>
             <Stack.Screen name='SignupSecondScreen' component={SignupSecondScreen} options={{headerShown: false, gestureEnabled: false}}/>
             <Stack.Screen name='SignupThirdScreen' component={SignupThirdScreen} options={{headerShown: false, gestureEnabled: false}}/>
-            <Stack.Screen name='HomeScreen' component={HomeScreen} options={{headerShown: false, gestureEnabled: false}} />
+            <Stack.Screen name='HomeTabNavigator' component={HomeTabNavigator} options={{headerShown: false, gestureEnabled: false}} />
             <Stack.Screen name='ContactAdminScreen' component={ContactAdminScreen} options={{headerShown: false}}/>
           </Stack.Navigator>
         </NavigationContainer>

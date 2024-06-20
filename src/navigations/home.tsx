@@ -24,7 +24,6 @@ const barHeight = Math.floor(height/12);
 const marginBottom = Math.floor(height/50);
 
 const HomeTabNavigator = (data: any) => { 
-
   return (
     <Tab.Navigator screenOptions={{  
         tabBarShowLabel: false,
@@ -38,31 +37,31 @@ const HomeTabNavigator = (data: any) => {
         tabBarLabel: 'Feed', headerShown: false, 
         tabBarIcon: ({focused, color, size}) => (<Foundation name='home' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={30} />)
         }} 
-        initialParams={data.params} />
+         />
 
       <Tab.Screen name='MatchNavigator' component={MatchNavigator} options={{ 
         tabBarLabel: 'Match', headerShown: false, 
         tabBarIcon: ({focused, color, size}) => (<Ionicons name='chatbubble-ellipses-outline' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={30} />)
         }} 
-        initialParams={data.params} />
+         />
 
       <Tab.Screen name='CameraNavigator' component={CameraNavigator} options={{ 
         tabBarLabel: 'Camera', headerShown: false, 
         tabBarIcon: ({focused, color, size}) => (<Ionicons name='camera' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={30} />)
         }} 
-        initialParams={data.params} />
+         />
         
       <Tab.Screen name='ProfileNavigator' component={ProfileNavigator} options={{ 
         tabBarLabel: 'Profile', headerShown: false,
         tabBarIcon: ({focused, color, size}) => (<FontAwesome name='user' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={25}/>)
         }} 
-        initialParams={data.params} />
+         />
 
       <Tab.Screen name='SettingScreen' component={SettingScreen} options={{ 
         tabBarLabel: 'Setting', headerShown: false,
         tabBarIcon: ({focused, color, size}) => (<FontAwesome name='gear' color={ focused ? COLOR_CODE.BRIGHT_BLUE : COLOR_CODE.BLACK } size={25}/>)
         }} 
-        initialParams={data.params} />
+         />
     </Tab.Navigator>
   );
 }

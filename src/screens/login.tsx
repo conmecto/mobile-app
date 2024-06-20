@@ -9,6 +9,7 @@ import TopBar from '../components/top.bar';
 import environments from '../utils/environments';
 import { setAccessToken } from '../utils/token';
 import { saveToken, getToken } from '../utils/helpers';
+import { setUserId } from '../utils/user.id';
 
 type LoginObj = {
   appleAuthUserId?: string,
@@ -29,6 +30,7 @@ const LoginScreen = ({ navigation }: any) => {
   const [loginUser, setLoginUser] = useState(false);
   useEffect(() => {
     let check = true;
+    let timerId: NodeJS.Timeout;
     const callLogin = async () => {
       const res = await verifyOtp(loginObj);
       if (check) {
@@ -36,15 +38,21 @@ const LoginScreen = ({ navigation }: any) => {
         setLoginUser(false);
         if (res && res.errorCode && res.errorCode === ERROR_CODES.TOKEN_INVALID) {
           setLoginError('Invalid token, please retry with same apple id you used for creating user');
+          timerId = setTimeout(() => navigation.navigate('WelcomeScreen'), 3000);
         } else if (res && res.errorCode && res.errorCode === ERROR_CODES.USER_NOT_FOUND) {
           setLoginError('User not found, Please sign up first');
+          timerId = setTimeout(() => navigation.navigate('WelcomeScreen'), 3000);
         } else if (res && res.data) {
           const userId = res.data[0].userId as number;
           const key = userId + ':auth:token';
-          await saveToken(key, JSON.stringify({ refresh: res.data[0].refresh }));
+          await Promise.all([
+            saveToken('userId', userId?.toString()),
+            saveToken(key, JSON.stringify({ refresh: res.data[0].refresh }))
+          ]);
+          setUserId(userId);
           setAccessToken(res.data[0].access as string);
           setLoginError('');
-          navigation.navigate('HomeScreen'); 
+          navigation.replace('HomeTabNavigator'); 
         } else {
           setLoginError('');
           navigation.navigate('ContactAdminScreen');
@@ -55,6 +63,7 @@ const LoginScreen = ({ navigation }: any) => {
       callLogin();
     }
     return () => {
+      clearTimeout(timerId);
       check = false;
     }
   }, [loginUser]);
