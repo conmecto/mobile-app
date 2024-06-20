@@ -9,7 +9,6 @@ import { Provider, Modal, Portal, Button } from 'react-native-paper';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { getChatSocketInstance } from '../sockets/chat.socket';
 import { COLOR_CODE, ChatSocketEvents } from '../utils/enums';
-import { useHeaderHeight } from '@react-navigation/elements';
 import getChats from '../api/get.chats';
 import endMatch from '../api/end.match';
 import { getUserId } from '../utils/user.id';
@@ -34,9 +33,6 @@ type Chat = {
 }
 
 type ChatObj = {
-  chats: Chat[],
-  fetchChats: string,
-  sendChat: string,
   page: number,
   isLoading: boolean,
   hasMoreChats: boolean
@@ -56,7 +52,6 @@ FontAwesome.loadFont();
 const { width, height } = Dimensions.get('window');
 
 const MatchChatScreen = ({ navigation, route }: any) => {
-  const headerHeight = useHeaderHeight();
   const userId = getUserId() as number;
   const { matchId, matchedUserId, matchedUserName }: { 
     matchId: number, matchedUserId: number, matchedUserName: string 
@@ -76,13 +71,11 @@ const MatchChatScreen = ({ navigation, route }: any) => {
     );
   }
   const [message, setMessage] = useState('');
+  const [chats, setChats] = useState<Chat[]>([]);
   //Convert chats to array with O(1) unshift
   const [chatObj, setChatObj] = useState<ChatObj>({
     page: 1,
     isLoading: true,
-    chats: [],
-    fetchChats: '',
-    sendChat: '',
     hasMoreChats: true
   });
   const [endMatchObj, setEndMatchObj] = useState<EndMatchType>({
@@ -96,7 +89,8 @@ const MatchChatScreen = ({ navigation, route }: any) => {
   useEffect(() => {
     let check = true;
     const getData = async () => {
-      const res = await getChats({ matchId, userId, page: chatObj.page });
+      const skip = chats.length;
+      const res = await getChats({ matchId, userId, page: chatObj.page, skip });
       const chatObjUpdated = {
         ...chatObj,
         isLoading: false,
@@ -105,8 +99,11 @@ const MatchChatScreen = ({ navigation, route }: any) => {
       }
       if (check) {
         if (res?.data.length) {
-          chatObjUpdated.chats = [...chatObj.chats, ...res.data];
           chatObjUpdated.hasMoreChats = res.hasMoreChats;
+          setChats(prevData => {
+            prevData.push(...res.data);
+            return prevData;
+          });
         }
         setChatObj(chatObjUpdated);
       }
@@ -171,9 +168,11 @@ const MatchChatScreen = ({ navigation, route }: any) => {
   const onPressSendHandler = () => {
     if (message.length) {
       chatSocket.send(JSON.stringify({ event: ChatSocketEvents.SAVE_MESSAGE, message }));
-      const chat = { message, sender: userId, receiver: matchedUserId, type: 'text', seen: false, matchId, createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
-      chatObj.chats = [chat, ...chatObj.chats];
-      setChatObj(chatObj);
+      const chat = {
+        message, sender: userId, receiver: matchedUserId, type: 'text', 
+        seen: false, matchId, createdAt: new Date(), updatedAt: new Date(), deletedAt: null 
+      };
+      setChats(prevData => [chat, ...prevData]);
       setMessage('');
     }
   }
@@ -181,7 +180,7 @@ const MatchChatScreen = ({ navigation, route }: any) => {
   chatSocket.onmessage = (wsMessage: any) => {
     const parsedData = JSON.parse(wsMessage.data);
     if (parsedData?.event === ChatSocketEvents.MESSAGE_RECEIVED) {
-      setChatObj({ ...chatObj, chats: [ omit(parsedData, ['event']) as Chat, ...chatObj.chats] });
+      setChats(prevData => [omit(parsedData, ['event']) as Chat, ...prevData]);
     }
   }
 
@@ -248,7 +247,7 @@ const MatchChatScreen = ({ navigation, route }: any) => {
                 <View style={styles.bodyContainer}>
                   <View style={styles.chatsContainer}>     
                     <FlatList 
-                      data={chatObj.chats}
+                      data={chats}
                       renderItem={({ item }) => <ChatView chat={item} />}
                       keyExtractor={(chat: any, index) => index?.toString()}
                       scrollEnabled={true}

@@ -20,13 +20,14 @@ type Chats = {
 type params = {
   matchId: number,
   userId: number,
-  page: number
+  page: number,
+  skip: number
 }
 
-const getChats = async ({ matchId, userId, page }: params, callIfUnauthorized: boolean = true): Promise<{ data: Chats[], hasMoreChats: boolean } | undefined> => {
+const getChats = async ({ matchId, userId, page, skip }: params, callIfUnauthorized: boolean = true): Promise<{ data: Chats[], hasMoreChats: boolean } | undefined> => {
   try {
     const token = getAccessToken();
-    const response = await fetch(Environments.api.matchService.baseUrl + `/match/${matchId}/chats?userId=${userId}&page=${page}&perPage=10`, {
+    const response = await fetch(Environments.api.matchService.baseUrl + `/match/${matchId}/chats?userId=${userId}&page=${page}&skip=${skip}&perPage=10`, {
       method: 'GET',
       headers: {
         authorization: 'Bearer ' + token
@@ -36,7 +37,7 @@ const getChats = async ({ matchId, userId, page }: params, callIfUnauthorized: b
     if (response?.status === 401 && callIfUnauthorized) {
       const tokens = await updateTokens(userId);
       if (tokens) {
-        const res = await getChats({ matchId, userId, page }, false);
+        const res = await getChats({ matchId, userId, page, skip }, false);
         return res;
       }
     }
