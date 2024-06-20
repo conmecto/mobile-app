@@ -12,33 +12,17 @@ import { getUserId } from '../utils/user.id';
 import TopBar from '../components/top.bar';
 import { getPolaroidDate, getFormatedView } from '../utils/helpers';
 
-type UserProfileRes = {
-  id: number,
-  userName?: string,
-  description?: string,
-  city?: string,
-  country?: string,
-  school?: string,
-  work?: string,
-  igId?: string,
-  snapId?: string,
-  interests?: string,
-  profilePicture?: string,
-  userId: number,
-  name: string,
-  age?: number
-}
-
 type UserPost = {
   id: number,
   userId: number,
   location: string,
   type: string,
-  fileMetadataId: number,
   createdAt: string,
-  updatedAt: string,
-  deletedAt?: string | null,
   caption: string,
+  match: boolean,
+  reported?: boolean,
+  reportedBy?: number,
+  reactCount: number
 }
 
 FontAwesome.loadFont();
@@ -116,7 +100,7 @@ const ViewPostScreen = ({ navigation, route }: any) => {
     } 
   }
   const polaroidDate = getPolaroidDate(post?.createdAt);
-  const [views, symbol] = getFormatedView(1000);
+  const [views, symbol] = getFormatedView(post.reactCount);
   return (
     <View style={styles.mainContainer}>
       <TopBar />

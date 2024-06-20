@@ -9,10 +9,12 @@ type UserPost = {
   userId: number,
   location: string,
   type: string,
-  fileMetadataId: number,
-  createdAt: Date,
-  updatedAt: Date,
-  deletedAt?: Date | null
+  createdAt: string,
+  caption: string,
+  match: boolean,
+  reported?: boolean,
+  reportedBy?: number,
+  reactCount: number
 }
 
 type PostObj = {
