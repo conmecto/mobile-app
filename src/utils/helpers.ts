@@ -1,8 +1,7 @@
 import * as Keychain from 'react-native-keychain';
-import logout from '../api/logout';
 import { COLOR_CODE } from './enums';
 import authenticateRefreshToken from '../api/auth';
-import { setAccessToken, resetToken } from './token';
+import { setAccessToken } from './token';
 import Environments from './environments'
 import { allowedFileTypes } from './constants';
 
@@ -17,14 +16,9 @@ const formatPayloadDob = (dob: string): string => {
 
 const deleteToken = async (userId: number) => {
   let res = null;
-  let apiRes = null; 
   try {
     const key = userId + ':auth:token';
-    [res, apiRes] = await Promise.all([
-      Keychain.resetGenericPassword({ service: key }),
-      logout(userId)
-    ]);
-    resetToken();
+    res = await Keychain.resetGenericPassword({ service: key });
   } catch(error) {
     if (Environments.appEnv !== 'prod') {
       console.log('Delete token error: ', error);

@@ -33,4 +33,8 @@ const setBulkPost = (bulkPosts: UserPost[]) => {
     }
 }
 
-export { getPost, setPost, setBulkPost }
+const resetPosts = () => {
+    posts = {};
+}
+
+export { getPost, setPost, setBulkPost, resetPosts }

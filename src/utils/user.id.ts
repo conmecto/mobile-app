@@ -8,4 +8,8 @@ const setUserId = (id: number) => {
   userId = id;
 }
 
-export { getUserId, setUserId }
+const resetUserId = () => {
+  userId = null;
+}
+
+export { getUserId, setUserId, resetUserId }

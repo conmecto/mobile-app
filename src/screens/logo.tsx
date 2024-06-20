@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Image, StyleSheet, Text, Dimensions } from 'react-native';
 import { IMAGE_LOGO } from '../files';
-import { COLOR_CODE } from '../utils/enums';
 
-const { height, width } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 const LogoScreen = ({ navigation }: any) => {  
   return (
