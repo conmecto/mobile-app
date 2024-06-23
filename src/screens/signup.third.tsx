@@ -5,7 +5,7 @@ import TopBar from '../components/top.bar';
 import { COLOR_CODE, ERROR_CODES } from '../utils/enums';
 import createUser from '../api/create.user';
 import getCities from '../api/get.cities';
-import { GENDER, SEARCH_FOR } from '../utils/constants';
+import { GENDER } from '../utils/constants';
 import { setUserId } from '../utils/user.id';
 import { setAccessToken } from '../utils/token';
 import { saveToken } from '../utils/helpers';
@@ -19,8 +19,6 @@ type SignupObj = {
   appleAuthUserId?: string,
   dob?: Date,
   city?: string,
-  searchIn?: string,
-  searchFor?: string,
   gender?: string
 }
 
@@ -104,7 +102,7 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
             buttonColor={COLOR_CODE.OFF_WHITE} 
             onPress={() => onSelectField(item)} 
             style={{ width: '90%', alignSelf: 'center' }} 
-            labelStyle={{ color: COLOR_CODE.GREY }}
+            labelStyle={{ color: COLOR_CODE.BRIGHT_BLUE }}
           >
               {item}
           </Button>
@@ -115,16 +113,10 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
 
   const onPressSubmit = () => {
     let error = '';
-    if (!finalSignupObj.searchIn) {
-      error = 'Please select Connect with users in';
-    }
     if (!finalSignupObj.city) {
       error = 'Please select your City';
     }
-    if (!finalSignupObj.searchFor) {
-      error = 'Please select Connect with';
-    }
-    if (!finalSignupObj.gender) {
+    if (!finalSignupObj.gender) { 
       error = 'Please select I identify as';
     }
     if (error) {
@@ -141,8 +133,6 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
   const getFlatListData = () => {
     if (modalField === 'gender') {
       return GENDER;
-    } else if (modalField === 'searchFor') {
-      return SEARCH_FOR;
     } else {
       return cities;
     }
@@ -167,9 +157,7 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
           </View>
           <View style={styles.fieldContainer}>
             <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={() => onPressShowModal('gender')} style={{ width: '80%' }} labelStyle={styles.submitButtonText}>{finalSignupObj.gender || 'I identify as'}</Button>
-            <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={() => onPressShowModal('searchFor')} style={{ width: '80%' }} labelStyle={styles.submitButtonText}>{finalSignupObj.searchFor || 'Connect with'}</Button>
             <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={() => onPressShowModal('city')} style={{ width: '80%' }} labelStyle={styles.submitButtonText}>{finalSignupObj.city || 'Select your City'}</Button>
-            <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={() => onPressShowModal('searchIn')} style={{ width: '80%' }} labelStyle={styles.submitButtonText}>{finalSignupObj.searchIn || 'Connect with users in'}</Button>
           </View>
           <View style={styles.submitContainer}>
             <Button mode='contained' buttonColor={COLOR_CODE.BLACK} onPress={onPressSubmit} labelStyle={styles.submitButtonText}>Submit</Button>
@@ -190,7 +178,7 @@ const styles = StyleSheet.create({
 
   modalContainer: { 
     backgroundColor: COLOR_CODE.OFF_WHITE, 
-    height: height * 0.6, 
+    height: height * 0.4, 
     width: width * 0.8, 
     alignSelf: 'center', 
     borderRadius: 20 

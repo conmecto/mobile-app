@@ -38,7 +38,7 @@ FontAwesome.loadFont();
 MaterialCommunityIcons.loadFont();
 const { height, width } = Dimensions.get('window');
 
-const searchFor = ['everyone', 'men', 'women'];
+const searchFor = ['women', 'men', 'everyone'];
 const age: number[] = [];
 for(let i = 18; i <= 70; i++) {
   age.push(i);
