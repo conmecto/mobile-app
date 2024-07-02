@@ -15,7 +15,7 @@ type CapturedPhoto = {
 
 type polaroidDetail = {
   caption: string,
-  link?: string,
+  tags?: string,
   match: boolean
 }
 
@@ -39,17 +39,12 @@ const CapturedCameraScreen = ({ route, navigation }: any) => {
     navigation.goBack();
   }
 
-  const onChangeText = (key: string, value: string) => {
-    if (key === 'caption') {
-      if (value.length > 100) {
-        setError('Caption character limit is 100');
-      } else {
-        setError('');
-        setPolaroidDetail({ ...polaroidDetail, caption: value });
-      }
+  const onChangeCaption = (value: string) => {
+    if (value.length > 100) {
+      setError('Caption character limit is 100');
     } else {
       setError('');
-      setPolaroidDetail({ ...polaroidDetail, link: value });
+      setPolaroidDetail({ ...polaroidDetail, caption: value });
     }
   }
 
@@ -59,7 +54,7 @@ const CapturedCameraScreen = ({ route, navigation }: any) => {
     if (!polaroidDetail.caption) {
       setError('Caption is required');
     } else {
-      navigation.navigate('UploadFileScreen', { capturedPhoto, polaroidDetail });
+      navigation.navigate('TagsScreen', { capturedPhoto, polaroidDetail });
     }
   }
 
@@ -79,18 +74,23 @@ const CapturedCameraScreen = ({ route, navigation }: any) => {
             <TextInput
               placeholder='Caption'
               value={polaroidDetail.caption}
-              onChangeText={text => onChangeText('caption', text)}
+              onChangeText={text => onChangeCaption(text)}
               style={styles.captionInput}
               onFocus={() => setKeyboardEnabled(true)}
               onSubmitEditing={() => setKeyboardEnabled(false)}
             />
           </View>
-          <View style={styles.considerContainer}>
-            <Text numberOfLines={1} adjustsFontSizeToFit style={{ fontSize: 15, fontWeight: 'bold' }}>
-              Consider For a Match {'\t'}
-            </Text>
-            <Switch value={polaroidDetail.match} onValueChange={onToggleChange} color={COLOR_CODE.BRIGHT_BLUE} />
-          </View>
+          {
+            !keyboardEnabled && 
+            (
+              <View style={styles.considerContainer}>
+                <Text numberOfLines={1} adjustsFontSizeToFit style={{ fontSize: 15, fontWeight: 'bold' }}>
+                  Consider For a Match {'\t'}
+                </Text>
+                <Switch value={polaroidDetail.match} onValueChange={onToggleChange} color={COLOR_CODE.BRIGHT_BLUE} />
+              </View>
+            )
+          }
           {
             !keyboardEnabled && 
             (
@@ -120,11 +120,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 15,
     color: COLOR_CODE.BRIGHT_BLUE    
-  },
-  linkInput: { 
-    fontWeight: 'bold',
-    fontSize: 15,
-    color: COLOR_CODE.BLACK    
   },
   detailsContainer: { flex: 1, borderTopLeftRadius: 30, borderTopRightRadius: 30, backgroundColor: COLOR_CODE.OFF_WHITE },
   errorText: { color: COLOR_CODE.BRIGHT_RED, fontSize: 10, fontWeight: 'bold' },

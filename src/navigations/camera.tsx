@@ -4,6 +4,7 @@ import CameraScreen from '../screens/camera';
 import CapturedCameraScreen from '../screens/captured.camera';
 import UploadFileScreen from '../screens/upload.file';
 import AddFileScreen from '../screens/add.file';
+import TagsScreen from '../screens/tags';
 
 const CameraStack = createNativeStackNavigator();
 
@@ -19,6 +20,9 @@ const CameraNavigator = ({ params }: any) => {
       />
       <CameraStack.Screen name='CapturedCameraScreen' 
         component={CapturedCameraScreen} options={{ headerShown: false, gestureEnabled: false }}
+      />
+      <CameraStack.Screen name='TagsScreen' 
+        component={TagsScreen} options={{ headerShown: false, gestureEnabled: false }}
       />
       <CameraStack.Screen name='UploadFileScreen' 
         component={UploadFileScreen} options={{ headerShown: false, gestureEnabled: false }}

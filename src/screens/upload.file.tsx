@@ -21,7 +21,7 @@ type param = {
     },
     polaroidDetail: {
         caption: string,
-        link?: string,
+        tags?: string,
         match: boolean
     }
 }
@@ -63,7 +63,8 @@ const UploadFileScreen = ({ route, navigation }: any) => {
                             height: capturedPhoto.height,
                             width: capturedPhoto.width,
                             match: polaroidDetail.match,
-                            caption: polaroidDetail.caption
+                            caption: polaroidDetail.caption,
+                            ...(polaroidDetail.tags ? { tags: polaroidDetail.tags } : {})
                         }
                         const addPostRes = await uploadPost(userId, data);
                         if (addPostRes?.message) {
