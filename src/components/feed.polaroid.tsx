@@ -10,21 +10,12 @@ import { getUserId } from '../utils/user.id';
 import { getPost, setPost } from '../utils/post';
 import reportUserPost from '../api/report.post';
 import reactUserPost from '../api/react.post';
+import { colors } from '../utils/constants';
+import TagItem from '../components/tag';
 
-type UserPost = {
-    id: number,
-    userId: number,
-    location: string,
-    type: string,
-    createdAt: string,
-    profilePicture?: string,
-    name: string,
-    caption: string,
-    match: boolean,
-    reported?: boolean,
-    reactCount: number,
-    reacted: boolean
-}
+const randomColor = () => {
+    return colors[Math.floor(Math.random() * colors.length)];
+};
 
 type PostOptions = {
     openOptionsModal: boolean,
@@ -145,6 +136,9 @@ const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) =
         }
     }
 
+    const tags = item.tags?.split(',') || [];
+    const tagsColor = tags.map(t => randomColor());
+
     return (
         <View style={styles.polaroidMainContainer}>
             <Provider>
@@ -248,8 +242,20 @@ const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) =
                         </View>
                     </View>
                 </View>
+                {
+                    item.tags &&
+                    (   
+                        <View style={styles.tagsMainContainer}>
+                            <View style={styles.tagsContainer}>
+                                {
+                                    tags.map((tag, index) => <TagItem tag={tag} key={index} tagColor={tagsColor[index]}/>)
+                                }
+                            </View>
+                        </View>
+                    )
+                }
                 <TouchableOpacity style={styles.optionTouchable} onPress={onPressPostOptions}>
-                    <Entypo name='dots-three-horizontal' color={COLOR_CODE.GREY} size={30} />
+                    <Entypo name='dots-three-horizontal' color={COLOR_CODE.GREY} size={35} />
                 </TouchableOpacity>
             </Provider>
         </View>
@@ -270,8 +276,8 @@ const styles = StyleSheet.create({
     profileTouchable: { flex: 1, alignItems: 'center', justifyContent: 'space-evenly' },
     profileContainer: { flex: 2 },
     optionTouchable: { 
-        height: 50, width: 50, position: 'absolute', alignSelf: 'flex-end', bottom: 0, 
-        alignItems: 'center', justifyContent: 'center' 
+        height: width * 0.15, width: width * 0.15, position: 'absolute', alignSelf: 'flex-end', bottom: 0, 
+        alignItems: 'center', justifyContent: 'center'
     },
     optionsModalStyle: { 
         bottom: 0,
@@ -300,6 +306,8 @@ const styles = StyleSheet.create({
     reportText: { fontSize: 15, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_RED },
     reportTouchable: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     reportContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    tagsMainContainer: {  height: width * 0.15, width: width * 0.7, position: 'absolute', bottom: 0 },
+    tagsContainer: { flex: 1, paddingLeft: 10, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start' }
 });
 
 export default PolaroidItem;

@@ -10,6 +10,7 @@ type UserPost = {
   type: string,
   createdAt: string,
   caption: string,
+  tags: string,
   match: boolean,
   reported?: boolean,
   reportedBy?: number,

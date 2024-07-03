@@ -8,21 +8,6 @@ import { setBulkPost } from '../utils/post';
 import getFeed from '../api/get.feed';
 import PolaroidItem from '../components/feed.polaroid';
 
-type UserPost = {
-    id: number,
-    userId: number,
-    location: string,
-    type: string,
-    createdAt: string,
-    profilePicture?: string,
-    name: string,
-    caption: string,
-    match: boolean,
-    reported?: boolean,
-    reactCount: number,
-    reacted: boolean
-}
-
 type PostObj = {
     isLoading: boolean,
     page: number,
@@ -73,7 +58,7 @@ const FeedScreen = ({ navigation }: any) => {
         return () => {
             check = false;
         }
-    }, [postObj.page]);   
+    }, [postObj.page]);  
 
     const onLoadMorePost = ({ distanceFromEnd }: { distanceFromEnd: number }) => {
         if (postObj.hasMore) {

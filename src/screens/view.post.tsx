@@ -11,6 +11,8 @@ import reportUserPost from '../api/report.post';
 import { getUserId } from '../utils/user.id';
 import TopBar from '../components/top.bar';
 import { getPolaroidDate, getFormatedView } from '../utils/helpers';
+import { colors } from '../utils/constants';
+import TagItem from '../components/tag';
 
 type UserPost = {
   id: number,
@@ -22,13 +24,19 @@ type UserPost = {
   match: boolean,
   reported?: boolean,
   reportedBy?: number,
-  reactCount: number
+  reactCount: number,
+  tags: string
 }
 
 FontAwesome.loadFont();
 Entypo.loadFont();
 MaterialIcons.loadFont();
+
 const { width, height } = Dimensions.get('window');
+
+const randomColor = () => {
+  return colors[Math.floor(Math.random() * colors.length)];
+};
     
 const ViewPostScreen = ({ navigation, route }: any) => {
   const loggedInUserId = getUserId();
@@ -101,6 +109,10 @@ const ViewPostScreen = ({ navigation, route }: any) => {
   }
   const polaroidDate = getPolaroidDate(post?.createdAt);
   const [views, symbol] = getFormatedView(post.reactCount);
+
+  const tags = post.tags?.split(',') || [];
+  const tagsColor = tags.map(t => randomColor())
+
   return (
     <View style={styles.mainContainer}>
       <TopBar />
@@ -161,6 +173,18 @@ const ViewPostScreen = ({ navigation, route }: any) => {
                     <TouchableOpacity>              
                     </TouchableOpacity>
                   </Video> */}
+              {
+                post.tags &&
+                (   
+                  <View style={styles.tagsMainContainer}>
+                    <View style={styles.tagsContainer}>
+                      {
+                        tags.map((tag, index) => <TagItem tag={tag} key={index} tagColor={tagsColor[index]}/>)
+                      }
+                    </View>
+                  </View>
+                )
+              }
               <View style={styles.buttonContainer}>
                 <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_RED} onPress={() => {
                   const modal = showDeleteIcon ? 'Delete' : 'Report';
@@ -209,4 +233,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLOR_CODE.GREY
   },
+  tagsMainContainer: {  height: width * 0.15, width: width * 0.7, position: 'absolute', bottom: 0 },
+  tagsContainer: { flex: 1, paddingLeft: 10, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start' }
 });

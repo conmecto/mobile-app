@@ -14,7 +14,8 @@ type UserPost = {
   match: boolean,
   reported?: boolean,
   reportedBy?: number,
-  reactCount: number
+  reactCount: number,
+  tags: string
 }
 
 type PostObj = {
