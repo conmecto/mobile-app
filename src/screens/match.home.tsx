@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -45,7 +45,7 @@ type MatchObj = {
 Ionicons.loadFont();
 MaterialCommunityIcons.loadFont();
 
-const { height } = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 
 const MatchHomeScreen = ({ route, navigation }: any) => {
   const [markChatsRead, setMarkChatsRead] = useState<number>();
@@ -171,6 +171,7 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
       </View>
     );
   } 
+
   const MatchItem = ({ item, matchIndex }: { item: UserMatchRes, matchIndex: number }) => {
     const socket = getChatSocketInstance(item.id as number, userId);
     if (!socket || socket.readyState !== 1) {
@@ -212,10 +213,31 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     );
   }
 
+  const onPressActivity = () => {
+    navigation.navigate('MatchSummaryScreen');
+  } 
+
   return (
     <View style={styles.mainContainer}>
       <TopBar />
       <View style={{ flex: 1 }}>
+
+        <View style={styles.headerContainer}> 
+
+          <View style={styles.matchesTitleContainer}>
+            <Text style={styles.matchesTitleText}>Matches</Text>
+          </View>
+
+          <View style={styles.activityButtonContainer}>
+            <TouchableOpacity onPress={() => onPressActivity()} style={styles.activityButtonTouchable}>
+              <Text style={styles.activityButtonText}>Activity</Text>
+              <MaterialCommunityIcons name='arrow-top-right-thick' color={COLOR_CODE.OFF_WHITE} size={20}/>
+            </TouchableOpacity>
+          </View>
+
+        </View> 
+
+        <View style={{ flex: 1 }}>
         {
           matchObj.matches.length ? 
           (
@@ -241,6 +263,7 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
             />
           )
         }
+        </View>
       </View>
     </View>
   )
@@ -293,7 +316,16 @@ const styles = StyleSheet.create({
     shadowRadius: 2 
   },
   noMatchContainer: { height: 500, alignItems: 'center', justifyContent: 'center' },
-  noMatchText: { fontSize: 20, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE }
+  noMatchText: { fontSize: 20, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE, paddingLeft: 20, paddingRight: 20 },
+  headerContainer: { height: height * 0.05, width, flexDirection: 'row' },
+  matchesTitleContainer: { flex: 1, alignItems: 'flex-start', justifyContent: 'center' },
+  matchesTitleText: { fontSize: 15, fontWeight: 'bold', paddingLeft: width * 0.05 },
+  activityButtonContainer: { flex: 1, alignItems: 'flex-end', justifyContent: 'center', paddingRight: width * 0.05 },
+  activityButtonTouchable: {
+    width: '40%', height: '70%', alignItems: 'center', 
+    justifyContent: 'center', flexDirection: 'row', borderRadius: 20, backgroundColor: COLOR_CODE.BRIGHT_RED 
+  },
+  activityButtonText: { fontSize: 12, fontWeight: 'bold', color: COLOR_CODE.OFF_WHITE }
 });
 
 export default MatchHomeScreen;
