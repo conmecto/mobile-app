@@ -1,3 +1,4 @@
 export const IMAGE_LOGO = require('./conmecto.png'); 
-export const NO_MATCH_GIF = require('./no.match.gif'); 
+export const FINDING_GIF = require('./finding.gif'); 
 export const DEFAULT_PROFILE_PIC = require('./defaultsvg.png'); 
+export const IMAGE_LOGO_CROPPED = require('./logo-cropped.png'); 

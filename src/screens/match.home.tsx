@@ -10,8 +10,9 @@ import { getUserId } from '../utils/user.id';
 import MatchedUser from '../components/matched.user';
 import TopBar from '../components/top.bar'; 
 import getUserMatches from '../api/user.matches';
-import { NO_MATCH_GIF } from '../files';
 import getMultipleUsersProfile from '../api/multiple-users.profile';
+import ConmectoBotAnimated from '../components/conmecto.animated';
+import { FINDING_GIF } from '../files';
 
 type UserProfileRes = {
   id: number,
@@ -160,18 +161,6 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     }
   }
 
-  const NoMatch = ({ item }: any) => {
-    return (
-      <View style={styles.noMatchContainer}>
-        <Text numberOfLines={2} style={styles.noMatchText}>
-          Finding matches, keep adding more Polaroids 😃
-          {'\n'}
-        </Text>
-        <Image source={NO_MATCH_GIF} style={{ height: 300, width: 300 }}/>
-      </View>
-    );
-  } 
-
   const MatchItem = ({ item, matchIndex }: { item: UserMatchRes, matchIndex: number }) => {
     const socket = getChatSocketInstance(item.id as number, userId);
     if (!socket || socket.readyState !== 1) {
@@ -217,52 +206,66 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     navigation.navigate('MatchSummaryScreen');
   } 
 
+  const NoMatch = () => {
+    return (
+      <View style={styles.noMatchContainer}>
+        <Text numberOfLines={2} style={styles.noMatchText}>
+          Finding matches <Image source={FINDING_GIF} style={styles.noMatchGif}/>
+        </Text>
+        <Text numberOfLines={2} style={styles.noMatchText}>
+          Keep adding more Polaroids 😃
+        </Text>
+      </View>
+    );
+  } 
+
+  const currentMatches = matchObj.matches.length;
+
   return (
     <View style={styles.mainContainer}>
       <TopBar />
       <View style={{ flex: 1 }}>
-
         <View style={styles.headerContainer}> 
-
           <View style={styles.matchesTitleContainer}>
-            <Text style={styles.matchesTitleText}>Matches</Text>
+            <Text style={styles.matchesTitleText}>
+              Matches
+            </Text>           
           </View>
-
           <View style={styles.activityButtonContainer}>
             <TouchableOpacity onPress={() => onPressActivity()} style={styles.activityButtonTouchable}>
               <Text style={styles.activityButtonText}>Activity</Text>
               <MaterialCommunityIcons name='arrow-top-right-thick' color={COLOR_CODE.OFF_WHITE} size={20}/>
             </TouchableOpacity>
           </View>
-
         </View> 
-
         <View style={{ flex: 1 }}>
-        {
-          matchObj.matches.length ? 
-          (
-            <FlatList 
-              data={matchObj.matches}
-              renderItem={({ item, index }) => <MatchItem item={item} matchIndex={index} />}
-              keyExtractor={(item: any, index: number) => item.id?.toString()}
-              showsVerticalScrollIndicator={false}
-              onEndReached={onLoadMoreMatches}
-              onEndReachedThreshold={0}
-              refreshing={matchObj.isRefreshing}
-              onRefresh={() => setMatchObj({ page: 1, isLoading: true, isRefreshing: true, matches: [], hasMore: true })}
-              
-            />
-          ) : (
-            <FlatList 
-              data={[{}]}
-              renderItem={({ item }) => <NoMatch item={item}/>}
-              keyExtractor={(item: any, index: number) => ''}
-              showsVerticalScrollIndicator={false}
-              refreshing={matchObj.isRefreshing}
-              onRefresh={() => setMatchObj({ page: 1, isLoading: true, isRefreshing: true, matches: [], hasMore: true })}
-            />
-          )
-        }
+          {
+            currentMatches ? 
+            (
+              <FlatList 
+                data={matchObj.matches}
+                renderItem={({ item, index }) => <MatchItem item={item} matchIndex={index} />}
+                keyExtractor={(item: any, index: number) => item.id?.toString()}
+                showsVerticalScrollIndicator={false}
+                onEndReached={onLoadMoreMatches}
+                onEndReachedThreshold={0}
+                refreshing={matchObj.isRefreshing}
+                onRefresh={() => setMatchObj({ page: 1, isLoading: true, isRefreshing: true, matches: [], hasMore: true })}
+              />
+            ) : (
+              <FlatList 
+                data={[{}]}
+                renderItem={({ item }) => <NoMatch />}
+                keyExtractor={(item: any, index: number) => ''}
+                showsVerticalScrollIndicator={false}
+                refreshing={matchObj.isRefreshing}
+                onRefresh={() => setMatchObj({ page: 1, isLoading: true, isRefreshing: true, matches: [], hasMore: true })}
+              />
+            )
+          }
+        </View>
+        <View style={styles.conmectoAnimatedContainer}>
+          <ConmectoBotAnimated navigate={navigation.navigate} />
         </View>
       </View>
     </View>
@@ -316,16 +319,18 @@ const styles = StyleSheet.create({
     shadowRadius: 2 
   },
   noMatchContainer: { height: 500, alignItems: 'center', justifyContent: 'center' },
-  noMatchText: { fontSize: 20, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE, paddingLeft: 20, paddingRight: 20 },
+  noMatchText: { fontSize: 20, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE },
+  noMatchGif: { height: 40, width: 40 },
   headerContainer: { height: height * 0.05, width, flexDirection: 'row' },
-  matchesTitleContainer: { flex: 1, alignItems: 'flex-start', justifyContent: 'center' },
+  matchesTitleContainer: { flex: 1, justifyContent: 'center', alignItems: 'flex-start' },
   matchesTitleText: { fontSize: 15, fontWeight: 'bold', paddingLeft: width * 0.05 },
   activityButtonContainer: { flex: 1, alignItems: 'flex-end', justifyContent: 'center', paddingRight: width * 0.05 },
   activityButtonTouchable: {
     width: '40%', height: '70%', alignItems: 'center', 
     justifyContent: 'center', flexDirection: 'row', borderRadius: 20, backgroundColor: COLOR_CODE.BRIGHT_RED 
   },
-  activityButtonText: { fontSize: 12, fontWeight: 'bold', color: COLOR_CODE.OFF_WHITE }
+  activityButtonText: { fontSize: 12, fontWeight: 'bold', color: COLOR_CODE.OFF_WHITE },
+  conmectoAnimatedContainer: { position: 'absolute', right: 0, bottom: 0, width: height * 0.12, height: height * 0.12, backgroundColor: 'transparent' }
 });
 
 export default MatchHomeScreen;
