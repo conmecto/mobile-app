@@ -81,7 +81,21 @@ const colors = [
   '#228C22'
 ];
 
+const ASK_CONMECTO_PROMPTS = {
+  fixed: [
+    'How does Conmecto work?',
+    'What are Polaroids?',
+    'How to change Filter in the settings? How to change Filter in the settings? How to change Filter in the settings? How to change Filter in the settings? How to change Filter in the settings? How to change Filter in the settings?',
+    'How to change Filter in the settings?',
+    'How to change Filter in the settings?',
+    'How to change Filter in the settings?',
+    'How to change Filter in the settings?',
+    'How to change Filter in the settings?',
+    'How to change Filter in the settings?'
+  ]
+}
+
 export { 
   SEARCH_FOR, profilePictureOptions, postOptions, maxFileSizeBytes, allowedFileTypes, allowedImageTypes,
-  maxImageSizeBytes, Days, initialLogoScreenTimeMilli, GENDER, polaroidTags, colors
+  maxImageSizeBytes, Days, initialLogoScreenTimeMilli, GENDER, polaroidTags, colors, ASK_CONMECTO_PROMPTS
 };

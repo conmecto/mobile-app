@@ -20,6 +20,7 @@ type MatchesSummary = {
 
 const MatchSummaryScreen = () => {  
   const userId = getUserId() as number;
+  const maxMatches = 10;
   const [matchesSummary, setMatchesSummary] = useState<MatchesSummary>({
     callMatchesSummary: true,
     currentMatches: 0,
@@ -85,7 +86,7 @@ const MatchSummaryScreen = () => {
           </View>
           <View style={styles.activityValueContainer}>
             <Text numberOfLines={1} adjustsFontSizeToFit style={styles.currentMatchesText}>
-              {matchesSummary.currentMatches} / 2 ⚡
+              {matchesSummary.currentMatches} / {maxMatches} ⚡
             </Text>
           </View>
         </View>

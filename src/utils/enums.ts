@@ -2,7 +2,7 @@ enum COLOR_CODE {
   WINE_RED = '#722f37',
   LIGHT_SKY_BLUE = 'lightskyblue',
   SKY_BLUE = '#87CEEB',
-  WHITE = '#FFFFFF',
+  WHITE = 'white',
   LIGHT_GREY = '#D3D3D3',
   BLACK = '#000000',
   OFF_WHITE = '#FAF9F6',
@@ -19,7 +19,7 @@ enum COLOR_CODE {
   FIRE_BLUE = '#3D88FF',
   RED = 'red',
   GOLDEN = '#FFD700',
-  DIM_GREY = '#dadada'
+  DIM_GREY = '#dadada',
 }
 
 enum ERROR_CODES {
