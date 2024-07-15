@@ -16,11 +16,9 @@ import { FINDING_GIF } from '../files';
 
 type UserProfileRes = {
   id: number,
-  city?: string,
   profilePicture?: string,
   userId: number,
   name: string,
-  age?: number
 }
 
 type UserMatchRes = {
@@ -172,7 +170,7 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
       {
         item?.chatNotification ?
         (  
-          <LinearGradient colors={[COLOR_CODE.BRIGHT_RED, COLOR_CODE.OFF_WHITE]} style={styles.gradient}>
+          <LinearGradient colors={[COLOR_CODE.FIRE_BLUE, COLOR_CODE.OFF_WHITE]} style={styles.gradient}>
             { 
               item.profile ? 
               <MatchedUser 
@@ -238,6 +236,18 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
             </TouchableOpacity>
           </View>
         </View> 
+        {
+          (currentMatches && currentMatches < 10) ? (
+            <View style={styles.findingMoreContainer}>
+              <Text numberOfLines={1} style={styles.findingMoreText}>
+                Finding more Matches
+              <Image source={FINDING_GIF} style={{ height: 20, width: 20 }}/>
+              </Text>
+            </View>
+          ) : (
+            <View></View>
+          )
+        }
         <View style={{ flex: 1 }}>
           {
             currentMatches ? 
@@ -278,19 +288,19 @@ const styles = StyleSheet.create({
     backgroundColor: COLOR_CODE.OFF_WHITE 
   },
   matchedUserContainer: { 
-    height: Math.floor(height * 0.35), 
+    height: Math.floor(height * 0.15), 
     alignItems: 'center', 
     justifyContent: 'center'
   },
   gradient: { 
     height: '80%', 
-    width: '90%', 
-    borderRadius: 30 
+    width: '95%', 
+    borderRadius: 20 
   },
   noNotificationContainer: { 
     height: '80%', 
-    width: '90%', 
-    borderRadius: 30, 
+    width: '95%', 
+    borderRadius: 20, 
     shadowRadius: 3, 
     shadowOffset: {
       width: 0,
@@ -330,7 +340,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center', flexDirection: 'row', borderRadius: 20, backgroundColor: COLOR_CODE.BRIGHT_RED 
   },
   activityButtonText: { fontSize: 12, fontWeight: 'bold', color: COLOR_CODE.OFF_WHITE },
-  conmectoAnimatedContainer: { position: 'absolute', right: 0, bottom: 0, width: height * 0.12, height: height * 0.12, backgroundColor: 'transparent' }
+  conmectoAnimatedContainer: { position: 'absolute', right: 0, bottom: 0, width: height * 0.12, height: height * 0.12, backgroundColor: 'transparent' },
+  findingMoreContainer: { height: height * 0.03, alignItems: 'flex-start', justifyContent: 'flex-start', paddingLeft: width * 0.05 },
+  findingMoreText: { fontSize: 10, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE  }
 });
 
 export default MatchHomeScreen;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -13,19 +13,9 @@ MaterialCommunityIcons.loadFont();
 
 type UserProfileRes = {
   id: number,
-  userName?: string,
-  description?: string,
-  city?: string,
-  country?: string,
-  school?: string,
-  work?: string,
-  igId?: string,
-  snapId?: string,
-  interests?: string,
   profilePicture?: string,
   userId: number,
-  name: string,
-  age?: number
+  name: string
 }
 
 type props = { 
@@ -34,6 +24,8 @@ type props = {
   onPressMatchedUser: () => void,
   onPressCamera: () => void
 }
+
+const { width } = Dimensions.get('window');
 
 const MatchedUser = ({ matchedUserProfile, matchScore, onPressMatchedUser, onPressCamera }: props) => {
   let profilePictureSource = DEFAULT_PROFILE_PIC;
@@ -44,33 +36,32 @@ const MatchedUser = ({ matchedUserProfile, matchScore, onPressMatchedUser, onPre
   }
   return (
     <TouchableOpacity style={styles.mainContainer} onPress={onPressMatchedUser}>
-      <View style={styles.firstRow}>
-        <View style={styles.profilePicContainer}>
-          <Image source={profilePictureSource} style={styles.profilePic}/>
-        </View>
-        <View style={styles.detailsContainer}>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{formatText(matchedUserProfile.name)}</Text>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{matchedUserProfile.age}</Text>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}><FontAwesome name='map-pin' color={COLOR_CODE.BRIGHT_RED} /> {formatText(matchedUserProfile.city)}</Text>
-        </View>
+      <View style={styles.profilePicContainer}>
+        <Image source={profilePictureSource} style={styles.profilePic}/>
       </View>
-      <View style={styles.secondRow}>
-        <View style={{ flex: 2 }}>
+      <View style={{ flex: 2 }}>
+        <View style={styles.nameContainer}>
+          <Text numberOfLines={2} adjustsFontSizeToFit style={styles.commonText}>
+            {formatText(matchedUserProfile.name)}
+          </Text>
+        </View>
+        <View style={{ flex: 1 }}>
           <View style={styles.scoreHeaderContainer}>
-            <Text style={styles.headerText}>Match Streak</Text>
+            <Text style={styles.headerText}>
+              Match Streak
+            </Text>
           </View>
           <View style={styles.scoreContainer}>
             <Text numberOfLines={1} adjustsFontSizeToFit style={styles.scoreText}>
-              {getFormatedView(matchScore)}
-              <MaterialCommunityIcons name='fire' color={fireColorScoreBased(matchScore)}/>
+              {getFormatedView(matchScore)}<MaterialCommunityIcons name='fire' color={fireColorScoreBased(matchScore)} />
             </Text>
           </View>
         </View>
-        <View style={styles.cameraContainer}>
-          <TouchableOpacity onPress={onPressCamera} style={styles.cameraTouchable}>
-            <Ionicons name='camera' size={40} color={COLOR_CODE.BLACK}/> 
-          </TouchableOpacity>
-        </View>
+      </View>
+      <View style={styles.cameraContainer}>
+        <TouchableOpacity onPress={onPressCamera} style={styles.cameraTouchable}>
+          <Ionicons name='camera' size={35} color={COLOR_CODE.BLACK}/> 
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -82,14 +73,7 @@ const styles = StyleSheet.create({
   mainContainer: { 
     flex: 1, 
     borderWidth: 1, 
-    borderRadius: 30 
-  },
-  firstRow: { 
-    flex: 3, 
-    flexDirection: 'row' 
-  },
-  secondRow: { 
-    flex: 1,
+    borderRadius: 20,
     flexDirection: 'row'
   },
   profilePicContainer: { 
@@ -98,47 +82,45 @@ const styles = StyleSheet.create({
     justifyContent: 'center' 
   },
   profilePic: { 
-    height: 100, 
-    width: 100, 
+    height: width * 0.15, 
+    width: width * 0.15, 
     borderRadius: 100, 
-    borderWidth: 1 
+    borderWidth: 0.5 
   },
-  detailsContainer: { 
-    flex: 1.5, 
-    alignItems: 'flex-start', 
-    justifyContent: 'center' 
-  },
+  nameContainer: { flex: 1.5, alignItems: 'flex-start', justifyContent: 'center' },
   scoreText: {
-    fontSize: 20, 
-    fontWeight: 'bold'
+    fontSize: 20,
+    fontWeight: '600'
   },
   commonText: { 
-    fontSize: 25, 
-    fontWeight: 'bold' 
+    fontSize: 20, 
+    fontWeight: '500' 
   },
   scoreContainer: { 
-    flex: 4, 
-    alignItems: 'center', 
-    justifyContent: 'center',
-  },
-  scoreHeaderContainer: { 
     flex: 1, 
     alignItems: 'center', 
+    justifyContent: 'flex-start',
+    flexDirection: 'row'
+  },
+  scoreHeaderContainer: { 
+    flex: 0, 
+    alignItems: 'flex-start', 
     justifyContent: 'center', 
   },
   headerText: { 
-    fontSize: 10, 
-    fontWeight: 'bold' 
+    fontSize: 8, 
+    fontWeight: 'bold',
+    color: COLOR_CODE.GREY
   },
   cameraContainer: { 
     flex: 1, 
-    alignItems: 'flex-start', 
-    justifyContent: 'flex-start',
+    alignItems: 'center', 
+    justifyContent: 'center',
   },
   cameraTouchable: { 
-    height: 50, 
-    width: 50, 
+    height: width * 0.12, 
+    width: width * 0.12, 
     alignItems: 'center', 
-    justifyContent: 'center'
+    justifyContent: 'center',
   }
 });

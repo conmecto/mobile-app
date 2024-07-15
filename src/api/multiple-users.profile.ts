@@ -5,11 +5,9 @@ import { getAccessToken } from '../utils/token';
 
 type ProfileRes = {
   id: number,
-  city?: string,
   profilePicture?: string,
   userId: number,
   name: string,
-  age?: number
 }
 
 type UserProfileRes = {
