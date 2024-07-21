@@ -4,26 +4,23 @@ import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
 
 type UpdateMatchSettingObject = {
+  searchArea?: any;
+  minSearchAge?: number;
+  maxSearchAge?: number;
+  searchFor?: string;
+}
+
+type UserMatchSettingObject = {
+  id?: number;
   searchFor?: string,
-  searchIn?: string,
+  searchArea?: string,
   minSearchAge?: number,
   maxSearchAge?: number
 }
 
-type UserMatchSettingObject = {
-  id: number,
-  userId: number,
-  age?: number,
-  city?: string,
-  country?: string, 
-  searchFor: string,
-  searchIn: string,
-  gender?: string,
-  minSearchAge: number,
-  maxSearchAge: number
-}
-
-const updateMatchSetting = async (userId: number, updateObj: UpdateMatchSettingObject, callIfUnauthorized: boolean = true): Promise<UserMatchSettingObject | undefined> => {
+const updateMatchSetting = async (
+  userId: number, updateObj: UpdateMatchSettingObject, callIfUnauthorized: boolean = true
+): Promise<UserMatchSettingObject | undefined> => {
   try {
     const body = JSON.stringify(updateObj);
     const token = getAccessToken();

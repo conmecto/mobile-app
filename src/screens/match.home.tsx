@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Linking } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
+import { Button } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { RESULTS } from 'react-native-permissions';
-import { COLOR_CODE } from '../utils/enums';
 import { createChatSocketConnection, getChatSocketInstance } from '../sockets/chat.socket';
-import updateChatsRead from '../api/update.chats.read';
-import { getUserId } from '../utils/user.id'; 
 import MatchedUser from '../components/matched.user';
 import TopBar from '../components/top.bar'; 
+import ConmectoBotAnimated from '../components/conmecto.animated';
+import updateChatsRead from '../api/update.chats.read';
 import getUserMatches from '../api/user.matches';
 import getMultipleUsersProfile from '../api/multiple-users.profile';
-import ConmectoBotAnimated from '../components/conmecto.animated';
-import { FINDING_GIF } from '../files';
-import { checkLocation } from '../utils/update.location';
-import { Button } from 'react-native-paper';
 import Environments from '../utils/environments';
+import { checkLocation } from '../utils/update.location';
+import { COLOR_CODE } from '../utils/enums';
+import { getUserId } from '../utils/user.id'; 
+import { FINDING_GIF } from '../files';
 
 type UserProfileRes = {
   id: number,

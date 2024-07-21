@@ -5,28 +5,28 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Modal, Provider, Portal, Button} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import TopBar from '../components/top.bar';
-import { COLOR_CODE } from '../utils/enums';
+import Loading from '../components/loading';
+import TermsItem from '../components/terms'
 import getUserMatchSettings from '../api/user.match.setting';
 import updateMatchSetting from '../api/update.match.setting';
-import Loading from '../components/loading';
 import { deleteToken, formatText } from '../utils/helpers';
-import getCities from '../api/get.cities';
-import { deleteAllChatSocketInstance } from '../sockets/chat.socket';
-import TermsItem from '../components/terms'
+import removeAccount from '../api/remove.account';
+import logout from '../api/logout';
+import { COLOR_CODE } from '../utils/enums';
 import { getUserId, resetUserId } from '../utils/user.id';
 import { resetToken } from '../utils/token';
 import { resetPosts } from '../utils/post';
-import removeAccount from '../api/remove.account';
-import logout from '../api/logout';
+import { deleteAllChatSocketInstance } from '../sockets/chat.socket';
 import { IMAGE_LOGO } from '../files';
 
 type UserMatchSettingObject = {
   id?: number,
   country?: string, 
   searchFor?: string,
-  searchIn?: string,
   minSearchAge?: number,
-  maxSearchAge?: number
+  maxSearchAge?: number,
+  searchArea?: string,
+  geohash?: string,
 }
 
 type SearchSettings = UserMatchSettingObject & {
@@ -38,15 +38,15 @@ FontAwesome.loadFont();
 MaterialCommunityIcons.loadFont();
 const { height, width } = Dimensions.get('window');
 
-const searchFor = ['women', 'men', 'everyone'];
-const age: number[] = [];
+const searchForOptions = ['women', 'men', 'everyone'];
+const searchAreaOptions = ['close', 'mid', 'distant'];
+const ageOptions: number[] = [];
 for(let i = 18; i <= 70; i++) {
-  age.push(i);
+  ageOptions.push(i);
 }
 
 const SettingScreen = ({ navigation }: any) => {  
   const userId = getUserId() as number;
-  const [cities, setCities] = useState<string[]>([]);
   const [showAccountModal, setShowAccountModal] = useState('');
   const [accountAction, setAccountAction] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -57,29 +57,20 @@ const SettingScreen = ({ navigation }: any) => {
   
   useEffect(() => {
     let check = true;
-    const callCities = async () => {
-      const res = await getCities('india');
-      if (check && res) {
-        setCities(res);
-      }
-    }
     const callSettings = async () => {
       const res = await getUserMatchSettings(userId);
       if (check) {
         if (res) {
           searchSettings.minSearchAge = res.minSearchAge;
           searchSettings.maxSearchAge = res.maxSearchAge;
-          searchSettings.searchIn = res.searchIn;
+          searchSettings.searchArea = res.searchArea;
           searchSettings.searchFor = res.searchFor;
-          searchSettings.id = res.id;
           searchSettings.country = res.country;
+          searchSettings.id = res.id;
         }
         setSearchSettings({ ...searchSettings });
         setIsLoading(false);
       }
-    }
-    if (!cities.length) {
-      callCities();
     }
     if (!searchSettings.id) {
       callSettings();
@@ -88,23 +79,30 @@ const SettingScreen = ({ navigation }: any) => {
       check = false;
     }
   }, []);
-  
+
   useEffect(() => {
     let check = true;
     const callUpdateSettings = async () => {
-      const updateObj = searchSettings.updateSettings === 'age' ? { 
-        minSearchAge: searchSettings.minSearchAge,
-        maxSearchAge: searchSettings.maxSearchAge
-      } : (
-        searchSettings.updateSettings === 'searchFor' ? { searchFor: searchSettings.searchFor } : {
-        searchIn: searchSettings.searchIn
-      })
+      const updateObj = searchSettings.updateSettings === 'age' ? 
+        { 
+          minSearchAge: searchSettings.minSearchAge,
+          maxSearchAge: searchSettings.maxSearchAge
+        } : (
+          searchSettings.updateSettings === 'searchFor' ? 
+          { searchFor: searchSettings.searchFor } : { searchArea: searchSettings.searchArea }
+        )
       const res = await updateMatchSetting(userId, updateObj);
       if (check) {
-        if (res) {
+        if (res?.minSearchAge) {
           searchSettings.minSearchAge = res.minSearchAge;
+        }
+        if (res?.maxSearchAge) {
           searchSettings.maxSearchAge = res.maxSearchAge;
-          searchSettings.searchIn = res.searchIn;
+        }
+        if (res?.searchArea) {
+          searchSettings.searchArea = res.searchArea;
+        }
+        if (res?.searchFor) {
           searchSettings.searchFor = res.searchFor;
         }
         setSearchSettings({ ...searchSettings, updateSettings: '' });
@@ -191,11 +189,11 @@ const SettingScreen = ({ navigation }: any) => {
 
   const getFlatListData = (): any => {
     if (searchSettings.modal === 'age') {
-      return age;
+      return ageOptions;
     } else if (searchSettings.modal === 'searchFor') {
-      return searchFor;
+      return searchForOptions;
     } else {
-      return cities;
+      return searchAreaOptions;
     }
   }
 
@@ -219,10 +217,10 @@ const SettingScreen = ({ navigation }: any) => {
         searchSettings.searchFor = value;
       }
     } else {
-      if (value === searchSettings.searchIn) {
+      if (value === searchSettings.searchArea) {
         isSame = true;
       } else {
-        searchSettings.searchIn = value;
+        searchSettings.searchArea = value;
       }
     }
 
@@ -322,12 +320,14 @@ const SettingScreen = ({ navigation }: any) => {
 
                 <View style={{ flex: 2 }}>
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.settingFieldText}>Search In</Text>
+                    <Text style={styles.settingFieldText}>Distance</Text>
                   </View>
                   <View style={{ flex: 2 }}>
-                    <TouchableOpacity style={styles.settingFieldPressable} onPress={() => onPressOpenModal('searchIn')}>
+                    <TouchableOpacity style={styles.settingFieldPressable} onPress={() => onPressOpenModal('searchArea')}>
                       <View style={styles.settingFieldTextContainer}> 
-                        <Text numberOfLines={1} adjustsFontSizeToFit style={styles.settingValueText}>{formatText(searchSettings?.searchIn)}</Text>
+                        <Text numberOfLines={1} adjustsFontSizeToFit style={styles.settingValueText}>
+                          {formatText(searchSettings?.searchArea)}
+                        </Text>
                       </View>
                       <View style={styles.settingFieldIconContainer}> 
                         <FontAwesome name='angle-right' size={25} />
