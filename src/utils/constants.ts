@@ -95,7 +95,11 @@ const ASK_CONMECTO_PROMPTS = {
   ]
 }
 
+const GEOLOCATION_TIMEOUT_MILLIS = 1000;
+const GEOLOCATION_MAX_AGE_MILLIS = 86400000;
+
 export { 
   SEARCH_FOR, profilePictureOptions, postOptions, maxFileSizeBytes, allowedFileTypes, allowedImageTypes,
-  maxImageSizeBytes, Days, initialLogoScreenTimeMilli, GENDER, polaroidTags, colors, ASK_CONMECTO_PROMPTS
+  maxImageSizeBytes, Days, initialLogoScreenTimeMilli, GENDER, polaroidTags, colors, ASK_CONMECTO_PROMPTS,
+  GEOLOCATION_TIMEOUT_MILLIS, GEOLOCATION_MAX_AGE_MILLIS
 };
