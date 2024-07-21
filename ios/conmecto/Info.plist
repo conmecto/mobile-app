@@ -38,7 +38,7 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Allow this app to access your photos/videos for posts or profile pictures</string>
+	<string>Conmecto uses photo library for uploading Polaroids or Profile Picture</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
@@ -60,6 +60,8 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>Allow this app to access to your Camera for taking pictures</string>
+	<string>Conmecto uses your Camera for creating Polaroids</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+ 	<string>Conmecto uses your location to find nearby users and create matches</string>
 </dict>
 </plist>

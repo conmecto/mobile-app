@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Linking } from 'react-native';
+import { CommonActions } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
+import { RESULTS } from 'react-native-permissions';
 import { COLOR_CODE } from '../utils/enums';
 import { createChatSocketConnection, getChatSocketInstance } from '../sockets/chat.socket';
 import updateChatsRead from '../api/update.chats.read';
@@ -13,6 +15,9 @@ import getUserMatches from '../api/user.matches';
 import getMultipleUsersProfile from '../api/multiple-users.profile';
 import ConmectoBotAnimated from '../components/conmecto.animated';
 import { FINDING_GIF } from '../files';
+import { checkLocation } from '../utils/update.location';
+import { Button } from 'react-native-paper';
+import Environments from '../utils/environments';
 
 type UserProfileRes = {
   id: number,
@@ -57,6 +62,7 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     page: 1,
     hasMore: true
   });
+  const [locationDenied, setLocationDenied] = useState(false);
   
   useEffect(() => {
     let check = true;
@@ -74,6 +80,41 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
       check = false;
     }
   }, [markChatsRead]);
+
+  useEffect(() => {
+    let check = true;
+    const callCheckLocation = async () => {
+      const res = await checkLocation();
+      if (check && res && res === RESULTS.BLOCKED) {
+        setLocationDenied(true);
+      }
+    }
+    if (!locationDenied) {
+      callCheckLocation();
+    }
+    return () => {
+      check = false;
+    }
+  }, []);
+
+  const linkToLocationSetting = async () => {
+    try {
+      await Linking.openSettings();
+    } catch(error) {
+      if (Environments.appEnv !== 'prod') {
+        console.log('location linking error', error);
+      }
+    }
+  }
+  
+  const onPressRefresh = () => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'HomeTabNavigator' }],
+      })
+    );
+  }
 
   const onPressMatchedUser = (pressedMatch: UserMatchRes, matchIndex: number) => {
     const matchedUserId = userId === pressedMatch.userId1 ? pressedMatch.userId2 : pressedMatch.userId1;
@@ -237,20 +278,22 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
           </View>
         </View> 
         {
-          (currentMatches && currentMatches < 10) ? (
-            <View style={styles.findingMoreContainer}>
-              <Text numberOfLines={1} style={styles.findingMoreText}>
-                Finding more Matches
-              <Image source={FINDING_GIF} style={{ height: 20, width: 20 }}/>
-              </Text>
-            </View>
-          ) : (
-            <View></View>
+          !locationDenied && (
+            (currentMatches && currentMatches < 10) ? (
+              <View style={styles.findingMoreContainer}>
+                <Text numberOfLines={1} style={styles.findingMoreText}>
+                  Finding more Matches
+                <Image source={FINDING_GIF} style={{ height: 20, width: 20 }}/>
+                </Text>
+              </View>
+            ) : (
+              <View></View>
+            )
           )
         }
         <View style={{ flex: 1 }}>
           {
-            currentMatches ? 
+            !locationDenied && (currentMatches ? 
             (
               <FlatList 
                 data={matchObj.matches}
@@ -271,6 +314,30 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
                 refreshing={matchObj.isRefreshing}
                 onRefresh={() => setMatchObj({ page: 1, isLoading: true, isRefreshing: true, matches: [], hasMore: true })}
               />
+            ))
+          }
+          {
+            locationDenied && (
+              <View style={styles.locationContainer}>
+                <Text numberOfLines={1} adjustsFontSizeToFit style={styles.locationText1}>
+                  Location access denied!
+                </Text>
+                <Text numberOfLines={2} adjustsFontSizeToFit style={styles.locationText2}>
+                  Conmecto use your location for matches,
+                </Text>
+                <Text numberOfLines={2} adjustsFontSizeToFit style={styles.locationText2}>
+                  Please enable Location📍 access from the setting.
+                </Text>
+                <Text>{'\n'}</Text>
+                <View style={{ flex: 0, width: '100%', flexDirection: 'row', justifyContent: 'space-evenly' }}>
+                  <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={() => onPressRefresh()}>
+                    Refresh
+                  </Button>
+                  <Button mode='contained' buttonColor={COLOR_CODE.BLACK} onPress={() => linkToLocationSetting()}>
+                    Setting
+                  </Button>
+                </View>
+              </View>
             )
           }
         </View>
@@ -342,7 +409,10 @@ const styles = StyleSheet.create({
   activityButtonText: { fontSize: 12, fontWeight: 'bold', color: COLOR_CODE.OFF_WHITE },
   conmectoAnimatedContainer: { position: 'absolute', right: 0, bottom: 0, width: height * 0.12, height: height * 0.12, backgroundColor: 'transparent' },
   findingMoreContainer: { height: height * 0.03, alignItems: 'flex-start', justifyContent: 'flex-start', paddingLeft: width * 0.05 },
-  findingMoreText: { fontSize: 10, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE  }
+  findingMoreText: { fontSize: 10, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE  },
+  locationContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  locationText1: { fontSize: 20, color: COLOR_CODE.BRIGHT_BLUE, fontWeight: 'bold' },
+  locationText2: { fontSize: 15, color: COLOR_CODE.BRIGHT_BLUE, fontWeight: 'bold' }
 });
 
 export default MatchHomeScreen;

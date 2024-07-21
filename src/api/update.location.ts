@@ -3,31 +3,23 @@ import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
 
-type UpdateMatchSettingObject = {
-  searchFor?: string,
-  searchIn?: string,
-  minSearchAge?: number,
-  maxSearchAge?: number
+type UpdateResponse = {
+    message?: string,
+    errorCode?: string
 }
 
-type UserMatchSettingObject = {
-  id: number,
-  userId: number,
-  age?: number,
-  city?: string,
-  country?: string, 
-  searchFor: string,
-  searchIn: string,
-  gender?: string,
-  minSearchAge: number,
-  maxSearchAge: number
+type UpdateUserLocationObj = {
+  latitude: number,
+  longitude: number
 }
 
-const updateMatchSetting = async (userId: number, updateObj: UpdateMatchSettingObject, callIfUnauthorized: boolean = true): Promise<UserMatchSettingObject | undefined> => {
+const updateUserLocation = async (
+    userId: number, updateObj: UpdateUserLocationObj, callIfUnauthorized: boolean = true
+) : Promise<UpdateResponse | undefined> => {
   try {
     const body = JSON.stringify(updateObj);
     const token = getAccessToken();
-    const response = await fetch(Environments.api.matchService.baseUrl + `/match/setting/${userId}`, {
+    const response = await fetch(Environments.api.matchService.baseUrl + `/match/users/${userId}/location`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json', 
@@ -38,7 +30,7 @@ const updateMatchSetting = async (userId: number, updateObj: UpdateMatchSettingO
     if (response?.status === 401 && callIfUnauthorized) {
       const tokens = await updateTokens(userId);
       if (tokens) {
-        const res = await updateMatchSetting(userId, updateObj, false);
+        const res = await updateUserLocation(userId, updateObj, false);
         return res;
       }
     }
@@ -52,9 +44,9 @@ const updateMatchSetting = async (userId: number, updateObj: UpdateMatchSettingO
     }
   } catch(error) {
     if (Environments.appEnv !== 'prod') {
-      console.log('Update match settings api error', error);
+      console.log('Update location api error', error);
     }
   }
 }
 
-export default updateMatchSetting;
+export default updateUserLocation;

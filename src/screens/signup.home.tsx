@@ -5,7 +5,6 @@ import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentica
 import { Button, Checkbox, Modal, Portal, Provider } from 'react-native-paper';
 import { COLOR_CODE } from '../utils/enums';
 //import findNumber from '../api/find.number';
-import findEmail from '../api/find.email';
 import TopBar from '../components/top.bar';
 import environments from '../utils/environments';
 import { getToken } from '../utils/helpers';

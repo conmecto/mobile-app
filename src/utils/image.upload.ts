@@ -34,13 +34,13 @@ const onUploadImageHandler = (setError: any, setPost: any) => {
                 break;
             case RESULTS.DENIED:
                 request(PERMISSIONS.IOS.PHOTO_LIBRARY).then(result => {
-                if (Environments.appEnv !== 'prod') {
-                    console.log('request result', result)
-                }
+                    if (Environments.appEnv !== 'prod') {
+                        console.log('request result', result)
+                    }
                 }).catch(error => {
-                if (Environments.appEnv !== 'prod') {
-                    console.log('request error', error)
-                }
+                    if (Environments.appEnv !== 'prod') {
+                        console.log('request error', error)
+                    }
                 });
             case RESULTS.LIMITED:
             case RESULTS.GRANTED:

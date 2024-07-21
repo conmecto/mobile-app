@@ -8,7 +8,7 @@ import { useAppState } from '@react-native-community/hooks';
 import { useIsFocused } from '@react-navigation/native';
 import { Linking } from 'react-native';
 import { COLOR_CODE } from '../utils/enums';
-import environments from '../utils/environments';
+import Environments from '../utils/environments';
 
 type RouteParams = {
   commonScreen: boolean,
@@ -84,7 +84,7 @@ const CameraScreen = ({ navigation, route }: any) => {
     try {
       await Linking.openSettings();
     } catch(error) {
-      if (environments.appEnv !== 'prod') {
+      if (Environments.appEnv !== 'prod') {
         console.log('linking error', error);
       }
     }
@@ -126,7 +126,7 @@ const CameraScreen = ({ navigation, route }: any) => {
           format={format}
           photo={true}
           onError={(error) => {
-            if (environments.appEnv !== 'prod') {
+            if (Environments.appEnv !== 'prod') {
               console.log('Cannot use camera', error)
             }
           }}

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dimensions } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { RESULTS } from 'react-native-permissions';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Foundation from 'react-native-vector-icons/Foundation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -10,6 +11,7 @@ import ProfileNavigator from './profile';
 import FeedScreen from '../screens/feed';
 import MatchNavigator from './match';
 import CameraNavigator from './camera';
+import { checkLocation, askLocationAccess, updateLocation } from '../utils/update.location';
 
 Foundation.loadFont();
 FontAwesome.loadFont();
@@ -24,6 +26,25 @@ const barHeight = Math.floor(height/12);
 const marginBottom = Math.floor(height/50);
 
 const HomeTabNavigator = (data: any) => { 
+  useEffect(() => {
+    let check = true;
+    const runLocationService = async () => {
+      let permissionStatus = await checkLocation();
+      if (permissionStatus) {
+        if (permissionStatus === RESULTS.DENIED) {
+          permissionStatus = await askLocationAccess();
+        }
+        if (permissionStatus === RESULTS.GRANTED && check) {
+          await updateLocation();
+        } 
+      } 
+    }
+    runLocationService();
+    return () => {
+      check = false;
+    }
+  }, []);
+
   return (
     <Tab.Navigator screenOptions={{  
         tabBarShowLabel: false,
