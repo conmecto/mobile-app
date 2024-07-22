@@ -3,9 +3,10 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'rea
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { fireColorScoreBased, formatText, getFormatedView } from '../utils/helpers';
 import { DEFAULT_PROFILE_PIC } from '../files';
+import { fireColorScoreBased, formatText, getFormatedView } from '../utils/helpers';
 import { COLOR_CODE } from '../utils/enums';
+import { colors } from '../utils/constants';
 
 Ionicons.loadFont();
 FontAwesome.loadFont();
@@ -19,6 +20,8 @@ type UserProfileRes = {
 }
 
 type props = { 
+  chatNotification?: boolean,
+  newMatch: boolean,
   matchedUserProfile: UserProfileRes,
   matchScore: number,
   onPressMatchedUser: () => void,
@@ -27,15 +30,27 @@ type props = {
 
 const { width } = Dimensions.get('window');
 
-const MatchedUser = ({ matchedUserProfile, matchScore, onPressMatchedUser, onPressCamera }: props) => {
+const MatchedUser = ({ 
+  newMatch, matchedUserProfile, matchScore, onPressMatchedUser, onPressCamera,
+  chatNotification
+}: props) => {
   let profilePictureSource = DEFAULT_PROFILE_PIC;
   if (matchedUserProfile?.profilePicture) {
     profilePictureSource = { 
       uri: matchedUserProfile.profilePicture
     }
   }
+  if (newMatch) {
+    chatNotification = false;
+  }
   return (
-    <TouchableOpacity style={styles.mainContainer} onPress={onPressMatchedUser}>
+    <TouchableOpacity style={[
+        styles.mainContainer, 
+        newMatch ? { borderWidth: 2, borderColor: colors[8] } : {}, 
+        chatNotification ? { borderWidth: 2, borderColor: colors[22] } : {}
+      ]} 
+      onPress={onPressMatchedUser}
+    >
       <View style={styles.profilePicContainer}>
         <Image source={profilePictureSource} style={styles.profilePic}/>
       </View>
@@ -45,17 +60,30 @@ const MatchedUser = ({ matchedUserProfile, matchScore, onPressMatchedUser, onPre
             {formatText(matchedUserProfile.name)}
           </Text>
         </View>
-        <View style={{ flex: 1 }}>
-          <View style={styles.scoreHeaderContainer}>
-            <Text style={styles.headerText}>
-              Match Streak
-            </Text>
+        <View style={{ flex: 1, flexDirection: 'row' }}>
+          <View style={{ flex: 1}}> 
+            <View style={styles.scoreHeaderContainer}>
+              <Text style={styles.headerText}>
+                Match Streak
+              </Text>
+            </View>
+            <View style={styles.scoreContainer}>
+              <Text numberOfLines={1} adjustsFontSizeToFit style={styles.scoreText}>
+                {getFormatedView(matchScore)}<MaterialCommunityIcons name='fire' color={fireColorScoreBased(matchScore)} />
+              </Text>
+            </View>
           </View>
-          <View style={styles.scoreContainer}>
-            <Text numberOfLines={1} adjustsFontSizeToFit style={styles.scoreText}>
-              {getFormatedView(matchScore)}<MaterialCommunityIcons name='fire' color={fireColorScoreBased(matchScore)} />
-            </Text>
-          </View>
+          {
+            newMatch && (
+              <View style={styles.newMatchContainer}>
+                <View style={styles.newMatchBorderContainer}>
+                  <Text numberOfLines={1} adjustsFontSizeToFit style={styles.newMatchText}>
+                    New Match
+                  </Text>
+                </View>
+              </View>
+            )
+          }
         </View>
       </View>
       <View style={styles.cameraContainer}>
@@ -71,10 +99,18 @@ export default MatchedUser;
 
 const styles = StyleSheet.create({
   mainContainer: { 
-    flex: 1, 
-    borderWidth: 1, 
+    borderWidth: 0.5, 
     borderRadius: 20,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    height: '80%', 
+    width: '95%', 
+    // shadowRadius: 3, 
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 0
+    // }, 
+    // shadowOpacity: 0.5, 
+    backgroundColor: COLOR_CODE.OFF_WHITE 
   },
   profilePicContainer: { 
     flex: 1, 
@@ -122,5 +158,8 @@ const styles = StyleSheet.create({
     width: width * 0.12, 
     alignItems: 'center', 
     justifyContent: 'center',
-  }
+  },
+  newMatchContainer: { flex: 0, alignItems: 'center', justifyContent: 'center' },
+  newMatchBorderContainer: { backgroundColor: colors[8], borderRadius: 10, padding: 5 },
+  newMatchText: { fontSize: 10, fontWeight: 'bold', color: COLOR_CODE.OFF_WHITE }
 });

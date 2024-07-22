@@ -20,7 +20,9 @@ type UserMatchRes = {
   createdAt?: Date,
   city?: string,
   country?: string,
-  chatNotification?: boolean
+  chatNotification?: boolean,
+  user1MatchSeenAt: Date,
+  user2MatchSeenAt: Date
   profile?: UserProfileRes
 }
 

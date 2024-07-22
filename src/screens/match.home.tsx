@@ -4,13 +4,13 @@ import { CommonActions } from '@react-navigation/native';
 import { Button } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import LinearGradient from 'react-native-linear-gradient';
 import { RESULTS } from 'react-native-permissions';
 import { createChatSocketConnection, getChatSocketInstance } from '../sockets/chat.socket';
 import MatchedUser from '../components/matched.user';
 import TopBar from '../components/top.bar'; 
 import ConmectoBotAnimated from '../components/conmecto.animated';
 import updateChatsRead from '../api/update.chats.read';
+import updateMatchSeen from '../api/update.match.seen';
 import getUserMatches from '../api/user.matches';
 import getMultipleUsersProfile from '../api/multiple-users.profile';
 import Environments from '../utils/environments';
@@ -32,9 +32,10 @@ type UserMatchRes = {
   userId2?: number,
   score?: number,
   createdAt?: Date,
-  city?: string,
   country?: string,
-  chatNotification?: boolean
+  chatNotification?: boolean,
+  user1MatchSeenAt: Date,
+  user2MatchSeenAt: Date
   profile?: UserProfileRes
 }
 
@@ -46,15 +47,16 @@ type MatchObj = {
   isRefreshing: boolean
 }
 
+type MatchSeenKey = 'user1MatchSeenAt' | 'user2MatchSeenAt';
+
 Ionicons.loadFont();
 MaterialCommunityIcons.loadFont();
 
 const { height, width } = Dimensions.get('window');
 
 const MatchHomeScreen = ({ route, navigation }: any) => {
-  const [markChatsRead, setMarkChatsRead] = useState<number>();
   const userId = getUserId() as number;
-  const perPage = 2;
+  const perPage = 5;
   const [matchObj, setMatchObj] = useState<MatchObj>({
     matches: [],
     isLoading: true,
@@ -62,6 +64,8 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     page: 1,
     hasMore: true
   });
+  const [markChatsRead, setMarkChatsRead] = useState<number>();
+  const [markMatchSeen, setMarkMatchSeen] = useState<number>();
   const [locationDenied, setLocationDenied] = useState(false);
   
   useEffect(() => {
@@ -80,6 +84,23 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
       check = false;
     }
   }, [markChatsRead]);
+
+  useEffect(() => {
+    let check = true;
+    const callMarkMatchSeen = async () => {
+      await updateMatchSeen(markMatchSeen as number, userId);
+      if (check) {
+        setMatchObj(matchObj);
+        setMarkMatchSeen(undefined);
+      }
+    }
+    if (markMatchSeen) {
+      callMarkMatchSeen();
+    }
+    return () => {
+      check = false;
+    }
+  }, [markMatchSeen]);
 
   useEffect(() => {
     let check = true;
@@ -116,17 +137,22 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     );
   }
 
-  const onPressMatchedUser = (pressedMatch: UserMatchRes, matchIndex: number) => {
-    const matchedUserId = userId === pressedMatch.userId1 ? pressedMatch.userId2 : pressedMatch.userId1;
-    if (pressedMatch?.chatNotification) {
-      if (!isNaN(Number(matchIndex))) {
+  const onPressMatchedUser = (matchIndex: number, newMatch: boolean, matchSeenKey: MatchSeenKey) => {
+    if (!isNaN(matchIndex)) {
+      const pressedMatch = matchObj.matches[matchIndex];
+      const matchedUserId = userId === pressedMatch.userId1 ? pressedMatch.userId2 : pressedMatch.userId1;
+      if (pressedMatch?.chatNotification) {
         matchObj.matches[matchIndex].chatNotification = false;
+        setMarkChatsRead(pressedMatch.id);
       }
-      setMarkChatsRead(pressedMatch.id);
+      if (newMatch) {
+        matchObj.matches[matchIndex][matchSeenKey] = new Date();
+        setMarkMatchSeen(pressedMatch.id);
+      }
+      navigation.navigate('MatchChatScreen', { 
+        matchId: pressedMatch.id, matchedUserId, matchedUserName: pressedMatch.profile?.name 
+      });
     }
-    navigation.navigate('MatchChatScreen', { 
-      matchId: pressedMatch.id, matchedUserId, matchedUserName: pressedMatch.profile?.name 
-    });
   }
 
   const onPressCamera = (matchId: number, matchedUserId: number) => {
@@ -206,37 +232,24 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
       createChatSocketConnection(item.id as number, userId);
     }
     const matchedUserId = item.userId1 === userId ? item.userId2 : item.userId1;
+    const userNumber = userId === item.userId1 ? 1 : 2;
+    const matchSeenKey: keyof UserMatchRes = `user${userNumber}MatchSeenAt`;
+    const newMatch = !item[matchSeenKey];
+    
     return (
       <View style={styles.matchedUserContainer}> 
-      {
-        item?.chatNotification ?
-        (  
-          <LinearGradient colors={[COLOR_CODE.FIRE_BLUE, COLOR_CODE.OFF_WHITE]} style={styles.gradient}>
-            { 
-              item.profile ? 
-              <MatchedUser 
-                matchedUserProfile={item.profile} matchScore={item.score as number} 
-                onPressMatchedUser={() => onPressMatchedUser(item, matchIndex)}
-                onPressCamera={() => onPressCamera(item.id as number, matchedUserId as number)}
-              /> : 
-              (<Text style={{ alignSelf: 'center'}}>Profile load failed</Text>) 
-            }
-          </LinearGradient>       
-        ) : (
-          <View style={styles.noNotificationContainer}>
-            { 
-              item.profile ? 
-              <MatchedUser 
-                matchedUserProfile={item.profile} 
-                matchScore={item.score as number} 
-                onPressMatchedUser={() => onPressMatchedUser(item, matchIndex)}
-                onPressCamera={() => onPressCamera(item.id as number, matchedUserId as number)}
-              /> : 
-              (<Text style={{ alignSelf: 'center'}}>Profile load failed</Text>) 
-            }
-          </View>
-        )
-      }
+        { 
+          item.profile ? 
+          <MatchedUser 
+            chatNotification={item.chatNotification}
+            newMatch={newMatch}
+            matchedUserProfile={item.profile} 
+            matchScore={item.score as number} 
+            onPressMatchedUser={() => onPressMatchedUser(matchIndex, newMatch, matchSeenKey)}
+            onPressCamera={() => onPressCamera(item.id as number, matchedUserId as number)}
+          /> : 
+          (<Text style={{ alignSelf: 'center'}}>Profile load failed</Text>) 
+        }
       </View> 
     );
   }
@@ -358,23 +371,6 @@ const styles = StyleSheet.create({
     height: Math.floor(height * 0.15), 
     alignItems: 'center', 
     justifyContent: 'center'
-  },
-  gradient: { 
-    height: '80%', 
-    width: '95%', 
-    borderRadius: 20 
-  },
-  noNotificationContainer: { 
-    height: '80%', 
-    width: '95%', 
-    borderRadius: 20, 
-    shadowRadius: 3, 
-    shadowOffset: {
-      width: 0,
-      height: 0
-    }, 
-    shadowOpacity: 0.5, 
-    backgroundColor: COLOR_CODE.OFF_WHITE 
   },
   cameraContainer: { 
     flex: 1, 

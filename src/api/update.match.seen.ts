@@ -2,17 +2,15 @@ import Environments from '../utils/environments';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
 
-const updateChatsRead = async (matchId: number, userId: number, callIfUnauthorized: boolean = true): Promise<any> => {
+const updateMatchSeen = async (matchId: number, userId: number, callIfUnauthorized: boolean = true): Promise<any> => {
   try {
-    const body = JSON.stringify({ userId });
     const token = getAccessToken();
-    const response = await fetch(Environments.api.matchService.baseUrl + `/match/${matchId}/chats/read`, {
+    const response = await fetch(Environments.api.matchService.baseUrl + `/match/${matchId}/users/${userId}/seen`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json', 
         authorization: 'Bearer ' + token 
-      },
-      body
+      }
     });
     if (response?.status === 404) {
       // HOW TO HANDLE THIS?
@@ -21,7 +19,7 @@ const updateChatsRead = async (matchId: number, userId: number, callIfUnauthoriz
     if (response?.status === 401 && callIfUnauthorized) {
       const tokens = await updateTokens(userId);
       if (tokens) {
-        const res = await updateChatsRead(matchId, userId, false);
+        const res = await updateMatchSeen(matchId, userId, false);
         return res;
       }
     }
@@ -31,9 +29,9 @@ const updateChatsRead = async (matchId: number, userId: number, callIfUnauthoriz
     }
   } catch(error) {
     if (Environments.appEnv !== 'prod') {
-      console.log('Update chats read api error', error);
+      console.log('Update match seen api error', error);
     }
   }
 }
 
-export default updateChatsRead;
+export default updateMatchSeen;
