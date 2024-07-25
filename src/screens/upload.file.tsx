@@ -56,7 +56,6 @@ const UploadFileScreen = ({ route, navigation }: any) => {
                     if (uploadRes.status === 200)  {
                         const data = {
                             key,
-                            location: key,
                             name: fileName,
                             mimetype: fileType,
                             size: file.size, 

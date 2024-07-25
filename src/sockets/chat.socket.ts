@@ -5,7 +5,6 @@ import { ChatSocketEvents } from '../utils/enums';
 
 type SendFileData = {
   key: string,
-  location: string,
   name: string,
   mimetype: string,
   size: number, 

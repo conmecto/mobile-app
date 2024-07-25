@@ -34,7 +34,6 @@ const AddFileScreen = ({ navigation }: any) => {
         setShowUploadModal(true);
     }
     
-
     return (
         <View style={{ flex: 1 }}>
             <TopBar />

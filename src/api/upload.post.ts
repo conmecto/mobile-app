@@ -4,7 +4,6 @@ import { getAccessToken } from '../utils/token';
 
 type PostObj = {
   key: string,
-  location: string,
   name: string,
   mimetype: string,
   size: number, 

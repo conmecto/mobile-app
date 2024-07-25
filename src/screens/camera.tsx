@@ -63,16 +63,16 @@ const CameraScreen = ({ navigation, route }: any) => {
             matchedUserId,
             capturedPhoto: { 
               path: capturedPhoto.path, 
-              height: capturedPhoto.height, 
-              width: capturedPhoto.width 
+              height: capturedPhoto.width, 
+              width: capturedPhoto.height
             } 
           });
         } else {
           navigation.navigate('CapturedCameraScreen', { 
             capturedPhoto: { 
               path: capturedPhoto.path, 
-              height: capturedPhoto.height, 
-              width: capturedPhoto.width 
+              height: capturedPhoto.width, 
+              width: capturedPhoto.height
             } 
           });
         }
