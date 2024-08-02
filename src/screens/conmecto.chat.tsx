@@ -1,129 +1,97 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Image, Dimensions, Text, TouchableOpacity } from 'react-native';
+import React, { useState , useEffect} from 'react';
+import { StyleSheet, View, Image, Dimensions, Text } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { COLOR_CODE } from '../utils/enums';
-import { IMAGE_LOGO_CROPPED } from '../files';
 import TopBar from '../components/top.bar'; 
-import { ASK_CONMECTO_PROMPTS, colors } from '../utils/constants';
-import FixedPromptResponse from '../components/fixed.prompt.response';
-
-const randomColor = () => {
-    const size = colors.length;
-    return colors[Math.floor(Math.random() * size)];
-};
+import ConmectoChatResponse from '../components/conmecto.chat.response';
+import ConmectoChatPrompts from '../components/conmecto.chat.prompts';
+import ConmectoChatPast from '../components/conmecto.chat.past';
+import getTextGenSetting from '../api/get.text.gen.setting';
+import { COLOR_CODE } from '../utils/enums';
+import { getUserId } from '../utils/user.id';
+import { IMAGE_LOGO_CROPPED } from '../files';
 
 Ionicons.loadFont();
 const { height } = Dimensions.get('window');
 
-type SelectedPrompt = {
-    prompt: string,
-    promptType: string
+type TextGenSetting = {
+    current: number,
+    max: number,
+    lastResetAt: Date,
+    isWaitingPeriod: boolean
 }
 
-const ConmectoChat = () => {
-    const [selectedPrompt, setSelectedPrompt] = useState<SelectedPrompt>({
-        prompt: '',
-        promptType: ''
-    });
+const ConmectoChat = ({ route, navigation }: any) => {
+    const currentMatches: number = route.params?.currentMatches;
+    const userId = getUserId() as number;
+    const [context, setContext] = useState('');
+    const [generateText, setGenerateText] = useState(false);
+    const [textGenSetting, setTextGenSetting] = useState<TextGenSetting>();
+    const [viewPast, setViewPast] = useState(false);
 
-    const onSelectPrompt = (prompt: string, promptType: string) => {
-        setSelectedPrompt({
-            prompt,
-            promptType
-        })
-    }
+    useEffect(() => {
+        let check = true;
+        const callFetchSetting = async () => {
+            const res = await getTextGenSetting(userId);
+            if (check) {
+                if (res) {
+                    setTextGenSetting(res);
+                }
+            }
+        }
+        if (!textGenSetting) {
+            callFetchSetting();
+        }
+        return () => {
+            check = false;
+        }
+    }, []); 
 
-    const onClearSelectedPrompt = () => {
-        setSelectedPrompt({
-            prompt: '',
-            promptType: ''
-        });
+    const onCloseConmectoChat = () => {
+        navigation.goBack();
     }
 
     return (
         <View style={{ flex: 1 }}>
             <TopBar />
-            <View style={styles.mainContainer}>
-                <View style={{ flex: 1 }}>
-                    <View style={styles.headerImageContainer}>
-                        <Image source={IMAGE_LOGO_CROPPED} style={styles.headerImage}/>                
-                    </View>
-                    <View style={styles.headerTextContainer}>
-                        <Text numberOfLines={2} adjustsFontSizeToFit style={styles.headerText}>
-                            Hey, What can I help you with?
-                        </Text>
-                    </View>
+            <View style={{ flex: 1, backgroundColor: COLOR_CODE.OFF_WHITE }}>
+                <View style={styles.headerImageContainer}>
+                    <Image source={IMAGE_LOGO_CROPPED} style={styles.headerImage}/>                
                 </View>
-                <View style={{ flex: 4 }}>
-                {
-                    selectedPrompt.prompt ?
-                    (
-                        <View style={{ flex: 1 }}>
-                            <View style={styles.closeIconContainer}>
-                                <TouchableOpacity onPress={() => onClearSelectedPrompt()}>
-                                    <Ionicons size={35} name='close-circle' />
-                                </TouchableOpacity>
-                            </View>
-                            {
-                                selectedPrompt.promptType === 'fixed' ? (
-                                    <FixedPromptResponse prompt={selectedPrompt.prompt} />
-                                ) : (
-                                    <View>
-                            
-                                    </View>
-                                )
-                            }
-                        </View>
-                    ) : (
-                        <View style={styles.promptMainContainer}>
-                            {
-                                ASK_CONMECTO_PROMPTS.fixed.map((prompt, index) => {
-                                    const fontColor = prompt === 'Find a Match' ? COLOR_CODE.BLACK : randomColor();
-                                    return (
-                                        <TouchableOpacity 
-                                            key={index} 
-                                            onPress={() => onSelectPrompt(prompt, 'fixed')} 
-                                            style={styles.promptTouchable}
-                                        >
-                                            <Text style={[styles.promptText, { color: fontColor }]}>
-                                                {prompt}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    );
-                                })
-                            }
-                        </View>
-                    )
-                }    
+                <View style={styles.headerTextContainer}>
+                    <Text numberOfLines={2} adjustsFontSizeToFit style={styles.headerText}>
+                        Hi there! Ready to assist 😊 
+                    </Text>
                 </View>
             </View>
+            {
+                (!generateText && !viewPast) && (
+                    <ConmectoChatPrompts context={context} currentMatches={currentMatches} setGenerateText={setGenerateText}
+                        textGenSetting={textGenSetting} setContext={setContext} onCloseConmectoChat={onCloseConmectoChat}
+                        setViewPast={setViewPast}
+                    />
+                )
+            }
+            {
+                (generateText && !viewPast) && (
+                    <ConmectoChatResponse context={context} generateText={generateText}
+                        setGenerateText={setGenerateText} setContext={setContext}
+                    />
+                )
+            }
+            {
+                (viewPast && !generateText) && (
+                    <ConmectoChatPast setViewPast={setViewPast} />
+                )
+            }
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    mainContainer: { flex: 1, backgroundColor: COLOR_CODE.OFF_WHITE },
     headerImageContainer: { flex: 0, justifyContent: 'center', alignItems: 'center' },
     headerImage: { height: height * 0.07, width: height * 0.07, borderRadius: 100 },
     headerTextContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    headerText: { fontSize: 20, fontWeight: 'bold', color: COLOR_CODE.GREY },
-    closeIconContainer: { flex: 0, justifyContent: 'center', alignItems: 'flex-end', padding: 10 },
-    promptMainContainer: {
-        flex: 1, flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'flex-start', padding: 10 
-    },
-    promptTouchable: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        borderWidth: 0.5,
-        backgroundColor: 'white',
-        borderColor: COLOR_CODE.LIGHT_GREY,
-        borderRadius: 10,
-        padding: 10,
-        margin: 4,
-    },
-    promptText: { fontSize: 15, fontWeight: 'bold' }
+    headerText: { fontSize: 20, fontWeight: 'bold', color: COLOR_CODE.GREY }
 });
 
 export default ConmectoChat;

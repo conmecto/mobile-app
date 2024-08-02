@@ -67,7 +67,9 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
   const [markChatsRead, setMarkChatsRead] = useState<number>();
   const [markMatchSeen, setMarkMatchSeen] = useState<number>();
   const [locationDenied, setLocationDenied] = useState(false);
-  
+
+  const currentMatches = matchObj.matches.length;
+
   useEffect(() => {
     let check = true;
     const callMarkChatsRead = async () => {
@@ -271,8 +273,6 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     );
   } 
 
-  const currentMatches = matchObj.matches.length;
-
   return (
     <View style={styles.mainContainer}>
       <TopBar />
@@ -355,7 +355,7 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
           }
         </View>
         <View style={styles.conmectoAnimatedContainer}>
-          <ConmectoBotAnimated navigate={navigation.navigate} />
+          <ConmectoBotAnimated navigate={navigation.navigate} currentMatches={currentMatches}/>
         </View>
       </View>
     </View>
