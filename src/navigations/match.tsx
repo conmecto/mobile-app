@@ -18,7 +18,7 @@ const MatchNavigator = ({ params }: any) => {
       <MatchStack.Screen name='MatchHomeScreen' component={MatchHomeScreen} options={{ headerShown: false, gestureEnabled: false }} />
       <MatchStack.Screen name='MatchChatScreen' component={MatchChatScreen} options={{ headerShown: false }} />
       <MatchStack.Screen name='MatchSummaryScreen' component={MatchSummaryScreen} options={{ headerShown: false }} />
-      <MatchStack.Screen name='ConmectoChat' component={ConmectoChat} options={{ headerShown: false }} />
+      <MatchStack.Screen name='ConmectoChat' component={ConmectoChat} options={{ headerShown: false, gestureEnabled: false }} />
       <MatchStack.Screen name='ProfileScreen' component={ProfileScreen} options={{ headerShown: false }} />
       <MatchStack.Screen name='ViewPostScreen' component={ViewPostScreen} options={{ headerShown: false }} />
       <MatchStack.Screen name='CameraScreen' component={CameraScreen} options={{ headerShown: false }} 
