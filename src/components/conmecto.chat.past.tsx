@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, Dimensions, TouchableOpacity, FlatList } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Clipboard from '@react-native-clipboard/clipboard';
 import getPastGenMessages from '../api/get.past.gen.messages';
 import { getUserId } from '../utils/user.id';
 import { COLOR_CODE } from '../utils/enums';
@@ -28,6 +29,12 @@ type Params = {
 
 const GenMessageView = React.memo(({ genMessage }: { genMessage: PastGenMessage }) => {
     const [copied, setCopied] = useState(false);
+
+    const copyText = () => {
+        Clipboard.setString(genMessage.response);
+        setCopied(true);
+    }
+    
     return (
         <View style={styles.messageMainContainer}>
             <View style={styles.contextMainContainer}>
@@ -44,7 +51,7 @@ const GenMessageView = React.memo(({ genMessage }: { genMessage: PastGenMessage 
                             {genMessage.response.substring(0, 500)}
                         </Text>
                     </View>
-                    <TouchableOpacity onPress={() => setCopied(true)} style={styles.copyTouchable}>
+                    <TouchableOpacity onPress={copyText} style={styles.copyTouchable}>
                         <Text style={styles.copyText}>
                             { copied ? 'Copied' : 'Copy' }
                         </Text>

@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@invertase/react-native-apple-authentication": "^2.3.0",
-    "@react-native-community/datetimepicker": "^7.1.0",
+    "@react-native-clipboard/clipboard": "^1.14.1",
+    "@react-native-community/datetimepicker": "^7.7.0",
     "@react-native-community/geolocation": "^3.3.0",
     "@react-native-community/hooks": "^3.0.0",
     "@react-native-community/push-notification-ios": "^1.11.0",
@@ -62,5 +63,11 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "overrides": {
+    "@react-native-clipboard/clipboard": {
+      "react-native": "~0.71.8",
+      "react-native-windows": "~0.71.8"
+    }
   }
 }

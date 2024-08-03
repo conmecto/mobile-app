@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Clipboard from '@react-native-clipboard/clipboard';
 import createTextGenJob from '../api/create.text.gen.job';
 import getTextGenJob from '../api/get.text.gen.job';
 import { getUserId } from '../utils/user.id';
@@ -29,6 +30,11 @@ const ConmectoChatResponse = ({
     const onClearSelectedPrompt = () => {
         setContext('');
         setGenerateText(false);
+    }
+    
+    const copyText = () => {
+        Clipboard.setString(jobResponse);
+        setCopied(true);
     }
 
     useEffect(() => {
@@ -119,7 +125,7 @@ const ConmectoChatResponse = ({
                                     {jobResponse.substring(0, 500)}
                                 </Text>
                             </View>
-                            <TouchableOpacity onPress={() => setCopied(true)} style={styles.copyTouchable}>
+                            <TouchableOpacity onPress={copyText} style={styles.copyTouchable}>
                                 <Text style={styles.copyText}>
                                     { copied ? 'Copied' : 'Copy' }
                                 </Text>
