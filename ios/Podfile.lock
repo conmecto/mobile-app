@@ -347,6 +347,8 @@ PODS:
     - React-Core
   - RNKeychain (8.2.0):
     - React-Core
+  - RNLocalize (3.2.1):
+    - React-Core
   - RNPermissions (3.10.1):
     - React-Core
   - RNScreens (3.33.0):
@@ -411,6 +413,7 @@ DEPENDENCIES:
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNFS (from `../node_modules/react-native-fs`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
+  - RNLocalize (from `../node_modules/react-native-localize`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -512,6 +515,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-fs"
   RNKeychain:
     :path: "../node_modules/react-native-keychain"
+  RNLocalize:
+    :path: "../node_modules/react-native-localize"
   RNPermissions:
     :path: "../node_modules/react-native-permissions"
   RNScreens:
@@ -570,12 +575,13 @@ SPEC CHECKSUMS:
   RNDateTimePicker: 4f3c4dbd4f908be32ec8c93f086e8924bd4a2e07
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNKeychain: bfe3d12bf4620fe488771c414530bf16e88f3678
+  RNLocalize: 4f22418187ecd5ca693231093ff1d912d1b3c9bc
   RNPermissions: ac8fc529732ab6e2be46bee9fbc7616c57872d9d
   RNScreens: 03acbdcf84e1bf6832ba83dbe3601eae20c55de0
   RNVectorIcons: bfb663f3f7b37340cd90120151b720641523dc84
   VisionCamera: 104de00dce2e04dec51bfb6027eff0312fa3174e
   Yoga: 065f0b74dba4832d6e328238de46eb72c5de9556
 
-PODFILE CHECKSUM: c5be0850ec6d0a77fd86454bbf56dbdbfdaf2ce2
+PODFILE CHECKSUM: 30793b70391cd6d3cac7d70c0dca268fd7816d48
 
 COCOAPODS: 1.15.2
