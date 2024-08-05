@@ -15,7 +15,8 @@ type SignupObj = {
   appleAuthToken?: string,
   termsAccepted?: boolean,
   appleAuthUserId?: string,
-  dob?: Date
+  dob?: Date,
+  deviceToken?: string
 }
 
 FontAwesome.loadFont();
@@ -67,10 +68,11 @@ const SignupSecondScreen = ({ navigation, route }: any) => {
   return (
     <View style={{ flex: 1 }}>  
       <TopBar />
-      <View style={styles.container}>          
-        <View style={styles.nameContainer}>
+      <View style={styles.container}>   
+        <View style={styles.errorContainer}>
           <Text style={styles.errorTextStyle} numberOfLines={1} adjustsFontSizeToFit>{signupError}</Text>
-          <Text>{'\n'}{'\n'}{'\n'}{'\n'}{'\n'}</Text>
+        </View>       
+        <View style={styles.nameContainer}>
           <TextInput
             placeholder='Name'
             value={signupObjSecondStage.name}
@@ -120,19 +122,21 @@ const styles = StyleSheet.create({
   },
 
   nameContainer: {
-    flex: 2,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-end',
     //paddingBottom: 50,
-    //borderWidth: 1
+    // borderWidth: 1
   },
 
   dobContainer: {
     flex: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    //borderWidth: 1
+    // borderWidth: 1
   },
+
+  errorContainer: { flex: 2, alignItems: 'center', justifyContent: 'center' },
 
   nextContainer: {
     flex: 1,
@@ -152,7 +156,7 @@ const styles = StyleSheet.create({
   },
 
   nameInput: { 
-    height: '15%', 
+    height: '30%', 
     width: '70%', 
     backgroundColor: COLOR_CODE.LIGHT_GREY, 
     borderRadius: 10,

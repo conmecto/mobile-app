@@ -3,6 +3,7 @@ import { View, Text, Dimensions, StyleSheet, ScrollView } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
 import { Button, Checkbox, Modal, Portal, Provider } from 'react-native-paper';
+import { getCountry } from "react-native-localize";
 import { COLOR_CODE } from '../utils/enums';
 //import findNumber from '../api/find.number';
 import TopBar from '../components/top.bar';
@@ -28,7 +29,8 @@ const SignupHomeScreen = ({ navigation }: any) => {
   //const numberRegex = new RegExp(/^[0-9]*$/);
   //const emailRegex = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
   //const extension = '+91';
-  const [signupObj, setSignupObj] = useState<SignupObj>({ country: 'india' });
+  const country = getCountry();
+  const [signupObj, setSignupObj] = useState<SignupObj>({ country: country });
   const [signupError, setSignupError] = useState('');
   const [showTerms, setShowTerms] = useState(false);
   

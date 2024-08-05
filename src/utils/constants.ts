@@ -84,8 +84,12 @@ const colors = [
 const GEOLOCATION_TIMEOUT_MILLIS = 1000;
 const GEOLOCATION_MAX_AGE_MILLIS = 86400000;
 
+const Cities: any = {
+  'IN': ['delhi', 'gurugram', 'mumbai']
+}
+
 export { 
   SEARCH_FOR, profilePictureOptions, postOptions, maxFileSizeBytes, allowedFileTypes, allowedImageTypes,
   maxImageSizeBytes, Days, initialLogoScreenTimeMilli, GENDER, polaroidTags, colors, GEOLOCATION_TIMEOUT_MILLIS, 
-  GEOLOCATION_MAX_AGE_MILLIS
+  GEOLOCATION_MAX_AGE_MILLIS, Cities
 };

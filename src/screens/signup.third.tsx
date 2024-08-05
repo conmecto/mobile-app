@@ -4,8 +4,7 @@ import { Provider, Portal, Modal, Button } from 'react-native-paper';
 import TopBar from '../components/top.bar';
 import { COLOR_CODE, ERROR_CODES } from '../utils/enums';
 import createUser from '../api/create.user';
-import getCities from '../api/get.cities';
-import { GENDER } from '../utils/constants';
+import { GENDER, Cities } from '../utils/constants';
 import { setUserId } from '../utils/user.id';
 import { setAccessToken } from '../utils/token';
 import { saveToken } from '../utils/helpers';
@@ -19,35 +18,20 @@ type SignupObj = {
   appleAuthUserId?: string,
   dob?: Date,
   city?: string,
-  gender?: string
+  gender?: string,
+  deviceToken?: string
 }
 
 const { height, width } = Dimensions.get('window');
 
 const SignupThirdScreen = ({ navigation, route }: any) => {
-  const signupObjSecondStage = JSON.parse(route.params.signupObjSecondStage);
+  const signupObjSecondStage: SignupObj = JSON.parse(route.params.signupObjSecondStage);
   //const extension = '+91';
-  const [cities, setCities] = useState<string[]>([]);
+  const cities: string[] = Cities[signupObjSecondStage?.country];
   const [finalSignupObj, setFinalSignupObj] = useState<SignupObj>({ ...signupObjSecondStage });
   const [signupError, setSignupError] = useState('');
   const [modalField, setModalField] = useState('');
   const [createUserCheck, setCreateUserCheck] = useState(false);
-  
-  useEffect(() => {
-    let check = true;
-    const callCities = async () => {
-      const res = await getCities('india');
-      if (check && res) {
-        setCities(res);
-      }
-    }
-    if (!cities.length) {
-      callCities();
-    }
-    return () => {
-      check = false;
-    }
-  }, []);
 
   const onSelectField = (value: string) => {
     setFinalSignupObj({ ...finalSignupObj, [modalField]: value });
@@ -143,7 +127,9 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
       <TopBar />
       <Provider>
         <Portal>
-          <Modal visible={Boolean(modalField)} onDismiss={() => setModalField('')} contentContainerStyle={styles.modalContainer}>
+          <Modal visible={Boolean(modalField)} onDismiss={() => setModalField('')} 
+            contentContainerStyle={[styles.modalContainer, modalField === 'gender' ? { height: height * 0.2 } : {}]}
+          >
             <FlatList
               data={getFlatListData()}
               renderItem={renderItem()}
