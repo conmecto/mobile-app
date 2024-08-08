@@ -101,7 +101,7 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
       error = 'Please select your City';
     }
     if (!finalSignupObj.gender) { 
-      error = 'Please select I identify as';
+      finalSignupObj.gender = 'n/s';
     }
     if (error) {
       setSignupError(error);

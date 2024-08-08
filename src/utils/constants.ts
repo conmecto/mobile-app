@@ -1,5 +1,5 @@
 const SEARCH_FOR = ['women', 'men', 'everyone'];
-const GENDER = ['woman', 'others', 'man'];
+const GENDER = ['woman', 'nonbinary', 'man'];
 
 const Days = ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat']
 
