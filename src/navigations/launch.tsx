@@ -5,13 +5,14 @@ import WelcomeScreen from '../screens/welcome';
 import LoginScreen from '../screens/login';
 import SignupHomeScreen from '../screens/signup.home';
 import SignupSecondScreen from '../screens/signup.second';
-import HomeTabNavigator from './home';
 import ContactAdminScreen from '../screens/contact.admin';
+import LogoScreen from '../screens/logo';
+import SignupThirdScreen from '../screens/signup.third';
 import { getToken, updateTokens } from '../utils/helpers';
 import { initialLogoScreenTimeMilli } from '../utils/constants';
-import LogoScreen from '../screens/logo';
 import { setUserId } from '../utils/user.id';
-import SignupThirdScreen from '../screens/signup.third';
+import { setUserCountry } from '../utils/user.country';
+import HomeTabNavigator from './home';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,7 @@ const LaunchStackNavigator = () => {
   useEffect(() => {
     let check = true;
     if (check) {
+      setUserCountry();
       checkAuthenticated();
     }
     return () => {

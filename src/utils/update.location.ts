@@ -1,9 +1,9 @@
 import { check, PERMISSIONS, request } from 'react-native-permissions';
 import Geolocation, { GeolocationResponse } from '@react-native-community/geolocation';
-import Environments from './environments';
 import updateUserLocation from '../api/update.location';
 import { getUserId } from './user.id';
 import { GEOLOCATION_TIMEOUT_MILLIS, GEOLOCATION_MAX_AGE_MILLIS } from './constants';
+import Environments from './environments';
 
 const checkLocation = async () => {
     try {

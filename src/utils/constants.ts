@@ -85,7 +85,8 @@ const GEOLOCATION_TIMEOUT_MILLIS = 1000;
 const GEOLOCATION_MAX_AGE_MILLIS = 86400000;
 
 const Cities: any = {
-  'IN': ['delhi', 'gurugram', 'mumbai']
+  'IN': ['delhi', 'gurugram', 'mumbai'],
+  'US': []
 }
 
 export { 

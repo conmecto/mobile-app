@@ -16,6 +16,7 @@ import { COLOR_CODE } from '../utils/enums';
 import { getUserId, resetUserId } from '../utils/user.id';
 import { resetToken } from '../utils/token';
 import { resetPosts } from '../utils/post';
+import { resetUserCountry } from '../utils/user.country';
 import { deleteAllChatSocketInstance } from '../sockets/chat.socket';
 import { IMAGE_LOGO } from '../files';
 
@@ -130,6 +131,7 @@ const SettingScreen = ({ navigation }: any) => {
           resetToken();
           resetUserId();
           resetPosts();
+          resetUserCountry();
           navigation.dispatch(
             CommonActions.reset({
               index: 0,              
