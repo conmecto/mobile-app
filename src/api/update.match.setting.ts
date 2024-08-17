@@ -8,6 +8,7 @@ type UpdateMatchSettingObject = {
   minSearchAge?: number;
   maxSearchAge?: number;
   searchFor?: string;
+  gender?: string;
 }
 
 type UserMatchSettingObject = {
@@ -15,7 +16,8 @@ type UserMatchSettingObject = {
   searchFor?: string,
   searchArea?: string,
   minSearchAge?: number,
-  maxSearchAge?: number
+  maxSearchAge?: number,
+  gender?: string
 }
 
 const updateMatchSetting = async (

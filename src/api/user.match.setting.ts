@@ -12,6 +12,7 @@ type UserMatchSettingObject = {
   maxSearchAge?: number,
   searchArea?: string,
   geohash?: string,
+  gender?: string
 }
 
 const getUserMatchSettings = async (userId: number, callIfUnauthorized: boolean = true): Promise<UserMatchSettingObject | undefined> => {

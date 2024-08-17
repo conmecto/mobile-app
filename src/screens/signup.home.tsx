@@ -29,7 +29,7 @@ const SignupHomeScreen = ({ navigation }: any) => {
   //const numberRegex = new RegExp(/^[0-9]*$/);
   //const emailRegex = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
   //const extension = '+91';
-  const country = getCountry();
+  const country = getCountry()?.toLowerCase() || 'in';
   const [signupObj, setSignupObj] = useState<SignupObj>({ country: country });
   const [signupError, setSignupError] = useState('');
   const [showTerms, setShowTerms] = useState(false);

@@ -18,7 +18,6 @@ import { resetToken } from '../utils/token';
 import { resetPosts } from '../utils/post';
 import { resetUserCountry } from '../utils/user.country';
 import { deleteAllChatSocketInstance } from '../sockets/chat.socket';
-import { IMAGE_LOGO } from '../files';
 
 type UserMatchSettingObject = {
   id?: number,
@@ -28,6 +27,7 @@ type UserMatchSettingObject = {
   maxSearchAge?: number,
   searchArea?: string,
   geohash?: string,
+  gender?: string
 }
 
 type SearchSettings = UserMatchSettingObject & {
@@ -38,7 +38,7 @@ type SearchSettings = UserMatchSettingObject & {
 FontAwesome.loadFont();
 MaterialCommunityIcons.loadFont();
 const { height, width } = Dimensions.get('window');
-
+const genderOptions = ['woman', 'nonbinary', 'man'];
 const searchForOptions = ['women', 'men', 'everyone'];
 const searchAreaOptions = ['close', 'mid', 'distant'];
 const ageOptions: number[] = [];
@@ -62,6 +62,7 @@ const SettingScreen = ({ navigation }: any) => {
       const res = await getUserMatchSettings(userId);
       if (check) {
         if (res) {
+          searchSettings.gender = res.gender;
           searchSettings.minSearchAge = res.minSearchAge;
           searchSettings.maxSearchAge = res.maxSearchAge;
           searchSettings.searchArea = res.searchArea;
@@ -90,7 +91,11 @@ const SettingScreen = ({ navigation }: any) => {
           maxSearchAge: searchSettings.maxSearchAge
         } : (
           searchSettings.updateSettings === 'searchFor' ? 
-          { searchFor: searchSettings.searchFor } : { searchArea: searchSettings.searchArea }
+          { searchFor: searchSettings.searchFor } : (
+            searchSettings.updateSettings === 'gender' ? 
+            { gender: searchSettings.gender } : 
+            { searchArea: searchSettings.searchArea }
+          )
         )
       const res = await updateMatchSetting(userId, updateObj);
       if (check) {
@@ -105,6 +110,9 @@ const SettingScreen = ({ navigation }: any) => {
         }
         if (res?.searchFor) {
           searchSettings.searchFor = res.searchFor;
+        }
+        if (res?.gender) {
+          searchSettings.gender = res.gender;
         }
         setSearchSettings({ ...searchSettings, updateSettings: '' });
         setIsLoading(false);
@@ -194,6 +202,8 @@ const SettingScreen = ({ navigation }: any) => {
       return ageOptions;
     } else if (searchSettings.modal === 'searchFor') {
       return searchForOptions;
+    } else if (searchSettings.modal === 'gender') {
+      return genderOptions;
     } else {
       return searchAreaOptions;
     }
@@ -217,6 +227,12 @@ const SettingScreen = ({ navigation }: any) => {
         isSame = true;
       } else {
         searchSettings.searchFor = value;
+      }
+    } else if (searchSettings.modal === 'gender') {
+      if (value === searchSettings.gender) {
+        isSame = true;
+      } else {
+        searchSettings.gender = value;
       }
     } else {
       if (value === searchSettings.searchArea) {
@@ -365,6 +381,24 @@ const SettingScreen = ({ navigation }: any) => {
                     </View>
                   </TouchableOpacity>
                 </View>
+
+                <View style={{ flex: 2 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.settingFieldText}>Gender</Text>
+                  </View>
+                  <View style={{ flex: 2 }}>
+                    <TouchableOpacity style={styles.settingFieldPressable} onPress={() => onPressOpenModal('gender')}>
+                      <View style={styles.settingFieldTextContainer}> 
+                        <Text numberOfLines={1} adjustsFontSizeToFit style={styles.settingValueText}>
+                          {formatText(searchSettings?.gender)}
+                        </Text>
+                      </View>
+                      <View style={styles.settingFieldIconContainer}> 
+                        <FontAwesome name='angle-right' size={25} />
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
 
               <View style={styles.accountSettingContainer}>
@@ -407,10 +441,6 @@ const SettingScreen = ({ navigation }: any) => {
               </View>
 
               <View style={{ flex: 3, alignItems: 'center', justifyContent: 'flex-end' }}>
-                <Image source={ IMAGE_LOGO } style={styles.logo} />
-                <Text>{'\n'}</Text>
-                <Text style={styles.conmectoText}>Conmecto</Text>
-                <Text>{'\n'}</Text>
               </View>
             </View>
           )
@@ -429,7 +459,7 @@ const styles = StyleSheet.create({
   },
   
   settingContainer: {
-    flex: 3
+    flex: 5
   },
 
   settingHeader: {
@@ -476,7 +506,7 @@ const styles = StyleSheet.create({
   },
 
   accountSettingContainer: {
-    flex: 2
+    flex: 3
   },
   accountSettingHeader: {
     flex: 1.5,
