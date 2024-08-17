@@ -2,6 +2,7 @@ import Environments from '../utils/environments';
 import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
+import { getUserCountry } from '../utils/user.country';
 
 type LogoutRes = {
   error?: string,
@@ -16,7 +17,8 @@ const logout = async (userId: number, callIfUnauthorized: boolean = true): Promi
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        authorization: 'Bearer ' + token 
+        authorization: 'Bearer ' + token,
+        'X-Country-Code': getUserCountry() 
       },
     });
     const jsonResponse = await response.json();

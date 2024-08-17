@@ -1,6 +1,7 @@
 import Environments from '../utils/environments';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
+import { getUserCountry } from '../utils/user.country';
 
 const updateChatsRead = async (matchId: number, userId: number, callIfUnauthorized: boolean = true): Promise<any> => {
   try {
@@ -10,7 +11,8 @@ const updateChatsRead = async (matchId: number, userId: number, callIfUnauthoriz
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json', 
-        authorization: 'Bearer ' + token 
+        authorization: 'Bearer ' + token,
+        'X-Country-Code': getUserCountry() 
       },
       body
     });

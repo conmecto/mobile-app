@@ -7,19 +7,11 @@ const getUserCountry = () => {
 }
 
 const setUserCountry = () => {
-  userCountry = getCountry()?.toLowerCase();
+  userCountry = getCountry()?.toLowerCase() || 'in';
 }
 
 const resetUserCountry = () => {
   userCountry = '';
 }
 
-const addCountryToApi = (api?: string) => {
-  const components = api?.split('//');
-  if (components?.length === 2) {
-    return components[0] + `//${getUserCountry()}.` + components[1];
-  }
-  return api;
-}
-
-export { getUserCountry, setUserCountry, resetUserCountry, addCountryToApi }
+export { getUserCountry, setUserCountry, resetUserCountry }

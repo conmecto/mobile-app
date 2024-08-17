@@ -1,6 +1,7 @@
 import Environments from '../utils/environments';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
+import { getUserCountry } from '../utils/user.country';
 
 type TextGenSetting = {
     current: number,
@@ -16,7 +17,8 @@ const getTextGenSetting = async (userId: number, callIfUnauthorized: boolean = t
       method: 'GET',
       headers: {
         'Content-Type': 'application/json', 
-        authorization: 'Bearer ' + token 
+        authorization: 'Bearer ' + token,
+        'X-Country-Code': getUserCountry() 
       },
     });
     const jsonResponse = await response.json();

@@ -3,6 +3,7 @@ import { Asset } from 'react-native-image-picker';
 import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
+import { getUserCountry } from '../utils/user.country';
 
 type UserPost = {
   id: number,
@@ -48,7 +49,8 @@ const addPost = async (userId: number, post: Asset, callIfUnauthorized: boolean 
       body: formData,
       headers: {
         'Content-Type': 'multipart/form-data',
-        authorization: 'Bearer ' + token 
+        authorization: 'Bearer ' + token,
+        'X-Country-Code': getUserCountry()
       }
     });
     const jsonResponse = await response.json();

@@ -1,6 +1,7 @@
 import Environments from '../utils/environments';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
+import { getUserCountry } from '../utils/user.country';
 
 type Chats = {
   id: number,
@@ -30,7 +31,8 @@ const getChats = async ({ matchId, userId, page, skip }: params, callIfUnauthori
     const response = await fetch(Environments.api.matchService.baseUrl + `/match/${matchId}/chats?userId=${userId}&page=${page}&skip=${skip}&perPage=10`, {
       method: 'GET',
       headers: {
-        authorization: 'Bearer ' + token
+        authorization: 'Bearer ' + token,
+        'X-Country-Code': getUserCountry()
       }
     });
     const jsonResponse = await response.json();

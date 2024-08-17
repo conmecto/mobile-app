@@ -2,6 +2,7 @@ import Environments from '../utils/environments';
 import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
+import { getUserCountry } from '../utils/user.country';
 
 type UserPost = {
   id: number,
@@ -35,7 +36,8 @@ const getFeed = async (userId: number, paginationOptions: PaginationOptions, cal
     const response = await fetch(Environments.api.profileService.baseUrl + `/profile/users/${userId}/feed?page=${paginationOptions.page}&perPage=${paginationOptions.perPage}`, {
       method: 'GET',
       headers: {
-        authorization: 'Bearer ' + token 
+        authorization: 'Bearer ' + token,
+        'X-Country-Code': getUserCountry() 
       },
     });
     const jsonResponse = await response.json();

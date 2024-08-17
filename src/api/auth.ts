@@ -1,4 +1,5 @@
 import Environments from '../utils/environments';
+import { getUserCountry } from '../utils/user.country';
 
 type AuthenticateRefreshToken = {
   userId: number,
@@ -19,6 +20,7 @@ const authenticateRefreshToken = async (refreshToken: string): Promise<Authentic
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Country-Code': getUserCountry()
       },
       body
     });

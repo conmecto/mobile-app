@@ -1,6 +1,7 @@
 import Environments from '../utils/environments';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
+import { getUserCountry } from '../utils/user.country';
 
 type LogoutRes = {
   error?: string,
@@ -15,7 +16,8 @@ const removeAccount = async (userId: number, callIfUnauthorized: boolean = true)
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        authorization: 'Bearer ' + token 
+        authorization: 'Bearer ' + token,
+        'X-Country-Code': getUserCountry() 
       },
     });
     const jsonResponse = await response.json();

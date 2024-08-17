@@ -1,5 +1,6 @@
 import Environments from '../utils/environments';
 import { ERROR_CODES } from '../utils/enums';
+import { getUserCountry } from '../utils/user.country';
 
 type ResendOtpRes = {
   userId?: number,
@@ -16,7 +17,8 @@ const resendOtp = async (email: string): Promise<ResendOtpRes | undefined> => {
     const response = await fetch(Environments.api.userService.baseUrl + '/users/otp/resend', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Country-Code': getUserCountry()
       },
       body
     });

@@ -2,6 +2,7 @@ import Environments from '../utils/environments';
 import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
+import { getUserCountry } from '../utils/user.country';
 
 type endMatchRes = {
   error?: string,
@@ -20,7 +21,8 @@ const endMatch = async (matchId: number, userId: number, block: boolean, callIfU
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json', 
-        authorization: 'Bearer ' + token 
+        authorization: 'Bearer ' + token,
+        'X-Country-Code': getUserCountry() 
       },
       body
     });

@@ -2,6 +2,7 @@ import Environments from '../utils/environments';
 import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
+import { getUserCountry } from '../utils/user.country';
 
 type UserProfileRes = {
   id: number,
@@ -26,7 +27,8 @@ const getUserProfile = async (userId: number, callIfUnauthorized: boolean = true
     const response = await fetch(Environments.api.profileService.baseUrl + `/profile/users/${userId}`, {
       method: 'GET',
       headers: {
-        authorization: 'Bearer ' + token 
+        authorization: 'Bearer ' + token,
+        'X-Country-Code': getUserCountry() 
       },
     });
     const jsonResponse = await response.json();

@@ -2,6 +2,7 @@ import Environments from '../utils/environments';
 import { Asset } from 'react-native-image-picker';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
+import { getUserCountry } from '../utils/user.country';
 
 type requestBody = {
     userId: number, 
@@ -28,7 +29,8 @@ const requestSignedUrl = async (data: requestBody, callIfUnauthorized: boolean =
       body,
       headers: {
         'Content-Type': 'application/json',
-        authorization: 'Bearer ' + token 
+        authorization: 'Bearer ' + token,
+        'X-Country-Code': getUserCountry() 
       },
     });
     const jsonResponse = await response.json();

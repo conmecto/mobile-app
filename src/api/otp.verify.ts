@@ -1,5 +1,6 @@
 import Environments from '../utils/environments';
 import { ERROR_CODES } from '../utils/enums';
+import { getUserCountry } from '../utils/user.country';
 
 type LoginObj = {
   appleAuthUserId?: string,
@@ -30,7 +31,8 @@ const verifyOtp = async (loginObj: LoginObj): Promise<VerifyOtpRes | undefined> 
     const response = await fetch(Environments.api.userService.baseUrl + '/users/login', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Country-Code': getUserCountry()
       },
       body
     });

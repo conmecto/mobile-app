@@ -1,4 +1,5 @@
 import Environments from '../utils/environments';
+import { getUserCountry } from '../utils/user.country';
 
 type CreateUserRes = {
   data?: {
@@ -30,7 +31,8 @@ const createUser = async (createUserObj: CreateUserObj): Promise<CreateUserRes |
     const response = await fetch(Environments.api.userService.baseUrl + `/users`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Country-Code': getUserCountry()
       },
       body
     });

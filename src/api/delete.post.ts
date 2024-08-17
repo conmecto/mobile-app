@@ -1,6 +1,7 @@
 import Environments from '../utils/environments';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
+import { getUserCountry } from '../utils/user.country';
 
 const deletePost = async (postId: number, userId: number, callIfUnauthorized: boolean = true): Promise<undefined> => {
   try {
@@ -9,7 +10,8 @@ const deletePost = async (postId: number, userId: number, callIfUnauthorized: bo
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json', 
-        authorization: 'Bearer ' + token 
+        authorization: 'Bearer ' + token,
+        'X-Country-Code': getUserCountry() 
       }
     });
     const jsonResponse = await response.json();

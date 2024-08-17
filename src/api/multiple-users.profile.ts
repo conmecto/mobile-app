@@ -2,6 +2,7 @@ import Environments from '../utils/environments';
 import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
+import { getUserCountry } from '../utils/user.country';
 
 type ProfileRes = {
   id: number,
@@ -20,7 +21,8 @@ const getMultipleUsersProfile = async (userIds: number[], loggedInUserId: number
     const response = await fetch(Environments.api.profileService.baseUrl + `/profile/multiple-users?userIds=${userIds.join(',')}`, {
       method: 'GET',
       headers: {
-        authorization: 'Bearer ' + token 
+        authorization: 'Bearer ' + token,
+        'X-Country-Code': getUserCountry() 
       },
     });
     const jsonResponse = await response.json();

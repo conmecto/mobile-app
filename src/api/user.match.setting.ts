@@ -2,6 +2,7 @@ import Environments from '../utils/environments';
 import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
+import { getUserCountry } from '../utils/user.country';
 
 type UserMatchSettingObject = {
   id?: number,
@@ -21,7 +22,8 @@ const getUserMatchSettings = async (userId: number, callIfUnauthorized: boolean 
     const response = await fetch(Environments.api.matchService.baseUrl + `/match/setting/${userId}`, {
       method: 'GET',
       headers: {
-        authorization: 'Bearer ' + token 
+        authorization: 'Bearer ' + token,
+        'X-Country-Code': getUserCountry() 
       },
     });
     if (response?.status === 404) {
