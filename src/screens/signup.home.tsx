@@ -7,9 +7,9 @@ import { getCountry } from "react-native-localize";
 import { COLOR_CODE } from '../utils/enums';
 //import findNumber from '../api/find.number';
 import TopBar from '../components/top.bar';
+import TermsItem from '../components/terms'
 import environments from '../utils/environments';
 import { getToken } from '../utils/helpers';
-import TermsItem from '../components/terms'
 
 type SignupObj = {
   country: string,
