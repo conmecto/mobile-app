@@ -290,7 +290,7 @@ const SettingScreen = ({ navigation }: any) => {
                 <Modal 
                   visible={Boolean(searchSettings.modal)} 
                   onDismiss={onPressDismissSearchModal} 
-                  contentContainerStyle={styles.modalContainer}
+                  contentContainerStyle={[styles.modalContainer, searchSettings.modal === 'age' ? {} : { height: height * 0.15 }]}
                 >
                   <FlatList
                     data={getFlatListData()}
