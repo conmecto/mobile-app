@@ -7,15 +7,14 @@ import { omit } from 'lodash';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Provider, Modal, Portal, Button } from 'react-native-paper';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { getChatSocketInstance } from '../sockets/chat.socket';
-import { COLOR_CODE, ChatSocketEvents } from '../utils/enums';
+import Loading from '../components/loading';
+import ChatMessageComponent from '../components/chat.message';
 import getChats from '../api/get.chats';
 import endMatch from '../api/end.match';
 import { getUserId } from '../utils/user.id';
-import { deleteChatSocketInstance } from '../sockets/chat.socket';
+import { COLOR_CODE, ChatSocketEvents } from '../utils/enums';
 import { formatText } from '../utils/helpers';
-import Loading from '../components/loading';
-import ChatMessageComponent from '../components/chat.message';
+import { getChatSocketInstance, deleteChatSocketInstance } from '../sockets/chat.socket';
 
 type Chat = {
   id?: number,

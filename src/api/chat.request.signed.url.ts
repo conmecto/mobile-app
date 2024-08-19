@@ -17,11 +17,11 @@ type UpdateProfileRes = {
     path?: string
 }
 
-const requestSignedUrl = async (data: requestBody, callIfUnauthorized: boolean = true): Promise<UpdateProfileRes | undefined> => {
+const requestChatSignedUrl = async (matchId: number, data: requestBody, callIfUnauthorized: boolean = true): Promise<UpdateProfileRes | undefined> => {
   try {
     const token = getAccessToken();
     const body = JSON.stringify(data);
-    const response = await fetch(Environments.api.profileService.baseUrl + `/profile/users/request/signed-url`, {
+    const response = await fetch(Environments.api.matchService.baseUrl + `/match/${matchId}/chats/signed-url`, {
       method: 'POST',
       body,
       headers: {
@@ -34,7 +34,7 @@ const requestSignedUrl = async (data: requestBody, callIfUnauthorized: boolean =
     if (response?.status === 401 && callIfUnauthorized) {
       const tokens = await updateTokens(data.userId);
       if (tokens) {
-        const res = await requestSignedUrl(data, false);
+        const res = await requestChatSignedUrl(matchId, data, false);
         return res;
       }
     }
@@ -47,9 +47,9 @@ const requestSignedUrl = async (data: requestBody, callIfUnauthorized: boolean =
     }
   } catch(error) {
     if (Environments.appEnv !== 'prod') {
-      console.log('Request signed url error', error);
+      console.log('Request chat signed url error', error);
     }
   }
 }
 
-export default requestSignedUrl;
+export default requestChatSignedUrl;

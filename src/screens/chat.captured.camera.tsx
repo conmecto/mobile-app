@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { View, Image, Text, TextInput, StyleSheet, SafeAreaView, KeyboardAvoidingView } from 'react-native';
 import { Button } from 'react-native-paper';
 import { unlink } from 'react-native-fs';
+import requestChatSignedUrl from '../api/chat.request.signed.url';
 import { COLOR_CODE, ChatSocketEvents } from '../utils/enums';
 import environments from '../utils/environments';
-import requestSignedUrl from '../api/request.signed.url';
 import { getUserId } from '../utils/user.id';
 import { getFileType } from '../utils/helpers';
-import { sendFileAsMessage } from '../sockets/chat.socket';
 import Loading from '../components/loading';
+import { sendFileAsMessage } from '../sockets/chat.socket';
 
 type RouteParams = { 
   capturedPhoto: {
@@ -33,7 +33,7 @@ const ChatCapturedCameraScreen = ({ route, navigation }: any) => {
     const callSendImage = async () => {
       const fileName = capturedPhoto.path.split('/').pop() as string;
       const fileType = getFileType(fileName.split('.').pop() as string) as string;
-      const res = await requestSignedUrl({ userId, fileName, contentType: fileType });
+      const res = await requestChatSignedUrl(matchId, { userId, fileName, contentType: fileType });
       let uploadError = '';
       if (check && res?.url) {
         const result = await fetch(capturedPhoto.path);
