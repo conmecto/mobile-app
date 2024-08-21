@@ -20,7 +20,7 @@ type MatchesSummary = {
 
 const MatchSummaryScreen = () => {  
   const userId = getUserId() as number;
-  const maxMatches = 10;
+  const maxMatches = 5;
   const [matchesSummary, setMatchesSummary] = useState<MatchesSummary>({
     callMatchesSummary: true,
     currentMatches: 0,
