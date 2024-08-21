@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Button } from 'react-native-paper';
+import getConmectoScore from '../api/get.conmecto.score';
 import { fireColorScoreBased, formatText } from '../utils/helpers';
 import { COLOR_CODE } from '../utils/enums';
 import { DEFAULT_PROFILE_PIC } from '../files';
@@ -34,6 +35,23 @@ type props = {
 }
 
 const ProfileDetails = ({ profileDetails, navigate, commonScreen }: props) => {
+  const defaultScore = 5;
+  const [conmectoStreak, setConmectoStreak] = useState(defaultScore);
+
+  useEffect(() => {
+    let check = true;
+    const callGetData = async () => {
+      const res = await getConmectoScore(profileDetails.userId);
+      if (check && res?.conmectoScore) {
+        setConmectoStreak(res.conmectoScore);
+      }
+    }
+    callGetData();
+    return () => {
+      check = false;
+    }
+  }, []);
+
   const onPressEditProfile = () => {
     navigate('EditProfileScreen', { profileDetails });
   }
@@ -46,7 +64,9 @@ const ProfileDetails = ({ profileDetails, navigate, commonScreen }: props) => {
             <Text style={styles.headerText}>Conmecto Streak</Text>
           </View>
           <View style={styles.scoreContainer}>
-            <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{5}<MaterialCommunityIcons name='fire' color={fireColorScoreBased(5)}/></Text>
+            <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>
+              {conmectoStreak}<MaterialCommunityIcons name='fire' color={fireColorScoreBased(conmectoStreak)}/>
+            </Text>
           </View>
         </View>
         <View style={styles.editButtonContainer}>
