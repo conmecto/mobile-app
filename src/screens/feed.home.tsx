@@ -71,7 +71,7 @@ const FeedScreen = ({ navigation }: any) => {
             <FlatList 
                 data={data}
                 renderItem={({ item, index }) => 
-                    <PolaroidItem postId={item} navigate={navigation.navigate}/>
+                    <PolaroidItem postId={item} navigate={navigation.navigate} setPostObj={setPostObj} setData={setData} />
                 }
                 keyExtractor={(item: any, index: number) => index?.toString()}
                 pagingEnabled
