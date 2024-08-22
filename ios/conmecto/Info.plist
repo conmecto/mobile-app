@@ -60,6 +60,8 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Conmecto uses your Camera for creating Polaroids</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
- 	<string>Conmecto uses your location to find nearby users and create matches</string>
+ 	<string>Conmecto uses your location to find nearby automated connections</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription </key>
+ 	<string>Conmecto uses your location to find nearby automated connections</string>
 </dict>
 </plist>
