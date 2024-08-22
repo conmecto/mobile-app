@@ -1,5 +1,4 @@
 import Environments from '../utils/environments';
-import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
 import { getUserCountry } from '../utils/user.country';
@@ -9,22 +8,24 @@ type response = {
   message?: string
 }
 
-const reportUserPost = async (postId: number, userId: number, callIfUnauthorized: boolean = true): Promise<response | undefined> => {
+const blockProfile = async (userId: number, blockedUserId: number, callIfUnauthorized: boolean = true): Promise<response | undefined> => {
   try {
     const token = getAccessToken();
-    const response = await fetch(Environments.api.profileService.baseUrl + `/profile/users/post/${postId}/report`, {
-      method: 'PUT',
+    const body = JSON.stringify({ blockedUserId });
+    const response = await fetch(Environments.api.profileService.baseUrl + `/profile/users/${userId}/block`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json', 
         authorization: 'Bearer ' + token,
-        'X-Country-Code': getUserCountry() 
-      }
+        'X-Country-Code': getUserCountry()
+      },
+      body
     });
     const jsonResponse = await response.json();
     if (response?.status === 401 && callIfUnauthorized) {
       const tokens = await updateTokens(userId);
       if (tokens) {
-        const res = await reportUserPost(postId, userId, false);
+        const res = await blockProfile(userId, blockedUserId, false);
         return res;
       }
     }
@@ -37,9 +38,9 @@ const reportUserPost = async (postId: number, userId: number, callIfUnauthorized
     }
   } catch(error) {
     if (Environments.appEnv !== 'prod') {
-      console.log('Report user post api error', error);
+      console.log('Block profile api error', error);
     }
   }
 }
 
-export default reportUserPost;
+export default blockProfile;
