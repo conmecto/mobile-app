@@ -35,8 +35,6 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Conmecto uses photo library for uploading Polaroids or Profile Picture</string>
 	<key>UIBackgroundModes</key>
