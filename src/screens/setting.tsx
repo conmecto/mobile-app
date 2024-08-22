@@ -420,7 +420,7 @@ const SettingScreen = ({ navigation }: any) => {
                 <View style={styles.accountSettingBody}>
                   <TouchableOpacity style={{ flex: 1, flexDirection: 'row' }} onPress={() => onPressAccountModal('terms')}>
                     <View style={styles.settingFieldTextContainer}> 
-                      <Text style={styles.logoutText}>Terms & Conditions</Text>
+                      <Text style={styles.logoutText}>Terms & Privacy Policy</Text>
                     </View>
                     <View style={styles.settingFieldIconContainer}> 
                       <FontAwesome name='angle-right' size={25} />
