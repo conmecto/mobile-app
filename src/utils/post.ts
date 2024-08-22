@@ -1,3 +1,9 @@
+import { colors } from '../utils/constants';
+
+const randomColor = () => {
+    return colors[Math.floor(Math.random() * colors.length)];
+};
+
 type UserPost = {
     id: number,
     userId: number,
@@ -11,7 +17,9 @@ type UserPost = {
     reported?: boolean,
     reactCount: number,
     reacted: boolean,
-    tags: string
+    tags: string,
+    tagsArray?: string[], 
+    tagsColor?: string[]
 }
 
 type PostsType = {
@@ -31,6 +39,14 @@ const setPost = (postId: number, post: UserPost) => {
 const setBulkPost = (bulkPosts: UserPost[]) => {
     for(const post of bulkPosts) {
         posts[post.id] = post;
+        if (post.tags?.length) {
+            const tags = post.tags?.split(',') || [];
+            posts[post.id].tagsArray = tags;
+            posts[post.id].tagsColor = tags.map(t => randomColor());
+        } else {
+            posts[post.id].tagsArray = [];
+            posts[post.id].tagsColor = [];
+        }
     }
 }
 

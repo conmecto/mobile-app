@@ -3,15 +3,16 @@ import { Text, View, Dimensions, Image, TouchableOpacity, StyleSheet } from 'rea
 import { Button, Modal, Portal, Provider } from 'react-native-paper';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { COLOR_CODE } from '../utils/enums';
-import { DEFAULT_PROFILE_PIC } from '../files';
-import { getPolaroidDate, getFormatedView, formatText } from '../utils/helpers';
-import { getUserId } from '../utils/user.id';
-import { getPost, setPost } from '../utils/post';
 import reportUserPost from '../api/report.post';
 import reactUserPost from '../api/react.post';
+import blockProfile from '../api/block.profile';
+import { getPolaroidDate, getFormatedView, formatText } from '../utils/helpers';
+import { COLOR_CODE } from '../utils/enums';
+import { getUserId } from '../utils/user.id';
+import { getPost, setPost } from '../utils/post';
 import { colors } from '../utils/constants';
 import TagItem from '../components/tag';
+import { DEFAULT_PROFILE_PIC } from '../files';
 
 const randomColor = () => {
     return colors[Math.floor(Math.random() * colors.length)];
@@ -20,13 +21,17 @@ const randomColor = () => {
 type PostOptions = {
     openOptionsModal: boolean,
     openReportModal: boolean,
+    openBlockModal: boolean,
     reportPost: boolean,
-    reactToPost: boolean
+    reactToPost: boolean,
+    blockUser: boolean
 }
 
 type PolaroidItemParameters = {
     postId: number,
-    navigate: any
+    navigate: any,
+    setPostObj: any,
+    setData: any
 }
 
 const { width, height } = Dimensions.get('window');
@@ -35,14 +40,16 @@ const polaroidHeight = Math.floor(height * 0.9);
 Entypo.loadFont();
 MaterialIcons.loadFont();
 
-const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) => {
+const PolaroidItem = React.memo(({ postId, navigate, setPostObj, setData }: PolaroidItemParameters) => {
     const userId = getUserId() as number;
     const item = getPost(postId);
     const [postOptions, setPostOptions] = useState<PostOptions>({
+        openBlockModal: false,
         openOptionsModal: false,
         openReportModal: false,
         reportPost: false,
-        reactToPost: false
+        reactToPost: false,
+        blockUser: false
     });
     const polaroidDate = getPolaroidDate(item?.createdAt);
     const [views, symbol] = getFormatedView(item.reactCount);
@@ -59,17 +66,54 @@ const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) =
                     ...prevState,
                     reportPost: false
                 }));
+                if (res?.message) {
+                    setPostObj((prevState: any) => ({
+                        ...prevState,
+                        isLoading: true,
+                        isRefreshing: false,
+                        page: 1,
+                        hasMore: true
+                    }));
+                    setData([]);
+                }
             }
         }
         if (postOptions.reportPost && !item.reported) { 
-            item.reported = true;
-            setPost(postId, item);
             callReportPostApi();
         }
         return () => {
           check = false;
         }
     }, [postOptions.reportPost]);
+
+    useEffect(() => {
+        let check = true;
+        const callBlockProfile = async () => {
+            const res = await blockProfile(userId, item.userId);
+            if (check) {
+                setPostOptions(prevState => ({
+                    ...prevState,
+                    blockUser: false
+                }));
+                if (res?.message) {
+                    setPostObj((prevState: any) => ({
+                        ...prevState,
+                        isLoading: true,
+                        isRefreshing: false,
+                        page: 1,
+                        hasMore: true
+                    }));
+                    setData([]);
+                }
+            }
+        }
+        if (postOptions.blockUser) { 
+            callBlockProfile();
+        }
+        return () => {
+          check = false;
+        }
+    }, [postOptions.blockUser]);
 
     useEffect(() => {
         let check = true;
@@ -111,11 +155,25 @@ const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) =
         }
     }
 
+    const onDismissBlockModal = () => {
+        if (postOptions.openBlockModal) {
+            setPostOptions(prevState => ({ ...prevState, openBlockModal: false }));
+        }
+    }
+
     const onPressReportButton = () => {
         setPostOptions(prevState => ({ 
             ...prevState, 
             openOptionsModal: false, 
             openReportModal: true 
+        }));
+    }
+
+    const onPressBlockButton = () => {
+        setPostOptions(prevState => ({ 
+            ...prevState, 
+            openOptionsModal: false, 
+            openBlockModal: true 
         }));
     }
 
@@ -127,6 +185,14 @@ const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) =
         }));
     }
 
+    const onPressBlock = () => {
+        setPostOptions(prevState => ({ 
+            ...prevState, 
+            openBlockModal: false,
+            blockUser: true 
+        }));
+    }
+
     const onPressReact = () => {
         if (!item.reacted) {
             setPostOptions(prevState => ({
@@ -135,9 +201,6 @@ const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) =
             }));
         }
     }
-
-    const tags = item.tags?.split(',') || [];
-    const tagsColor = tags.map(t => randomColor());
 
     return (
         <View style={styles.polaroidMainContainer}>
@@ -164,22 +227,16 @@ const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) =
                                     </TouchableOpacity>
                                 )
                             }
-                            {
-                                item.reported ? 
-                                (
-                                    <View style={styles.reportContainer}>
-                                        <Text style={styles.reportText}>
-                                            Reported ✅
-                                        </Text>
-                                    </View>
-                                ) : (
-                                    <TouchableOpacity onPress={onPressReportButton} style={styles.reportTouchable}>
-                                        <Text style={styles.reportText}>
-                                            Report Polaroid
-                                        </Text>
-                                    </TouchableOpacity>
-                                )
-                            }
+                            <TouchableOpacity onPress={onPressReportButton} style={styles.reportTouchable}>
+                                <Text style={styles.reportText}>
+                                    Report Polaroid
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={(onPressBlockButton)} style={styles.blockTouchable}>
+                                <Text style={styles.reportText}>
+                                    Block User Profile
+                                </Text>
+                            </TouchableOpacity>
                         </View>
                     </Modal>
                     <Modal visible={postOptions.openReportModal} 
@@ -194,6 +251,20 @@ const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) =
                                 Spam or Misleading or Child abuse
                             </Text>
                             <Button onPress={onPressReport} buttonColor={COLOR_CODE.BRIGHT_RED} 
+                                textColor={COLOR_CODE.OFF_WHITE} labelStyle={{ fontSize: 12 }}
+                            >
+                                Confirm
+                            </Button>
+                        </View>
+                    </Modal>
+                    <Modal visible={postOptions.openBlockModal} 
+                        onDismiss={onDismissBlockModal} contentContainerStyle={styles.modalStyle}
+                    >
+                        <View style={styles.modalContainer}>
+                            <Text numberOfLines={2} adjustsFontSizeToFit style={styles.reportTitle}>
+                                Are you sure you want to Block this User Profile?
+                            </Text>
+                            <Button onPress={onPressBlock} buttonColor={COLOR_CODE.BRIGHT_RED} 
                                 textColor={COLOR_CODE.OFF_WHITE} labelStyle={{ fontSize: 12 }}
                             >
                                 Confirm
@@ -248,7 +319,11 @@ const PolaroidItem = React.memo(({ postId, navigate }: PolaroidItemParameters) =
                         <View style={styles.tagsMainContainer}>
                             <View style={styles.tagsContainer}>
                                 {
-                                    tags.map((tag, index) => <TagItem tag={tag} key={index} tagColor={tagsColor[index]}/>)
+                                    item.tagsArray?.map((tag, index) => {
+                                        if (item.tagsColor) {
+                                            return (<TagItem tag={tag} key={index} tagColor={item.tagsColor[index]}/>)
+                                        }
+                                    })
                                 }
                             </View>
                         </View>
@@ -284,7 +359,7 @@ const styles = StyleSheet.create({
         right: 10,
         position: 'absolute', 
         borderRadius: 10, 
-        height: height * 0.1, 
+        height: height * 0.15, 
         width: width * 0.4, 
         backgroundColor: COLOR_CODE.OFF_WHITE
     },
@@ -301,10 +376,11 @@ const styles = StyleSheet.create({
         color: COLOR_CODE.GREY
     },
     reactContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: COLOR_CODE.LIGHT_GREY },
-    reactTouchable: { flex: 1, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: COLOR_CODE.LIGHT_GREY },
+    reactTouchable: { flex: 1, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 0.5, borderBottomColor: COLOR_CODE.LIGHT_GREY },
     reactText: { fontSize: 15, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE },
     reportText: { fontSize: 15, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_RED },
-    reportTouchable: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    reportTouchable: { flex: 1, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 0.5, borderBottomColor: COLOR_CODE.LIGHT_GREY },
+    blockTouchable: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     reportContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     tagsMainContainer: {  height: width * 0.15, width: width * 0.7, position: 'absolute', bottom: 0 },
     tagsContainer: { flex: 1, paddingLeft: 10, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start' }
