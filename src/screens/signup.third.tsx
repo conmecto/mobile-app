@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Dimensions, StyleSheet, FlatList } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, FlatList, TextInput } from 'react-native';
 import { Provider, Portal, Modal, Button } from 'react-native-paper';
 import TopBar from '../components/top.bar';
 import { COLOR_CODE, ERROR_CODES } from '../utils/enums';
@@ -122,6 +122,10 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
     }
   }
 
+  const onChangeCity = (text: string) => {
+    setFinalSignupObj({ ...finalSignupObj, city: text.toLowerCase() });
+  }
+
   return (
     <View style={{ flex: 1 }}>  
       <TopBar />
@@ -142,11 +146,29 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
             <Text style={styles.errorTextStyle} numberOfLines={1} adjustsFontSizeToFit>{signupError}</Text>
           </View>
           <View style={styles.fieldContainer}>
-            <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={() => onPressShowModal('gender')} style={{ width: '80%' }} labelStyle={styles.submitButtonText}>{finalSignupObj.gender || 'I identify as'}</Button>
-            <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={() => onPressShowModal('city')} style={{ width: '80%' }} labelStyle={styles.submitButtonText}>{finalSignupObj.city || 'Select your City'}</Button>
+            {
+              cities ? 
+              (
+                <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={() => onPressShowModal('city')} style={styles.cityButton} labelStyle={styles.submitButtonText}>
+                  {finalSignupObj.city || 'Select your City'}
+                </Button>
+              ) : (
+                <TextInput
+                  placeholder='Enter your City'
+                  value={finalSignupObj.city}
+                  onChangeText={onChangeCity}
+                  style={styles.cityInput}
+                />
+              )
+            }
+            <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={() => onPressShowModal('gender')} style={styles.cityButton} labelStyle={styles.submitButtonText}>
+              {finalSignupObj.gender || 'I identify as'}
+            </Button>
           </View>
           <View style={styles.submitContainer}>
-            <Button mode='contained' buttonColor={COLOR_CODE.BLACK} onPress={onPressSubmit} labelStyle={styles.submitButtonText}>Submit</Button>
+            <Button mode='contained' buttonColor={COLOR_CODE.BLACK} onPress={onPressSubmit} labelStyle={styles.submitButtonText}>
+              Submit
+            </Button>
           </View>
         </View>
       </Provider>
@@ -200,4 +222,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     //borderWidth: 1
   },
+
+  cityInput: { backgroundColor: COLOR_CODE.LIGHT_GREY, borderRadius: 10, width: '70%', height: height * 0.06, padding: 10 },
+  cityButton: { width: '70%', borderRadius: 10 }
 });

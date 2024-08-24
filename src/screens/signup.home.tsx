@@ -124,7 +124,7 @@ const SignupHomeScreen = ({ navigation }: any) => {
             </View>
             <View>
               <Button mode='text' onPress={() => setShowTerms(true)} textColor={COLOR_CODE.GREY} labelStyle={styles.termsText}>
-                Terms and Conditions
+                Terms and Privacy Policy
               </Button>
             </View>
           </View>

@@ -99,7 +99,7 @@ const SignupSecondScreen = ({ navigation, route }: any) => {
                 </Button>
               </View>
             ) : (
-              <Button mode='contained-tonal' onPress={onPressShowDatePicker} style={styles.dobButton} labelStyle={{ color: COLOR_CODE.BLACK }}>
+              <Button mode='contained-tonal' onPress={onPressShowDatePicker} buttonColor={COLOR_CODE.LIGHT_GREY} style={styles.dobButton} labelStyle={{ color: COLOR_CODE.BLACK }}>
                 {signupObjSecondStage.dob ? signupObjSecondStage.dob?.toDateString() : 'Select date of birth'}
               </Button>
             )
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
 
   nameInput: { 
-    height: '30%', 
+    height: '35%', 
     width: '70%', 
     backgroundColor: COLOR_CODE.LIGHT_GREY, 
     borderRadius: 10,
@@ -164,11 +164,8 @@ const styles = StyleSheet.create({
   },
 
   dobButton: {
-    height: '15%', 
     width: '70%', 
-    backgroundColor: COLOR_CODE.LIGHT_GREY,
     borderRadius: 10,
-    justifyContent: 'center'
   },
 
   datePicker: {
