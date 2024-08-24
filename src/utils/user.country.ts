@@ -7,7 +7,11 @@ const getUserCountry = () => {
 }
 
 const setUserCountry = () => {
-  userCountry = getCountry()?.toLowerCase() || 'in';
+  try {
+    userCountry = getCountry()?.toLowerCase() || 'in';
+  } catch (error) {
+    userCountry = 'in';
+  }
 }
 
 const resetUserCountry = () => {
