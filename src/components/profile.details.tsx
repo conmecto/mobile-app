@@ -83,9 +83,18 @@ const ProfileDetails = ({ profileDetails, navigate, commonScreen }: props) => {
           <Image source={profileDetails?.profilePicture ? { uri: profileDetails?.profilePicture} : DEFAULT_PROFILE_PIC} style={styles.profilePic}/>
         </View>
         <View style={styles.detailsContainer}>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{formatText(profileDetails?.name)}</Text>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>{profileDetails?.age}</Text>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}><FontAwesome name='map-pin' color={COLOR_CODE.BRIGHT_RED} /> {formatText(profileDetails?.city)}</Text>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>
+            {formatText(profileDetails?.name)}
+          </Text>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>
+            {profileDetails?.age}
+          </Text>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.commonText}>
+            <FontAwesome name='map-pin' color={COLOR_CODE.BRIGHT_RED} /> {
+              profileDetails?.city?.toLowerCase() === 'others' ? 
+              '' : formatText(profileDetails?.city)
+            }
+          </Text>
         </View>
       </View>
       <View style={styles.aboutContainer}>
