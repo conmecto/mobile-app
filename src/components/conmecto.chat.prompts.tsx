@@ -40,10 +40,9 @@ const ConmectoChatPrompts = ({
             setGenerateText(true);
         }
     }
-
-    const cannotGenerateMessage = currentMatches === 0 ? 'Cannot Generate, No Matches found. 🥺' : (
-        textGenSetting?.isWaitingPeriod ? 'Reset in 24 hours ⏳' : ''
-    )
+    
+    const cannotGenerateMessage = textGenSetting?.isWaitingPeriod ? 'Reset in 24 hours ⏳' : ''
+    //currentMatches === 0 ? 'Cannot Generate, No Matches found. 🥺'
 
     return (
         <KeyboardAvoidingView behavior='padding' enabled={keyboardEnabled} style={styles.mainContainer}> 
