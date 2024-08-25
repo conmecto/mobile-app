@@ -337,7 +337,7 @@ const SettingScreen = ({ navigation }: any) => {
                 </View>
 
                 <View style={{ flex: 2 }}>
-                  <View style={{ flex: 1 }}>
+                  <View style={styles.settingTypeContainer}>
                     <Text style={styles.settingFieldText}>Distance</Text>
                   </View>
                   <View style={{ flex: 2 }}>
@@ -355,7 +355,7 @@ const SettingScreen = ({ navigation }: any) => {
                 </View>
 
                 <View style={{ flex: 2 }}>
-                  <View style={{ flex: 1 }}>
+                  <View style={styles.settingTypeContainer}>
                     <Text style={styles.settingFieldText}>Search For</Text>
                   </View>
                   <View style={{ flex: 2 }}>
@@ -371,7 +371,7 @@ const SettingScreen = ({ navigation }: any) => {
                 </View>
 
                 <View style={{ flex: 2 }}>
-                  <View style={{ flex: 1 }}>
+                  <View style={styles.settingTypeContainer}>
                     <Text style={styles.settingFieldText}>Age Range</Text>
                   </View>
                   <View style={{ flex: 2 }}>
@@ -391,7 +391,7 @@ const SettingScreen = ({ navigation }: any) => {
                 </View>
 
                 <View style={{ flex: 2 }}>
-                  <View style={{ flex: 1 }}>
+                  <View style={styles.settingTypeContainer}>
                     <Text style={styles.settingFieldText}>Gender</Text>
                   </View>
                   <View style={{ flex: 2 }}>
@@ -483,10 +483,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
 
+  settingTypeContainer: { flex: 1, justifyContent: 'center', paddingLeft: 10 },
+
   settingFieldText: {
     fontSize: 15,
-    fontWeight: '600',
-    padding: 5
+    fontWeight: '600'
   },
   settingFieldPressable: {
     flex: 1,
