@@ -4,10 +4,12 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
 import { Button, Checkbox, Modal, Portal, Provider } from 'react-native-paper';
 import { getCountry } from "react-native-localize";
+import checkAccount from '../api/check.account';
 import { COLOR_CODE } from '../utils/enums';
 //import findNumber from '../api/find.number';
 import TopBar from '../components/top.bar';
-import TermsItem from '../components/terms'
+import TermsItem from '../components/terms';
+import Loading from '../components/loading';
 import environments from '../utils/environments';
 import { getToken } from '../utils/helpers';
 
@@ -33,6 +35,31 @@ const SignupHomeScreen = ({ navigation }: any) => {
   const [signupObj, setSignupObj] = useState<SignupObj>({ country: country });
   const [signupError, setSignupError] = useState('');
   const [showTerms, setShowTerms] = useState(false);
+  const [checkAccountExists, setCheckAccountExists] = useState(false);
+
+  useEffect(() => {
+    let check = true;
+    let timerId: NodeJS.Timeout;
+    const callCheck = async () => {
+      const res = await checkAccount(signupObj.appleAuthUserId as string);
+      if (check) {
+        setCheckAccountExists(false);
+        if (res) {  
+          setSignupError('You have already signed up, Please login');
+          timerId = setTimeout(() => navigation.navigate('WelcomeScreen'), 3000);
+        } else {
+          navigation.navigate('SignupSecondScreen', { signupObj: JSON.stringify(signupObj) });
+        }
+      }
+    }
+    if (checkAccountExists && signupObj.appleAuthUserId) {
+      callCheck();
+    }
+    return () => {
+      clearTimeout(timerId);
+      check = false;
+    }
+  }, [checkAccountExists]);
   
   const onPressTerms = () => {
     setSignupObj({ ...signupObj, termsAccepted: !signupObj.termsAccepted })
@@ -49,9 +76,10 @@ const SignupHomeScreen = ({ navigation }: any) => {
     if (error) {
       setSignupError(error);
     } else {
-      navigation.navigate('SignupSecondScreen', { signupObj: JSON.stringify(signupObj) });
+      setCheckAccountExists(true);
     }
   }
+
   const onAppleButtonPress = async () => {
     try {
       if (signupObj.appleAuthToken) {
@@ -100,38 +128,43 @@ const SignupHomeScreen = ({ navigation }: any) => {
             <TermsItem />
           </Modal>
         </Portal>
-        <View style={styles.container}>          
-          <View style={styles.signinContainer}>
-            <Text style={styles.errorTextStyle} numberOfLines={1} adjustsFontSizeToFit>{signupError}</Text>
-            <Text>{'\n'}{'\n'}{'\n'}{'\n'}{'\n'}</Text>
-            <AppleButton 
-              buttonStyle={AppleButton.Style.BLACK}
-              buttonType={AppleButton.Type.SIGN_IN}
-              style={{
-                width: width * 0.5,
-                height: height * 0.07
-              }}
-              onPress={() => onAppleButtonPress()}
-            />
-          </View>
-          <View style={styles.termsContainer}>
-            <View style={styles.termsCheckBox}>
-              <Checkbox
-                status={signupObj.termsAccepted ? 'checked' : 'unchecked'}
-                onPress={onPressTerms}
-                color={COLOR_CODE.BRIGHT_BLUE}
-              />
+        {
+          checkAccountExists ? <Loading /> : 
+          (
+            <View style={styles.container}> 
+              <View style={styles.signinContainer}>
+                <Text style={styles.errorTextStyle} numberOfLines={1} adjustsFontSizeToFit>{signupError}</Text>
+                <Text>{'\n'}{'\n'}{'\n'}{'\n'}{'\n'}</Text>
+                <AppleButton 
+                  buttonStyle={AppleButton.Style.BLACK}
+                  buttonType={AppleButton.Type.SIGN_IN}
+                  style={{
+                    width: width * 0.5,
+                    height: height * 0.07
+                  }}
+                  onPress={() => onAppleButtonPress()}
+                />
+              </View>
+              <View style={styles.termsContainer}>
+                <View style={styles.termsCheckBox}>
+                  <Checkbox
+                    status={signupObj.termsAccepted ? 'checked' : 'unchecked'}
+                    onPress={onPressTerms}
+                    color={COLOR_CODE.BRIGHT_BLUE}
+                  />
+                </View>
+                <View>
+                  <Button mode='text' onPress={() => setShowTerms(true)} textColor={COLOR_CODE.GREY} labelStyle={styles.termsText}>
+                    Terms and Privacy Policy
+                  </Button>
+                </View>
+              </View>
+              <View style={styles.nextContainer}>
+                <Button mode='outlined' onPress={onPressNextHandler} labelStyle={styles.nextButtonText}>Next</Button>
+              </View>
             </View>
-            <View>
-              <Button mode='text' onPress={() => setShowTerms(true)} textColor={COLOR_CODE.GREY} labelStyle={styles.termsText}>
-                Terms and Privacy Policy
-              </Button>
-            </View>
-          </View>
-          <View style={styles.nextContainer}>
-            <Button mode='outlined' onPress={onPressNextHandler} labelStyle={styles.nextButtonText}>Next</Button>
-          </View>
-        </View>
+          )
+        }
       </Provider>
     </View>
   )
