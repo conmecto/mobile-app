@@ -29,6 +29,15 @@ const CameraScreen = ({ navigation, route }: any) => {
   const appState = useAppState()
   const isActive = isFocused && appState === 'active';
   const devices = Camera.getAvailableCameraDevices();
+  if (!devices?.length) {
+    return (
+      <View style={styles.noCameraContainer}>
+        <Text numberOfLines={3} adjustsFontSizeToFit style={styles.noCameraText}>
+          No Camera found for your Device, looks like you are running a simulator. Please use a real device.
+        </Text>
+      </View>
+    )
+  }
   const device = getCameraDevice(devices, cameraPos as CameraPosition);
   const format = useCameraFormat(device, [
     { photoResolution: { height: 720, width: 1280 } }
@@ -198,4 +207,6 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     justifyContent: 'center',
   },
+  noCameraContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 10 },
+  noCameraText: { color: COLOR_CODE.BRIGHT_RED, fontSize: 20, fontWeight: 'bold' }
 });
