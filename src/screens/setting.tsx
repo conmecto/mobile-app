@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, FlatList, Image } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { Modal, Provider, Portal, Button} from 'react-native-paper';
+import { Modal, Provider, Portal, Button } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import TopBar from '../components/top.bar';
 import Loading from '../components/loading';
@@ -355,31 +355,39 @@ const SettingScreen = ({ navigation }: any) => {
                 </View>
 
                 <View style={{ flex: 2 }}>
-                  <Text style={styles.settingFieldText}>Search For</Text>
-                  <TouchableOpacity style={styles.settingFieldPressable} onPress={() => onPressOpenModal('searchFor')}>
-                    <View style={styles.settingFieldTextContainer}> 
-                      <Text numberOfLines={1} adjustsFontSizeToFit style={styles.settingValueText}>{formatText(searchSettings?.searchFor)}</Text>
-                    </View>
-                    <View style={styles.settingFieldIconContainer}> 
-                      <FontAwesome name='angle-right' size={25} />
-                    </View>
-                  </TouchableOpacity>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.settingFieldText}>Search For</Text>
+                  </View>
+                  <View style={{ flex: 2 }}>
+                    <TouchableOpacity style={styles.settingFieldPressable} onPress={() => onPressOpenModal('searchFor')}>
+                      <View style={styles.settingFieldTextContainer}> 
+                        <Text numberOfLines={1} adjustsFontSizeToFit style={styles.settingValueText}>{formatText(searchSettings?.searchFor)}</Text>
+                      </View>
+                      <View style={styles.settingFieldIconContainer}> 
+                        <FontAwesome name='angle-right' size={25} />
+                      </View>
+                    </TouchableOpacity>
+                  </View>
                 </View>
 
                 <View style={{ flex: 2 }}>
-                  <Text style={styles.settingFieldText}>Age Range</Text>
-                  <TouchableOpacity style={styles.settingFieldPressable} onPress={() => onPressOpenModal('age')}>
-                    <View style={styles.settingFieldTextContainer}> 
-                      <Text numberOfLines={1} adjustsFontSizeToFit style={styles.settingValueText}>
-                        {searchSettings?.minSearchAge}
-                        {'   -   '}
-                        {searchSettings?.maxSearchAge}
-                      </Text>
-                    </View>
-                    <View style={styles.settingFieldIconContainer}> 
-                      <FontAwesome name='angle-right' size={25} />
-                    </View>
-                  </TouchableOpacity>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.settingFieldText}>Age Range</Text>
+                  </View>
+                  <View style={{ flex: 2 }}>
+                    <TouchableOpacity style={styles.settingFieldPressable} onPress={() => onPressOpenModal('age')}>
+                      <View style={styles.settingFieldTextContainer}> 
+                        <Text numberOfLines={1} adjustsFontSizeToFit style={styles.settingValueText}>
+                          {searchSettings?.minSearchAge}
+                          {'   -   '}
+                          {searchSettings?.maxSearchAge}
+                        </Text>
+                      </View>
+                      <View style={styles.settingFieldIconContainer}> 
+                        <FontAwesome name='angle-right' size={25} />
+                      </View>
+                    </TouchableOpacity> 
+                  </View>
                 </View>
 
                 <View style={{ flex: 2 }}>
@@ -438,9 +446,10 @@ const SettingScreen = ({ navigation }: any) => {
                     </View>
                   </TouchableOpacity>
                 </View>
-              </View>
 
-              <View style={{ flex: 3, alignItems: 'center', justifyContent: 'flex-end' }}>
+                <View style={{ flex: 2, justifyContent: 'center', paddingLeft: 10 }}>
+                  <Text style={styles.logoutText}>Contact Email: {'\t'} contact@conmecto.com</Text>
+                </View>
               </View>
             </View>
           )
@@ -459,7 +468,7 @@ const styles = StyleSheet.create({
   },
   
   settingContainer: {
-    flex: 5
+    height: height * 0.35
   },
 
   settingHeader: {
@@ -506,7 +515,7 @@ const styles = StyleSheet.create({
   },
 
   accountSettingContainer: {
-    flex: 3
+    height: height * 0.25
   },
   accountSettingHeader: {
     flex: 1.5,
