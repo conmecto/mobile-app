@@ -90,7 +90,7 @@ const SignupHomeScreen = ({ navigation }: any) => {
         requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL]
       });
       if (!appleAuthRequestResponse.identityToken || !appleAuthRequestResponse.user) {
-        throw new Error();
+        return;
       } else {
         let name = '';
         if (appleAuthRequestResponse.fullName?.givenName) {
@@ -115,7 +115,6 @@ const SignupHomeScreen = ({ navigation }: any) => {
       if (environments.appEnv !== 'prod') {
         console.log('Apple sign in error', error);
       }
-      setSignupError('Something went wrong, please retry');
     }
   }
 
