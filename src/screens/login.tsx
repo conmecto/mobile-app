@@ -78,7 +78,7 @@ const LoginScreen = ({ navigation }: any) => {
         requestedScopes: []
       });
       if (!appleAuthRequestResponse.identityToken || !appleAuthRequestResponse.user) {
-        throw new Error();
+        return;
       } else {
         const deviceTokenObj = await getToken('deviceToken');
         setLoginObj({ 
@@ -92,7 +92,6 @@ const LoginScreen = ({ navigation }: any) => {
       if (environments.appEnv !== 'prod') {
         console.log('Apple sign in error', error);
       }
-      setLoginError('Something went wrong, please retry or contact admin@conmecto.com');
     }
   }
 
