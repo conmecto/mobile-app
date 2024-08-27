@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Dimensions, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Dimensions, StyleSheet } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
-import { Button, Checkbox, Modal, Portal, Provider } from 'react-native-paper';
+import { Button, Modal, Portal, Provider } from 'react-native-paper';
 import { getCountry } from "react-native-localize";
 import checkAccount from '../api/check.account';
 import { COLOR_CODE } from '../utils/enums';
@@ -12,6 +12,7 @@ import TermsItem from '../components/terms';
 import Loading from '../components/loading';
 import environments from '../utils/environments';
 import { getToken } from '../utils/helpers';
+import PolicyItem from '../components/policy';
 
 type SignupObj = {
   country: string,
@@ -34,20 +35,21 @@ const SignupHomeScreen = ({ navigation }: any) => {
   const country = getCountry()?.toLowerCase() || 'in';
   const [signupObj, setSignupObj] = useState<SignupObj>({ country: country });
   const [signupError, setSignupError] = useState('');
-  const [showTerms, setShowTerms] = useState(false);
+  const [showTerms, setShowTerms] = useState('');
   const [checkAccountExists, setCheckAccountExists] = useState(false);
 
   useEffect(() => {
     let check = true;
-    let timerId: NodeJS.Timeout;
     const callCheck = async () => {
       const res = await checkAccount(signupObj.appleAuthUserId as string);
       if (check) {
         setCheckAccountExists(false);
-        if (res) {  
-          setSignupError('You have already signed up, Please login');
-          timerId = setTimeout(() => navigation.navigate('WelcomeScreen'), 3000);
+        if (res && !res.deletedAt) {  
+          setSignupError('We already have an Account connected to that Apple ID.');
         } else {
+          if (res?.name) {
+            signupObj.name = res.name;
+          }
           navigation.navigate('SignupSecondScreen', { signupObj: JSON.stringify(signupObj) });
         }
       }
@@ -56,35 +58,13 @@ const SignupHomeScreen = ({ navigation }: any) => {
       callCheck();
     }
     return () => {
-      clearTimeout(timerId);
       check = false;
     }
   }, [checkAccountExists]);
-  
-  const onPressTerms = () => {
-    setSignupObj({ ...signupObj, termsAccepted: !signupObj.termsAccepted })
-  }
-
-  const onPressNextHandler = () => {
-    let error = '';
-    if (!signupObj.appleAuthToken) {
-      error = 'Apple sign in error, Please retry';
-    }
-    if (!signupObj.termsAccepted) {
-      error = 'Please read and accept the Term and Conditions';
-    }
-    if (error) {
-      setSignupError(error);
-    } else {
-      setCheckAccountExists(true);
-    }
-  }
 
   const onAppleButtonPress = async () => {
     try {
-      if (signupObj.appleAuthToken) {
-        return;
-      }
+      setSignupError('');
       const appleAuthRequestResponse = await appleAuth.performRequest({
         requestedOperation: appleAuth.Operation.LOGIN,
         requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL]
@@ -107,9 +87,10 @@ const SignupHomeScreen = ({ navigation }: any) => {
           ...(appleAuthRequestResponse.email ? { email: appleAuthRequestResponse.email } : {}),
           name,
           appleAuthUserId: appleAuthRequestResponse.user,
-          ...(deviceTokenObj ? { deviceToken: deviceTokenObj.password } : {})
+          ...(deviceTokenObj ? { deviceToken: deviceTokenObj.password } : {}),
+          termsAccepted: true
         });
-        setSignupError('');
+        setCheckAccountExists(true);
       }
     } catch(error) {
       if (environments.appEnv !== 'prod') {
@@ -118,49 +99,70 @@ const SignupHomeScreen = ({ navigation }: any) => {
     }
   }
 
+  const onPressLogin = () => {
+    setSignupObj({ country: country });
+    setSignupError('');
+    navigation.navigate('LoginScreen');
+  }
+
   return (
     <View style={{ flex: 1 }}>  
       <TopBar />
       <Provider>
         <Portal>
-          <Modal visible={showTerms} onDismiss={() => setShowTerms(false)} contentContainerStyle={styles.modalContainer}>
-            <TermsItem />
+          <Modal visible={Boolean(showTerms)} onDismiss={() => setShowTerms('')} contentContainerStyle={styles.modalContainer}>
+            {
+              showTerms === 'terms' ? <TermsItem /> : <PolicyItem />
+            }
           </Modal>
         </Portal>
         {
           checkAccountExists ? <Loading /> : 
           (
-            <View style={styles.container}> 
+            <View style={styles.container}>
+              <View style={styles.createAccountContainer}>
+                <Text style={styles.createAccountText}>
+                  Create your Account
+                </Text>
+              </View> 
+              <View style={styles.termsContainer}>
+                <Text numberOfLines={2} adjustsFontSizeToFit style={styles.termsText}>
+                  By continuing with Sign up, you agree to our
+                </Text>
+                <Button mode='text' onPress={() => setShowTerms('terms')} labelStyle={styles.linkText}>
+                  Terms of Service
+                </Button>
+                <Text style={styles.termsText}>
+                  And that you have read our  
+                </Text>
+                <Button mode='text' onPress={() => setShowTerms('policy')} labelStyle={styles.linkText}>
+                  Privacy Policy
+                </Button>
+              </View>
               <View style={styles.signinContainer}>
-                <Text style={styles.errorTextStyle} numberOfLines={1} adjustsFontSizeToFit>{signupError}</Text>
-                <Text>{'\n'}{'\n'}{'\n'}{'\n'}{'\n'}</Text>
                 <AppleButton 
                   buttonStyle={AppleButton.Style.BLACK}
-                  buttonType={AppleButton.Type.SIGN_IN}
+                  buttonType={AppleButton.Type.SIGN_UP}
                   style={{
-                    width: width * 0.5,
+                    width: width * 0.6,
                     height: height * 0.07
                   }}
                   onPress={() => onAppleButtonPress()}
                 />
               </View>
-              <View style={styles.termsContainer}>
-                <View style={styles.termsCheckBox}>
-                  <Checkbox
-                    status={signupObj.termsAccepted ? 'checked' : 'unchecked'}
-                    onPress={onPressTerms}
-                    color={COLOR_CODE.BRIGHT_BLUE}
-                  />
-                </View>
-                <View>
-                  <Button mode='text' onPress={() => setShowTerms(true)} textColor={COLOR_CODE.GREY} labelStyle={styles.termsText}>
-                    Terms and Privacy Policy
-                  </Button>
-                </View>
-              </View>
-              <View style={styles.nextContainer}>
-                <Button mode='outlined' onPress={onPressNextHandler} labelStyle={styles.nextButtonText}>Next</Button>
-              </View>
+              <View style={styles.signupErrorContainer}>
+                <Text style={styles.errorTextStyle} numberOfLines={3} adjustsFontSizeToFit>
+                  {signupError}
+                </Text>
+              </View> 
+              <View style={styles.loginContainer}>
+                <Text style={styles.loginText}>
+                  Already have an Account? Please 
+                </Text>
+                <Button mode='text' onPress={onPressLogin} labelStyle={styles.linkText}>
+                  Login
+                </Button>
+              </View> 
             </View>
           )
         }
@@ -177,27 +179,20 @@ const styles = StyleSheet.create({
     backgroundColor: COLOR_CODE.OFF_WHITE
   },
 
+  createAccountContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  createAccountText: { fontSize: 25, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE },
+
   signinContainer: {
-    flex: 1.5,
+    flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    //paddingBottom: 50,
-    //borderWidth: 1
+    justifyContent: 'center',
+    //paddingBottom: 50
   },
 
   termsContainer: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    //borderWidth: 1
-  },
-
-  nextContainer: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center'
-    //borderWidth: 1
   },
 
   modalContainer: { 
@@ -209,6 +204,14 @@ const styles = StyleSheet.create({
   },
 
   termsText: { 
+    fontSize: 16,
+    color: COLOR_CODE.GREY,
+    fontWeight: '700' 
+  },
+
+  linkText: { 
+    fontSize: 16,
+    color: 'black',
     textDecorationLine: 'underline', 
     fontWeight: 'bold' 
   },
@@ -219,13 +222,8 @@ const styles = StyleSheet.create({
     color: COLOR_CODE.BRIGHT_RED
   },
 
-  termsCheckBox: { 
-    transform: [{ scale: 0.8 }], 
-    borderWidth: 0.5, 
-    borderRadius: 50 
-  },
+  loginContainer: { flex: 0.5, justifyContent: 'center', alignItems: 'center' },
+  loginText: { fontSize: 15, color: COLOR_CODE.GREY, fontWeight: 'bold' },
 
-  nextButtonText: {
-    color: COLOR_CODE.BRIGHT_BLUE
-  }
+  signupErrorContainer: { flex: 0.5, justifyContent: 'center', alignItems: 'center', paddingLeft: 10, paddingRight: 10 }
 });

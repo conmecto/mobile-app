@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Dimensions, StyleSheet } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { Button } from 'react-native-paper';
 import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
 import { COLOR_CODE, ERROR_CODES } from '../utils/enums';
 //import findNumber from '../api/find.number';
@@ -28,20 +29,18 @@ const LoginScreen = ({ navigation }: any) => {
   const [loginObj, setLoginObj] = useState<LoginObj>({});
   const [loginError, setLoginError] = useState('');
   const [loginUser, setLoginUser] = useState(false);
+
   useEffect(() => {
     let check = true;
-    let timerId: NodeJS.Timeout;
     const callLogin = async () => {
       const res = await verifyOtp(loginObj);
       if (check) {
         setLoginObj({});
         setLoginUser(false);
         if (res && res.errorCode && res.errorCode === ERROR_CODES.TOKEN_INVALID) {
-          setLoginError('Invalid token, please retry with same apple id you used for creating user');
-          timerId = setTimeout(() => navigation.navigate('WelcomeScreen'), 3000);
+          setLoginError('Invalid token, Please retry with same Apple ID you used for Creating the Account');
         } else if (res && res.errorCode && res.errorCode === ERROR_CODES.USER_NOT_FOUND) {
-          setLoginError('User not found, Please sign up first');
-          timerId = setTimeout(() => navigation.navigate('WelcomeScreen'), 3000);
+          setLoginError('We could not found an Account connected to that Apple ID. Please Create a new Account.');
         } else if (res && res.data) {
           const userId = res.data[0].userId as number;
           const key = userId + ':auth:token';
@@ -63,16 +62,13 @@ const LoginScreen = ({ navigation }: any) => {
       callLogin();
     }
     return () => {
-      clearTimeout(timerId);
       check = false;
     }
   }, [loginUser]);
 
   const onAppleButtonPress = async () => {
     try {
-      if (loginObj.appleAuthToken) {
-        return;
-      }
+      setLoginError('');
       const appleAuthRequestResponse = await appleAuth.performRequest({
         requestedOperation: appleAuth.Operation.LOGIN,
         requestedScopes: []
@@ -95,26 +91,44 @@ const LoginScreen = ({ navigation }: any) => {
     }
   }
 
+  const onPressSignup = () => {
+    setLoginObj({});
+    setLoginUser(false);
+    setLoginError('');
+    navigation.navigate('SignupHomeScreen');
+  }
+
   return (
     <View style={{ flex: 1 }}>  
       <TopBar />
       <View style={styles.container}>
         <View style={styles.hiContainer}>
-          <Text style={styles.hiText}>Hi There!</Text>
-          <Text style={styles.hiText}>Welcome back! 😁</Text>
+          <Text style={styles.hiText}>Hi There, Welcome back! 😁</Text>
+          <Text style={styles.hiText}>Login back to your Account</Text>
         </View>   
         <View style={styles.signinContainer}>
-          <Text style={styles.errorTextStyle} numberOfLines={1} adjustsFontSizeToFit>{loginError}</Text>
-          <Text>{'\n'}{'\n'}</Text>
           <AppleButton 
             buttonStyle={AppleButton.Style.BLACK}
             buttonType={AppleButton.Type.SIGN_IN}
             style={{
-              width: width * 0.5,
+              width: width * 0.6,
               height: height * 0.07
             }}
             onPress={() => onAppleButtonPress()}
           />
+        </View>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorTextStyle} numberOfLines={3} adjustsFontSizeToFit>
+            {loginError}
+          </Text>
+        </View>
+        <View style={styles.signupContainer}>
+          <Text style={styles.signupText}>
+            Don't have an Account yet? Please 
+          </Text>
+          <Button mode='text' onPress={onPressSignup} labelStyle={styles.linkText}>
+            Signup
+          </Button>
         </View>       
       </View>
     </View>
@@ -141,7 +155,7 @@ const styles = StyleSheet.create({
   errorTextStyle: {
     fontWeight: 'bold',
     fontSize: 15,
-    color: COLOR_CODE.BRIGHT_RED
+    color: COLOR_CODE.RED
   },
 
   hiContainer: {
@@ -151,9 +165,20 @@ const styles = StyleSheet.create({
     //borderWidth: 1
   },
   hiText: {
-    //fontWeight: '',
-    fontSize: 25,
+    fontWeight: 'bold',
+    fontSize: 20,
     padding: 2,
-    //color: COLOR_CODE.BLACK
+    color: COLOR_CODE.BRIGHT_BLUE
   },
+
+  linkText: { 
+    fontSize: 15,
+    color: 'black',
+    textDecorationLine: 'underline', 
+    fontWeight: 'bold' 
+  },
+
+  signupContainer: { flex: 0.5, justifyContent: 'center', alignItems: 'center' },
+  errorContainer: { flex: 0.5, justifyContent: 'center', alignItems: 'center', paddingLeft: 10, paddingRight: 10 },
+  signupText: { fontSize: 15, color: COLOR_CODE.GREY, fontWeight: 'bold' }
 });

@@ -3,7 +3,9 @@ import { getUserCountry } from '../utils/user.country';
 
 type response = {
   errorCode?: string,
-  message?: string
+  id?: string,
+  name?: string,
+  deletedAt?: Date | null
 }
 
 const checkAccount = async (appleAuthUserId: string): Promise<response | undefined> => {
