@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Dimensions, StyleSheet, FlatList, TextInput } from 'react-native';
 import { Provider, Portal, Modal, Button } from 'react-native-paper';
+import Octicons from 'react-native-vector-icons/Octicons';
 import TopBar from '../components/top.bar';
-import { COLOR_CODE, ERROR_CODES } from '../utils/enums';
 import createUser from '../api/create.user';
+import { COLOR_CODE, ERROR_CODES } from '../utils/enums';
 import { GENDER, Cities } from '../utils/constants';
 import { setUserId } from '../utils/user.id';
 import { setAccessToken } from '../utils/token';
@@ -22,6 +23,7 @@ type SignupObj = {
   deviceToken?: string
 }
 
+Octicons.loadFont();
 const { height, width } = Dimensions.get('window');
 
 const SignupThirdScreen = ({ navigation, route }: any) => {
@@ -112,6 +114,9 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
 
   const onPressShowModal = (field: string) => {
     setModalField(field);
+    if (signupError) {
+      setSignupError('');
+    }
   }
 
   const getFlatListData = () => {
@@ -124,6 +129,9 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
 
   const onChangeCity = (text: string) => {
     setFinalSignupObj({ ...finalSignupObj, city: text.toLowerCase() });
+    if (signupError) {
+      setSignupError('');
+    }
   }
 
   return (
@@ -142,9 +150,17 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
           </Modal>
         </Portal>
         <View style={styles.container}>
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorTextStyle} numberOfLines={1} adjustsFontSizeToFit>{signupError}</Text>
-          </View>
+          <View style={styles.headerContainer}>
+            <Text numberOfLines={2} adjustsFontSizeToFit style={styles.headerText}>
+              Few Additional Information Required for a Personalized App Experience
+            </Text>
+            <Text>
+            {'\n'} 
+            </Text>
+            <Text numberOfLines={2} adjustsFontSizeToFit style={styles.subHeaderText}>
+              Your City & I Identify As (Optional)
+            </Text>
+          </View> 
           <View style={styles.fieldContainer}>
             {
               cities ? 
@@ -165,10 +181,21 @@ const SignupThirdScreen = ({ navigation, route }: any) => {
               {finalSignupObj.gender || 'I identify as'}
             </Button>
           </View>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorTextStyle} numberOfLines={1} adjustsFontSizeToFit>
+              {signupError}
+            </Text>
+          </View>
           <View style={styles.submitContainer}>
             <Button mode='contained' buttonColor={COLOR_CODE.BLACK} onPress={onPressSubmit} labelStyle={styles.submitButtonText}>
               Submit
             </Button>
+          </View>
+          <View style={styles.pageDotsMainContainer}>
+            <View style={styles.pageDotsContainer}>
+              <Octicons name='dot' size={30} />
+              <Octicons name='dot-fill' size={30} />
+            </View>
           </View>
         </View>
       </Provider>
@@ -183,6 +210,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLOR_CODE.OFF_WHITE
   },
+
+  headerContainer: { flex: 2, justifyContent: 'center', alignItems: 'center' },
+  headerText: { fontSize: 18, fontWeight: 'bold' },
+  subHeaderText: { fontSize: 15, fontWeight: 'bold', color: COLOR_CODE.GREY },
 
   modalContainer: { 
     backgroundColor: COLOR_CODE.OFF_WHITE, 
@@ -204,7 +235,7 @@ const styles = StyleSheet.create({
   },
 
   errorContainer: {
-    flex: 1,
+    flex: 0.5,
     alignItems: 'center',
     justifyContent: 'center',
     //borderWidth: 1
@@ -224,5 +255,8 @@ const styles = StyleSheet.create({
   },
 
   cityInput: { backgroundColor: COLOR_CODE.LIGHT_GREY, borderRadius: 10, width: '70%', height: height * 0.06, padding: 10 },
-  cityButton: { width: '70%', borderRadius: 10 }
+  cityButton: { width: '70%', borderRadius: 10 },
+
+  pageDotsMainContainer: { flex: 0.5, justifyContent: 'center', alignItems: 'center' },
+  pageDotsContainer: { height: '70%', width: width * 0.15, justifyContent: 'space-evenly', alignItems: 'center', flexDirection: 'row' }
 });

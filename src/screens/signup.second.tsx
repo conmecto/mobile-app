@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, Dimensions, StyleSheet } from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Octicons from 'react-native-vector-icons/Octicons';
 import RNDateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Button } from 'react-native-paper';
 import { COLOR_CODE } from '../utils/enums';
@@ -19,7 +19,7 @@ type SignupObj = {
   deviceToken?: string
 }
 
-FontAwesome.loadFont();
+Octicons.loadFont();
 
 const { height, width } = Dimensions.get('window');
 
@@ -32,9 +32,9 @@ const SignupSecondScreen = ({ navigation, route }: any) => {
   const [signupError, setSignupError] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const onChangeName = (text: string) => {
-    setSignupObjSecondStage({ ...signupObjSecondStage, name: text.toLowerCase() });
-  }
+  // const onChangeName = (text: string) => {
+  //   setSignupObjSecondStage({ ...signupObjSecondStage, name: text.toLowerCase() });
+  // }
 
   const onPressShowDatePicker = () => {
     setShowDatePicker(!showDatePicker);
@@ -52,9 +52,9 @@ const SignupSecondScreen = ({ navigation, route }: any) => {
 
   const onPressNextHandler = () => {
     let error = '';
-    if (!signupObjSecondStage.name) {
-      error = 'Please enter your full name';
-    }
+    // if (!signupObjSecondStage.name) {
+    //   error = 'Please enter your full name';
+    // }
     if (!signupObjSecondStage.dob) {
       error = 'Please enter your date of birth';
     }
@@ -64,22 +64,29 @@ const SignupSecondScreen = ({ navigation, route }: any) => {
       navigation.navigate('SignupThirdScreen', { signupObjSecondStage: JSON.stringify(signupObjSecondStage) });
     }
   }
-
   return (
     <View style={{ flex: 1 }}>  
       <TopBar />
       <View style={styles.container}>   
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorTextStyle} numberOfLines={1} adjustsFontSizeToFit>{signupError}</Text>
-        </View>       
-        <View style={styles.nameContainer}>
+        <View style={styles.headerContainer}>
+          <Text numberOfLines={2} adjustsFontSizeToFit style={styles.headerText}>
+            Few Additional Information Required for a Personalized App Experience
+          </Text>
+          <Text>
+          {'\n'} 
+          </Text>
+          <Text numberOfLines={2} adjustsFontSizeToFit style={styles.subHeaderText}>
+            Date of Birth (It can't be changed later!)
+          </Text>
+        </View> 
+        {/* <View style={styles.nameContainer}>
           <TextInput
             placeholder='Name'
             value={signupObjSecondStage.name}
             onChangeText={onChangeName}
             style={styles.nameInput}
           />
-        </View>
+        </View> */}
         <View style={styles.dobContainer}>
           { 
             showDatePicker ? 
@@ -94,9 +101,6 @@ const SignupSecondScreen = ({ navigation, route }: any) => {
                   minimumDate={new Date(1950,0,1)}
                   style={styles.datePicker}
                 />
-                <Button mode='contained' onPress={onPressShowDatePicker} buttonColor={COLOR_CODE.BRIGHT_RED} style={styles.selectButton} labelStyle={{ color: COLOR_CODE.OFF_WHITE }}>
-                  Select
-                </Button>
               </View>
             ) : (
               <Button mode='contained-tonal' onPress={onPressShowDatePicker} buttonColor={COLOR_CODE.LIGHT_GREY} style={styles.dobButton} labelStyle={{ color: COLOR_CODE.BLACK }}>
@@ -105,8 +109,29 @@ const SignupSecondScreen = ({ navigation, route }: any) => {
             )
           }
         </View>
+        <View style={styles.selectContainer}>
+          { 
+            showDatePicker &&
+            (
+              <Button mode='contained' onPress={onPressShowDatePicker} buttonColor={COLOR_CODE.BRIGHT_RED} style={styles.selectButton} labelStyle={{ color: COLOR_CODE.OFF_WHITE }}>
+                Select
+              </Button>
+            )
+          }
+        </View>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorTextStyle} numberOfLines={1} adjustsFontSizeToFit>{signupError}</Text>
+        </View>       
         <View style={styles.nextContainer}>
-          <Button mode='outlined' onPress={onPressNextHandler} labelStyle={styles.nextButtonText}>Next</Button>
+          <Button mode='contained' onPress={onPressNextHandler} buttonColor={COLOR_CODE.BRIGHT_BLUE} labelStyle={styles.nextButtonText}>
+            Next
+          </Button>
+        </View>
+        <View style={styles.pageDotsMainContainer}>
+          <View style={styles.pageDotsContainer}>
+            <Octicons name='dot-fill' size={30} />
+            <Octicons name='dot' size={30} />
+          </View>
         </View>
       </View>
     </View>
@@ -120,6 +145,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLOR_CODE.OFF_WHITE
   },
+
+  headerContainer: { flex: 2, justifyContent: 'center', alignItems: 'center' },
+  headerText: { fontSize: 18, fontWeight: 'bold' },
+  subHeaderText: { fontSize: 15, fontWeight: 'bold', color: COLOR_CODE.GREY },
 
   nameContainer: {
     flex: 1,
@@ -136,7 +165,7 @@ const styles = StyleSheet.create({
     // borderWidth: 1
   },
 
-  errorContainer: { flex: 2, alignItems: 'center', justifyContent: 'center' },
+  errorContainer: { flex: 0.5, alignItems: 'center', justifyContent: 'center' },
 
   nextContainer: {
     flex: 1,
@@ -152,7 +181,7 @@ const styles = StyleSheet.create({
   },
 
   nextButtonText: {
-    color: COLOR_CODE.BRIGHT_BLUE
+    color: COLOR_CODE.OFF_WHITE
   },
 
   nameInput: { 
@@ -183,4 +212,9 @@ const styles = StyleSheet.create({
   selectButton: {
     alignSelf: 'center'
   },
+
+  pageDotsMainContainer: { flex: 0.5, justifyContent: 'center', alignItems: 'center' },
+  pageDotsContainer: { height: '70%', width: width * 0.15, justifyContent: 'space-evenly', alignItems: 'center', flexDirection: 'row' },
+
+  selectContainer: { flex: 0.5, alignItems: 'center', justifyContent: 'center' }
 });
