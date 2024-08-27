@@ -336,7 +336,7 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
                   Location access denied!
                 </Text>
                 <Text numberOfLines={2} adjustsFontSizeToFit style={styles.locationText2}>
-                  Conmecto use your location for matches,
+                  Conmecto use your location for Automated Matches,
                 </Text>
                 <Text numberOfLines={2} adjustsFontSizeToFit style={styles.locationText2}>
                   Please enable Location📍 access from the setting.
