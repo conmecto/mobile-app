@@ -6,12 +6,13 @@ import { Modal, Provider, Portal, Button } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import TopBar from '../components/top.bar';
 import Loading from '../components/loading';
-import TermsItem from '../components/terms'
+import TermsItem from '../components/terms';
+import PolicyItem from '../components/policy';
 import getUserMatchSettings from '../api/user.match.setting';
 import updateMatchSetting from '../api/update.match.setting';
-import { deleteToken, formatText } from '../utils/helpers';
 import removeAccount from '../api/remove.account';
 import logout from '../api/logout';
+import { deleteToken, formatText } from '../utils/helpers';
 import { COLOR_CODE } from '../utils/enums';
 import { getUserId, resetUserId } from '../utils/user.id';
 import { resetToken } from '../utils/token';
@@ -300,10 +301,10 @@ const SettingScreen = ({ navigation }: any) => {
                 </Modal>
                 <Modal visible={Boolean(showAccountModal)} 
                   onDismiss={() => setShowAccountModal('')} 
-                  contentContainerStyle={showAccountModal === 'terms' ? styles.termsModal : styles.modalStyle}
+                  contentContainerStyle={(showAccountModal === 'terms' || showAccountModal === 'policy') ? styles.termsModal : styles.modalStyle}
                 >
                   {
-                    showAccountModal === 'delete' ? 
+                    showAccountModal === 'delete' &&
                     (
                       <View style={styles.accountModalContainer}>
                         <Text numberOfLines={6} style={styles.deleteTitle}>
@@ -314,20 +315,26 @@ const SettingScreen = ({ navigation }: any) => {
                           Confirm
                         </Button>
                       </View>
-                    ) : (
-                      showAccountModal === 'logout' ? (
-                        <View style={styles.accountModalContainer}>
-                          <Text numberOfLines={2} adjustsFontSizeToFit style={styles.logoutTitle}>
-                            Are you sure you want to logout?
-                          </Text>
-                          <Button onPress={() => onPressAccountAction('logout')} buttonColor={COLOR_CODE.BRIGHT_RED} textColor={COLOR_CODE.OFF_WHITE}>
-                            Confirm
-                          </Button>
-                        </View>
-                      ) : (
-                        <TermsItem />
-                      )
                     )
+                  }
+                  {   
+                    showAccountModal === 'logout' &&
+                    (
+                      <View style={styles.accountModalContainer}>
+                        <Text numberOfLines={2} adjustsFontSizeToFit style={styles.logoutTitle}>
+                          Are you sure you want to logout?
+                        </Text>
+                        <Button onPress={() => onPressAccountAction('logout')} buttonColor={COLOR_CODE.BRIGHT_RED} textColor={COLOR_CODE.OFF_WHITE}>
+                          Confirm
+                        </Button>
+                      </View>
+                    ) 
+                  }
+                  {
+                    showAccountModal === 'terms' && (<TermsItem />)
+                  }
+                  {
+                    showAccountModal === 'policy' && (<PolicyItem />)
                   }
                 </Modal>
               </Portal>
@@ -428,7 +435,18 @@ const SettingScreen = ({ navigation }: any) => {
                 <View style={styles.accountSettingBody}>
                   <TouchableOpacity style={{ flex: 1, flexDirection: 'row' }} onPress={() => onPressAccountModal('terms')}>
                     <View style={styles.settingFieldTextContainer}> 
-                      <Text style={styles.logoutText}>Terms & Privacy Policy</Text>
+                      <Text style={styles.logoutText}>Terms of Service</Text>
+                    </View>
+                    <View style={styles.settingFieldIconContainer}> 
+                      <FontAwesome name='angle-right' size={25} />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.accountSettingBody}>
+                  <TouchableOpacity style={{ flex: 1, flexDirection: 'row' }} onPress={() => onPressAccountModal('policy')}>
+                    <View style={styles.settingFieldTextContainer}> 
+                      <Text style={styles.logoutText}>Privacy Policy</Text>
                     </View>
                     <View style={styles.settingFieldIconContainer}> 
                       <FontAwesome name='angle-right' size={25} />
@@ -516,7 +534,7 @@ const styles = StyleSheet.create({
   },
 
   accountSettingContainer: {
-    height: height * 0.25
+    height: height * 0.3
   },
   accountSettingHeader: {
     flex: 1.5,
