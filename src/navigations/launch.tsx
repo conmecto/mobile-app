@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WelcomeScreen from '../screens/welcome';
-import LoginScreen from '../screens/login';
-import SignupHomeScreen from '../screens/signup.home';
 import SignupSecondScreen from '../screens/signup.second';
 import ContactAdminScreen from '../screens/contact.admin';
 import LogoScreen from '../screens/logo';
@@ -52,8 +50,8 @@ const LaunchStackNavigator = () => {
         <NavigationContainer>
           <Stack.Navigator initialRouteName={initialScreen}>
             <Stack.Screen name='WelcomeScreen' component={WelcomeScreen} options={{headerShown: false}}/>
-            <Stack.Screen name='LoginScreen' component={LoginScreen} options={{headerShown: false}}/>
-            <Stack.Screen name='SignupHomeScreen' component={SignupHomeScreen} options={{headerShown: false}}/>
+            {/* <Stack.Screen name='LoginScreen' component={LoginScreen} options={{headerShown: false}}/> */}
+            {/* <Stack.Screen name='SignupHomeScreen' component={SignupHomeScreen} options={{headerShown: false}}/> */}
             <Stack.Screen name='SignupSecondScreen' component={SignupSecondScreen} options={{headerShown: false, gestureEnabled: false}}/>
             <Stack.Screen name='SignupThirdScreen' component={SignupThirdScreen} options={{headerShown: false, gestureEnabled: false}}/>
             <Stack.Screen name='HomeTabNavigator' component={HomeTabNavigator} options={{headerShown: false, gestureEnabled: false}} />

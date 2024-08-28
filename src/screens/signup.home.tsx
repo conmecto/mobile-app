@@ -5,14 +5,14 @@ import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentica
 import { Button, Modal, Portal, Provider } from 'react-native-paper';
 import { getCountry } from "react-native-localize";
 import checkAccount from '../api/check.account';
-import { COLOR_CODE } from '../utils/enums';
 //import findNumber from '../api/find.number';
 import TopBar from '../components/top.bar';
 import TermsItem from '../components/terms';
+import PolicyItem from '../components/policy';
 import Loading from '../components/loading';
+import { COLOR_CODE } from '../utils/enums';
 import environments from '../utils/environments';
 import { getToken } from '../utils/helpers';
-import PolicyItem from '../components/policy';
 
 type SignupObj = {
   country: string,
