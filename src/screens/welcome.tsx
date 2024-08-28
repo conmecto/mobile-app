@@ -58,11 +58,9 @@ const WelcomeScreen = ({ navigation }: any) => {
           ]);
           setUserId(userId);
           setAccessToken(loginRes.data[0].access as string);
-          setError('');
           setSignupObj({});
           navigation.replace('HomeTabNavigator'); 
         } else {
-          setError('');
           navigation.navigate('ContactAdminScreen');
         }
       }

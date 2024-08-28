@@ -7,9 +7,14 @@ const ContactAdminScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <TopBar />
-      <View style={{ flex: 1, justifyContent: 'center', backgroundColor: COLOR_CODE.OFF_WHITE, alignItems: 'center' }}>
-        <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Contact:</Text>
-        <Text style={{ fontSize: 25, fontWeight: 'bold' }}>contact@conmecto.com</Text>
+      <View style={{ flex: 1, backgroundColor: COLOR_CODE.OFF_WHITE }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Something went wrong!</Text>
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Contact:</Text>
+          <Text style={{ fontSize: 25, fontWeight: 'bold' }}>contact@conmecto.com</Text>
+        </View>
       </View>
     </View>
   );
