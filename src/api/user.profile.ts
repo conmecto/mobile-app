@@ -10,15 +10,12 @@ type UserProfileRes = {
   description?: string,
   city?: string,
   country?: string,
-  school?: string,
+  university?: string,
   work?: string,
-  igId?: string,
-  snapId?: string,
-  interests?: string,
   profilePicture?: string,
   userId: number,
   name: string,
-  age: number
+  age?: number
 }
 
 const getUserProfile = async (userId: number, callIfUnauthorized: boolean = true): Promise<UserProfileRes | undefined> => {

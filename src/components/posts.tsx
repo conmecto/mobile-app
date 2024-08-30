@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, FlatList }
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
 import getUserPosts from '../api/user.posts';
+import { COLOR_CODE } from '../utils/enums';
 
 type UserPost = {
   id: number,
@@ -158,13 +159,16 @@ const styles = StyleSheet.create({
 
   headerContainer: {
     flex: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    // borderWidth: 1
+    paddingTop: 10,
+    alignItems: 'center', 
+    borderBottomWidth: 0.5,
+    borderBottomColor: COLOR_CODE.LIGHT_GREY,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10
   },
   headerText: {
-    fontSize: 25,
-    fontWeight: 'bold',
+    fontSize: 30,
+    fontWeight: '900',
     fontFamily: 'SavoyeLetPlain'
   },
 

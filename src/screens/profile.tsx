@@ -14,11 +14,8 @@ type UserProfileRes = {
   description?: string,
   city?: string,
   country?: string,
-  school?: string,
+  university?: string,
   work?: string,
-  igId?: string,
-  snapId?: string,
-  interests?: string,
   profilePicture?: string,
   userId: number,
   name: string,
@@ -65,7 +62,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
       check = false;
     }
   }, []);
-
+  
   return (
     <View style={styles.container}>
       <TopBar />

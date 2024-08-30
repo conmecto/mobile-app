@@ -9,6 +9,7 @@ import ChatCapturedCameraScreen from '../screens/chat.captured.camera';
 import ViewChatFile from '../screens/view.chat.file';
 import MatchSummaryScreen from '../screens/match.summary';
 import ConmectoChat from '../screens/conmecto.chat';
+import FullProfileScreen from '../screens/full.profile';
 
 const MatchStack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ const MatchNavigator = ({ params }: any) => {
       <MatchStack.Screen name='MatchSummaryScreen' component={MatchSummaryScreen} options={{ headerShown: false }} />
       <MatchStack.Screen name='ConmectoChat' component={ConmectoChat} options={{ headerShown: false, gestureEnabled: false }} />
       <MatchStack.Screen name='ProfileScreen' component={ProfileScreen} options={{ headerShown: false }} />
+      <MatchStack.Screen name='FullProfileScreen' component={FullProfileScreen} options={{ headerShown: false }} />
       <MatchStack.Screen name='ViewPostScreen' component={ViewPostScreen} options={{ headerShown: false }} />
       <MatchStack.Screen name='CameraScreen' component={CameraScreen} options={{ headerShown: false }} 
         initialParams={{ commonScreen: false, matchId: null, matchedUserId: null }}/>
