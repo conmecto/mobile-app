@@ -12,17 +12,13 @@ type CreateUserRes = {
 }
 
 type CreateUserObj = {
-  //number: string,
+  country?: string,
   email?: string,
   name?: string,
   appleAuthToken?: string,
   termsAccepted?: boolean,
   appleAuthUserId?: string,
-  dob?: Date,
-  city?: string,
-  searchIn?: string,
-  searchFor?: string,
-  gender?: string
+  deviceToken?: string
 }
 
 const createUser = async (createUserObj: CreateUserObj): Promise<CreateUserRes | undefined> => {

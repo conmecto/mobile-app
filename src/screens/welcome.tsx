@@ -5,8 +5,8 @@ import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentica
 import { Button, Modal, Portal, Provider } from 'react-native-paper';
 import { getCountry } from "react-native-localize";
 import { pick } from 'lodash';
-import checkAccount from '../api/check.account';
 import verifyOtp from '../api/otp.verify';
+import createUser from '../api/create.user';
 import TopBar from '../components/top.bar';
 import TermsItem from '../components/terms';
 import PolicyItem from '../components/policy';
@@ -72,25 +72,33 @@ const WelcomeScreen = ({ navigation }: any) => {
       check = false;
     }
   }, [loginFlow]);
-    
+
   useEffect(() => {
     let check = true;
-    const callCheck = async () => {
-      const res = await checkAccount(signupObj.appleAuthUserId as string);
+    const callCreateUser = async () => {
+      const res = await createUser(signupObj);
       if (check) {
         setContinueSignupFlow(false);
-        if (!res || (res && res.deletedAt)) {
-          if (!signupObj.name && res?.name) {
-            signupObj.name = res.name;
-          }
-          navigation.navigate('SignupSecondScreen', { signupObj: JSON.stringify(signupObj) });
+        if (res?.errorCode === ERROR_CODES.TOKEN_INVALID) {
+          setError('Token expired or invalid, Please retry');
+        } else if (res?.data && res.data[0].userId) {
+          const userId = res.data[0].userId as number;
+          const key = userId + ':auth:token';
+          await Promise.all([
+            saveToken('userId', userId?.toString()),
+            saveToken(key, JSON.stringify({ refresh: res.data[0].refresh }))
+          ]);
+          setUserId(userId);
+          setAccessToken(res.data[0].access as string);
+          setSignupObj({});
+          navigation.replace('HomeTabNavigator');
         } else {
           navigation.navigate('ContactAdminScreen');
         }
       }
     }
     if (continueSignupFlow && !loginFlow &&signupObj.appleAuthUserId) {
-      callCheck();
+      callCreateUser();
     }
     return () => {
       check = false;
