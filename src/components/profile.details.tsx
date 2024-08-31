@@ -32,7 +32,7 @@ type props = {
 const ProfileDetails = ({ profileDetails, navigate, commonScreen }: props) => {
   const { age, name, profilePicture, city, description } = profileDetails;
   const isProfileComplete = !!(name && description && city && age && profilePicture);
-
+  
   const onPressEditProfile = () => {
     navigate('EditProfileScreen', { profileDetails });
   }

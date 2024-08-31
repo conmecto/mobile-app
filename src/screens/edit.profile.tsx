@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions } from 'react-native';
+import { CommonActions } from '@react-navigation/native';
 import { check, PERMISSIONS, RESULTS, request } from 'react-native-permissions';
 import { launchImageLibrary, ImageLibraryOptions, Asset } from 'react-native-image-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -77,7 +78,16 @@ const EditProfileScreen = (props: any) => {
         }
         setUpdateKeys({});
         setUpdateDetails(false);
-        props.navigation.replace('ProfileScreen');
+        props.navigation.dispatch(
+          CommonActions.reset({
+            index: 0,              
+            routes: [
+              {
+                name: 'ProfileScreen'
+              }
+            ]
+          })
+        );
       } 
     }
     if (updateDetails && !updateImage && !error) {
@@ -128,7 +138,16 @@ const EditProfileScreen = (props: any) => {
       if (check) {
         setProfilePicture(undefined);
         setUpdateImage(false);
-        props.navigation.replace('ProfileScreen');
+        props.navigation.dispatch(
+          CommonActions.reset({
+            index: 0,              
+            routes: [
+              {
+                name: 'ProfileScreen'
+              }
+            ]
+          })
+        );
       }
     }
     if (updateImage && !updateDetails && !error) {
