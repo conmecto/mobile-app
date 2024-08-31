@@ -2,28 +2,34 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions } from 'react-native';
 import { check, PERMISSIONS, RESULTS, request } from 'react-native-permissions';
 import { launchImageLibrary, ImageLibraryOptions, Asset } from 'react-native-image-picker';
-import { pick } from 'lodash';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import TopBar from '../components/top.bar';
+import { TextInput } from 'react-native-paper';
+import { pick } from 'lodash';
 import updateProfile from '../api/update.profile';
 import updateProfilePicture from '../api/update.profile.picture';
-import { COLOR_CODE } from '../utils/enums';
-import { TextInput } from 'react-native-paper';
+import requestSignedUrl from '../api/request.signed.url';
+import TopBar from '../components/top.bar';
 import Loading from '../components/loading';
+import { COLOR_CODE } from '../utils/enums';
 import { profilePictureOptions, allowedImageTypes, maxImageSizeBytes } from '../utils/constants';
 import { formatText } from '../utils/helpers';
 import { getUserId } from '../utils/user.id';
 import Environments from '../utils/environments';
 
 type UpdateProfileObj = {
-  profilePicture?: Asset, 
-  description: string,
-  city: string,
+  description?: string,
+  city?: string,
   name: string,
-  error: string,
-  updateImage: boolean,
-  updateDetails: boolean,
-  isLoading: boolean
+  work?: string,
+  university?: string
+}
+
+type UpdateProfileKeys = {
+  description?: boolean,
+  city?: boolean,
+  name?: boolean,
+  work?: boolean,
+  university?: boolean
 }
 
 type UserProfileRes = {
@@ -34,13 +40,10 @@ type UserProfileRes = {
   country?: string,
   school?: string,
   work?: string,
-  igId?: string,
-  snapId?: string,
-  interests?: string,
   profilePicture?: string,
   userId: number,
   name: string,
-  age?: number
+  university?: string
 }
 
 FontAwesome.loadFont();
@@ -52,107 +55,158 @@ const EditProfileScreen = (props: any) => {
   const profileObj: UserProfileRes = params?.profileDetails;
   const defaultUpdateObj: UpdateProfileObj = {
     description: profileObj.description || '',
-    city: formatText(profileObj.city),
-    name: formatText(profileObj.name),
-    error: '',
-    updateImage: false,
-    updateDetails: false,
-    isLoading: false
+    city: formatText(profileObj.city) || '',
+    work: formatText(profileObj.work) || '',
+    university: formatText(profileObj.university) || '',
+    name: formatText(profileObj.name)
   };
+  const [error, setError] = useState('');
+  const [updateImage, setUpdateImage] = useState(false);
+  const [profilePicture, setProfilePicture] = useState<Asset>();
+  const [updateDetails, setUpdateDetails] = useState(false);
   const [updateObj, setUpdateObj] = useState<UpdateProfileObj>(defaultUpdateObj);
+  const [updateKeys, setUpdateKeys] = useState<UpdateProfileKeys>({});
 
   useEffect(() => {
     let check = true;
     const callUpdateData = async () => {
-      const res = await updateProfile(userId, pick(updateObj, ['name', 'city', 'description']));
-      setUpdateObj(defaultUpdateObj);
+      const res = await updateProfile(userId, pick(updateObj, Object.keys(updateKeys)));
       if (check) {
-        if (res) {
-          props.navigation.replace('ProfileScreen');
+        if (res?.errorCode) {
+          setUpdateObj(defaultUpdateObj);
         }
+        setUpdateKeys({});
+        setUpdateDetails(false);
+        props.navigation.replace('ProfileScreen');
       } 
     }
-    if (updateObj.updateDetails && updateObj.isLoading && !updateObj.updateImage && !updateObj.error) {
+    if (updateDetails && !updateImage && !error) {
       callUpdateData();
     }
     return () => {
       check = false;
     }
-  }, [updateObj.updateDetails]);
+  }, [updateDetails]);
 
   useEffect(() => {
     let check = true;
     const callUpdateImage = async () => {
-      const res = await updateProfilePicture(userId, updateObj.profilePicture as Asset);
-      setUpdateObj(defaultUpdateObj);
-      if (check) {
-        if (res) {
-          props.navigation.replace('ProfileScreen');
+      const path = profilePicture?.uri;
+      const fileName = profilePicture?.fileName as string;
+      const fileType = profilePicture?.type as string;
+      const res = await requestSignedUrl({ userId, fileName, contentType: fileType, uploadType: 'profilePicture' });
+      if (res?.url && path) {
+        const result = await fetch(path);
+        const file = await result.blob();
+        try {
+          const url = res.url as string;
+          const key = url.split('?')?.shift() as string; 
+          const uploadRes = await fetch(url,  {
+            method: 'PUT',
+            headers: {
+              'Content-Type': fileType,
+            },
+            body: file
+          });
+          if (uploadRes.status === 200)  {
+            const data = {
+              key,
+              name: fileName,
+              mimetype: fileType,
+              size: file.size, 
+              height: profilePicture.height as number,
+              width: profilePicture.width as number
+            }
+            await updateProfilePicture(userId, data);
+          }
+        } catch(error) {
+          if (Environments.appEnv !== 'prod') {
+            console.log('Profile Picture upload error', error);
+          }
         }
       }
+      if (check) {
+        setProfilePicture(undefined);
+        setUpdateImage(false);
+        props.navigation.replace('ProfileScreen');
+      }
     }
-    if (updateObj.updateImage && updateObj.isLoading && !updateObj.updateDetails && !updateObj.error) {
+    if (updateImage && !updateDetails && !error) {
       callUpdateImage();
     }
     return () => {
       check = false;
     }
-  }, [updateObj.updateImage]);
+  }, [updateImage]);
 
   const onCancelPressHandler = () => {
     setUpdateObj(defaultUpdateObj);
     props.navigation.navigate('ProfileScreen');
   }
+
   const checkAllSame = () => {
-    if (
-      updateObj.city?.toLowerCase() === profileObj.city?.toLowerCase() && 
-      updateObj.name?.toLowerCase() === profileObj.name?.toLowerCase() && 
-      updateObj.description?.toLowerCase() === profileObj.description?.toLowerCase()
-    ) {
-      return true;
+    if (updateObj.city?.toLowerCase() !== defaultUpdateObj.city?.toLowerCase()) {
+      updateKeys.city = true;
     }
-    return false
+    if (updateObj.name?.toLowerCase() !== defaultUpdateObj.name?.toLowerCase()) {
+      updateKeys.name = true;
+    }
+    if (updateObj.description?.toLowerCase() !== defaultUpdateObj.description?.toLowerCase()) {
+      updateKeys.description = true;
+    }
+    if (updateObj.university?.toLowerCase() !== defaultUpdateObj.university?.toLowerCase()) {
+      updateKeys.university = true;
+    }
+    if (updateObj.work?.toLowerCase() !== defaultUpdateObj.work?.toLowerCase()) {
+      updateKeys.work = true;
+    }
+    setUpdateKeys(updateKeys);
   }
 
   const onUpdatePressHandler = () => {
     let error = '';
-     if (!updateObj.city.length) {
-      error = 'City cannot be empty';
-    }
-    if (!updateObj.description.length) {
-      error = 'About cannot be empty';
-    }
     if (!updateObj.name.length) {
       error = 'Name cannot be empty';
     }
-    if (checkAllSame()) {
+    if (error) {
+      setError(error);
+      return;
+    }
+    checkAllSame();
+    if (!Object.keys(updateKeys).length) {
       setUpdateObj(defaultUpdateObj);
       props.navigation.navigate('ProfileScreen');
-    } else if (error) {
-      setUpdateObj({ ...updateObj, error });
     } else {
-      setUpdateObj({ ...updateObj, error: '', updateImage: false, updateDetails: true, isLoading: true });
+      setError('');
+      setUpdateDetails(true);
     }
   }
 
   const onHandleChangeText = (text: string, key: string) => {
-    setUpdateObj({ ...updateObj, [key]: text});
+    if (key === 'description') {
+      text = text.substring(0, 250);
+    } else {
+      text = text.substring(0, 100);
+    }
+    setUpdateObj({ ...updateObj, [key]: text });
   }
 
   const handleFileImport = () => {
     launchImageLibrary(profilePictureOptions as ImageLibraryOptions, res => {
       if (res.errorMessage) {
-        setUpdateObj({ ...updateObj, error: 'Something went wrong', updateDetails: false, updateImage: false, isLoading: false });
+        setError('Something went wrong');
       } else if (res.assets?.length) {
         const asset = res.assets[0];
         if (!asset.fileSize || !asset.type) {
-          setUpdateObj({ ...updateObj, error: 'Corrupt file', updateDetails: false, updateImage: false, isLoading: false });    
+          setError('Corrupt file');    
         } else if (asset.fileSize > maxImageSizeBytes) {
-          setUpdateObj({ ...updateObj, error: 'File size exceed 10mb', updateDetails: false, updateImage: false, isLoading: false });    
+          setError('File size exceed 10mb'); 
         } else if (!allowedImageTypes.includes(asset.type)) {
-          setUpdateObj({ ...updateObj, error: 'File type not supported', updateDetails: false, updateImage: false, isLoading: false });    
+          setError('File type not supported'); 
         } else {
-          setUpdateObj({ ...updateObj, profilePicture: asset, updateDetails: false, updateImage: true, isLoading: true });
+          setError('');
+          setProfilePicture(asset);
+          setUpdateImage(true);
         }
       }
     });
@@ -178,7 +232,7 @@ const EditProfileScreen = (props: any) => {
           handleFileImport();
           break;
         case RESULTS.BLOCKED:
-          setUpdateObj({ ...updateObj, error: 'Please update your settings to allow photos access'});
+          setError('Please update your settings to allow photos access');
           break;
         default: 
           break;
@@ -195,7 +249,7 @@ const EditProfileScreen = (props: any) => {
       <TopBar />
       <SafeAreaView style={styles.mainContainer}>
         {
-          updateObj.isLoading ?
+          (updateDetails || updateImage) ?
           (<Loading />) :
           (
             <View style={styles.editContainer}>
@@ -219,7 +273,7 @@ const EditProfileScreen = (props: any) => {
                 <Text></Text>
                 
                 <Text style={styles.uploadText}>
-                  About
+                  About (Max 250 characters)
                 </Text>
                 <TextInput style={styles.commonInput} defaultValue={updateObj.description} onChangeText={text => onHandleChangeText(text, 'description')} />
                 <Text></Text>
@@ -229,7 +283,19 @@ const EditProfileScreen = (props: any) => {
                 </Text>
                 <TextInput style={styles.commonInput} defaultValue={updateObj.city} onChangeText={text => onHandleChangeText(text, 'city')} />
                 <Text></Text>
-                <Text style={{ color: COLOR_CODE.BRIGHT_RED, fontSize: 20, fontWeight: 'bold' }}>{updateObj.error}</Text>
+                
+                <Text style={styles.uploadText}>
+                  Work
+                </Text>
+                <TextInput style={styles.commonInput} defaultValue={updateObj.work} onChangeText={text => onHandleChangeText(text, 'work')} />
+                <Text></Text>
+                
+                <Text style={styles.uploadText}>
+                  University
+                </Text>
+                <TextInput style={styles.commonInput} defaultValue={updateObj.university} onChangeText={text => onHandleChangeText(text, 'university')} />
+                <Text></Text>
+                <Text style={{ color: COLOR_CODE.BRIGHT_RED, fontSize: 15, fontWeight: 'bold' }}>{error}</Text>
 
               </View>
 
@@ -266,9 +332,8 @@ const styles = StyleSheet.create({
   },
 
   editContainer: {
-    height: '95%',
-    width: '95%',
-    borderRadius: 30,
+    height: '100%',
+    width: '100%',
     backgroundColor: COLOR_CODE.OFF_WHITE,
   },
 

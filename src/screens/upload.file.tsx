@@ -39,7 +39,7 @@ const UploadFileScreen = ({ route, navigation }: any) => {
         const callAddPolaroid = async () => {
             const fileName = capturedPhoto.path.split('/').pop() as string;
             const fileType = getFileType(fileName.split('.').pop() as string) as string;
-            const res = await requestSignedUrl({ userId, fileName, contentType: fileType });
+            const res = await requestSignedUrl({ userId, fileName, contentType: fileType, uploadType: 'post' });
             if (check && res?.url) {
                 const result = await fetch(capturedPhoto.path);
                 const file = await result.blob();

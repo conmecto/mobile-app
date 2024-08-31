@@ -1,9 +1,16 @@
 import Environments from '../utils/environments';
-import { Asset } from 'react-native-image-picker';
-import { ERROR_CODES } from '../utils/enums';
 import { updateTokens } from '../utils/helpers';
 import { getAccessToken } from '../utils/token';
 import { getUserCountry } from '../utils/user.country';
+
+type ProfilePictureObj = {
+  key: string,
+  name: string,
+  mimetype: string,
+  size: number, 
+  height: number,
+  width: number
+}
 
 type UpdateProfileRes = {
   message?: string,
@@ -13,31 +20,17 @@ type UpdateProfileRes = {
   path?: string
 }
 
-const updateProfilePicture = async (userId: number, profilePictureObj: Asset, callIfUnauthorized: boolean = true): Promise<UpdateProfileRes | undefined> => {
+const updateProfilePicture = async (
+  userId: number, profilePictureObj: ProfilePictureObj, callIfUnauthorized: boolean = true
+): Promise<UpdateProfileRes | undefined> => {
   try {
     const token = getAccessToken();
-    const formData = new FormData();
-    formData.append('profilePicture', {
-      name: profilePictureObj.fileName,
-      fileName: profilePictureObj.fileName,
-      uri: profilePictureObj.uri,
-      type: profilePictureObj.type,
-      height: profilePictureObj.height,
-    });
-    formData.append('metadata', JSON.stringify({
-      height: profilePictureObj.height,
-      width: profilePictureObj.width,
-      name: profilePictureObj.fileName,
-      fileName: profilePictureObj.fileName,
-      type: profilePictureObj.type,
-      fileSize: profilePictureObj.fileSize,
-      timestamp: profilePictureObj.timestamp
-    }));
+    const body = JSON.stringify(profilePictureObj);
     const response = await fetch(Environments.api.profileService.baseUrl + `/profile/users/${userId}/profile-picture`, {
       method: 'POST',
-      body: formData,
+      body,
       headers: {
-        'Content-Type': 'multipart/form-data', 
+        'Content-Type': 'application/json',
         authorization: 'Bearer ' + token,
         'X-Country-Code': getUserCountry() 
       },

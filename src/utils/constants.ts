@@ -16,8 +16,8 @@ const postOptions = {
 
 const profilePictureOptions = {
   mediaType: 'photo',	
-  maxWidth: 420,	
-  maxHeight: 420,
+  maxWidth: 720,
+  maxHeight: 600,
   //quality: 1,
   // videoQuality
   //durationLimit
