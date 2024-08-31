@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, FlatList, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, FlatList } from 'react-native';
+import RNDateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { CommonActions } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Modal, Provider, Portal, Button } from 'react-native-paper';
@@ -12,13 +13,13 @@ import getUserMatchSettings from '../api/user.match.setting';
 import updateMatchSetting from '../api/update.match.setting';
 import removeAccount from '../api/remove.account';
 import logout from '../api/logout';
-import { deleteToken, formatText } from '../utils/helpers';
+import { deleteAllChatSocketInstance } from '../sockets/chat.socket';
+import { deleteToken, formatText, getAge } from '../utils/helpers';
 import { COLOR_CODE } from '../utils/enums';
 import { getUserId, resetUserId } from '../utils/user.id';
 import { resetToken } from '../utils/token';
 import { resetPosts } from '../utils/post';
 import { resetUserCountry } from '../utils/user.country';
-import { deleteAllChatSocketInstance } from '../sockets/chat.socket';
 
 type UserMatchSettingObject = {
   id?: number,
@@ -28,7 +29,8 @@ type UserMatchSettingObject = {
   maxSearchAge?: number,
   searchArea?: string,
   geohash?: string,
-  gender?: string
+  gender?: string,
+  dob?: Date
 }
 
 type SearchSettings = UserMatchSettingObject & {
@@ -38,6 +40,7 @@ type SearchSettings = UserMatchSettingObject & {
 
 FontAwesome.loadFont();
 MaterialCommunityIcons.loadFont();
+
 const { height, width } = Dimensions.get('window');
 const genderOptions = ['woman', 'nonbinary', 'man'];
 const searchForOptions = ['women', 'men', 'everyone'];
@@ -56,6 +59,8 @@ const SettingScreen = ({ navigation }: any) => {
     updateSettings: '',
     modal: ''
   });
+  const [tempDob, setTempDob] = useState<Date>();
+  const [error, setError] = useState('');
   
   useEffect(() => {
     let check = true;
@@ -63,6 +68,7 @@ const SettingScreen = ({ navigation }: any) => {
       const res = await getUserMatchSettings(userId);
       if (check) {
         if (res) {
+          searchSettings.dob = res.dob;
           searchSettings.gender = res.gender;
           searchSettings.minSearchAge = res.minSearchAge;
           searchSettings.maxSearchAge = res.maxSearchAge;
@@ -86,18 +92,21 @@ const SettingScreen = ({ navigation }: any) => {
   useEffect(() => {
     let check = true;
     const callUpdateSettings = async () => {
-      const updateObj = searchSettings.updateSettings === 'age' ? 
-        { 
+      let updateObj: any = {};
+      if (searchSettings.updateSettings === 'age') { 
+        updateObj = { 
           minSearchAge: searchSettings.minSearchAge,
           maxSearchAge: searchSettings.maxSearchAge
-        } : (
-          searchSettings.updateSettings === 'searchFor' ? 
-          { searchFor: searchSettings.searchFor } : (
-            searchSettings.updateSettings === 'gender' ? 
-            { gender: searchSettings.gender } : 
-            { searchArea: searchSettings.searchArea }
-          )
-        )
+        }
+      } else if (searchSettings.updateSettings === 'searchFor') {
+        updateObj = { searchFor: searchSettings.searchFor }
+      } else if (searchSettings.updateSettings === 'gender') {
+        updateObj = { gender: searchSettings.gender }
+      } else if (searchSettings.updateSettings === 'searchArea') {
+        updateObj = { searchArea: searchSettings.searchArea }
+      } else if (searchSettings.updateSettings === 'dob') {
+        updateObj = { dob: searchSettings.dob }
+      } 
       const res = await updateMatchSetting(userId, updateObj);
       if (check) {
         if (res?.minSearchAge) {
@@ -114,6 +123,9 @@ const SettingScreen = ({ navigation }: any) => {
         }
         if (res?.gender) {
           searchSettings.gender = res.gender;
+        }
+        if (res?.dob) {
+          searchSettings.dob = res.dob;
         }
         setSearchSettings({ ...searchSettings, updateSettings: '' });
         setIsLoading(false);
@@ -277,6 +289,22 @@ const SettingScreen = ({ navigation }: any) => {
     );
   }
 
+  const onChangeDob = (event: DateTimePickerEvent, selectedDate: Date | undefined) => {
+    const age = getAge(selectedDate?.toISOString() as string);
+    if (age >= 18) {
+      setTempDob(selectedDate);
+      setError('');
+    } else {
+      setError('Age should be 18 or above');
+    }
+  };
+ 
+  const onPressConfirmDob = () => {
+    setIsLoading(true);
+    setTempDob(undefined);
+    setSearchSettings({ ...searchSettings, modal: '', updateSettings: 'dob', dob: tempDob });
+  }
+
   return (
     <View style={styles.container}>
       <TopBar />
@@ -291,13 +319,38 @@ const SettingScreen = ({ navigation }: any) => {
                 <Modal 
                   visible={Boolean(searchSettings.modal)} 
                   onDismiss={onPressDismissSearchModal} 
-                  contentContainerStyle={[styles.modalContainer, searchSettings.modal === 'age' ? {} : { height: height * 0.15 }]}
+                  contentContainerStyle={[styles.modalContainer, 
+                    (searchSettings.modal === 'age' || searchSettings.modal === 'dob') ? { height: height * 0.4 } : {}
+                  ]}
                 >
-                  <FlatList
-                    data={getFlatListData()}
-                    renderItem={({ item, index }) => <SearchItem item={item} index={index}/>}
-                    keyExtractor={(item, index) => index.toString()}
-                  />
+                  {
+                    searchSettings.modal === 'dob' ?
+                    (
+                      <View style={{ flex: 1, justifyContent: 'space-around' }}>
+                        <RNDateTimePicker 
+                          value={tempDob ? tempDob : new Date()} 
+                          display='spinner'
+                          onChange={onChangeDob} 
+                          textColor={COLOR_CODE.BLACK}   
+                          maximumDate={new Date()}
+                          minimumDate={new Date(1950,0,1)}
+                          style={{ height: '70%' }}
+                        />
+                        <Text style={styles.dobError}>
+                          {error}
+                        </Text>
+                        <Button mode='contained' onPress={onPressConfirmDob} buttonColor={COLOR_CODE.BRIGHT_RED} style={{ alignSelf: 'center' }} labelStyle={{ color: COLOR_CODE.OFF_WHITE }}>
+                          Confirm
+                        </Button>
+                      </View>
+                    ) : (
+                      <FlatList
+                        data={getFlatListData()}
+                        renderItem={({ item, index }) => <SearchItem item={item} index={index}/>}
+                        keyExtractor={(item, index) => index.toString()}
+                      />
+                    )
+                  }
                 </Modal>
                 <Modal visible={Boolean(showAccountModal)} 
                   onDismiss={() => setShowAccountModal('')} 
@@ -414,6 +467,42 @@ const SettingScreen = ({ navigation }: any) => {
                     </TouchableOpacity>
                   </View>
                 </View>
+
+                <View style={{ flex: 2 }}>
+                  <View style={styles.settingTypeContainer}>
+                    <Text style={styles.settingFieldText}>
+                      Birth Date
+                    </Text>
+                  </View>
+                  <View style={{ flex: 2 }}>
+                    {
+                      searchSettings.dob ? 
+                      (
+                        <View style={{
+                          flex: 1,
+                          justifyContent: 'center',
+                          alignItems: 'flex-start',
+                          paddingLeft: 10,
+                        }}>
+                          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.settingValueText}>
+                            {new Date(searchSettings.dob)?.toDateString()}
+                          </Text>
+                        </View>
+                      ) : (
+                        <TouchableOpacity style={styles.settingFieldPressable} onPress={() => onPressOpenModal('dob')}>
+                          <View style={styles.settingFieldTextContainer}> 
+                            <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.settingFieldText, { color: COLOR_CODE.BRIGHT_BLUE }]}>
+                              Required for Automated Matches (Can be updated only once)
+                            </Text>
+                          </View>
+                          <View style={styles.settingFieldIconContainer}> 
+                            <FontAwesome name='angle-right' size={25} />
+                          </View>
+                        </TouchableOpacity>
+                      )
+                    }
+                  </View>
+                </View>
               </View>
 
               <View style={styles.accountSettingContainer}>
@@ -486,7 +575,7 @@ const styles = StyleSheet.create({
   },
   
   settingContainer: {
-    height: height * 0.35
+    height: height * 0.45
   },
 
   settingHeader: {
@@ -557,7 +646,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: { 
     backgroundColor: COLOR_CODE.OFF_WHITE, 
-    height: height * 0.3, 
+    height: height * 0.15, 
     width: width * 0.8, 
     alignSelf: 'center', 
     borderRadius: 20 
@@ -588,5 +677,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontFamily: 'SavoyeLetPlain',
     fontSize: 25
-  }
+  },
+  dobError: { fontSize: 12, fontWeight: 'bold', alignSelf: 'center', color: COLOR_CODE.BRIGHT_RED }
 });
