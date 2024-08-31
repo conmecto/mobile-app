@@ -88,7 +88,7 @@ const FullProfileScreen = ({ route }: props) => {
             About
           </Text>
           <Text numberOfLines={5} adjustsFontSizeToFit style={styles.commonText}>
-            {description ? description.substring(0, 200) : '-'}  
+            {description ? description.substring(0, 250) : '-'}  
           </Text>
         </View>
         <View style={styles.commonContainer}>

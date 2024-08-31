@@ -6,7 +6,8 @@ import { getUserCountry } from '../utils/user.country';
 type requestBody = {
     userId: number, 
     fileName: string, 
-    contentType: string
+    contentType: string,
+    uploadType: string
 }
 
 type UpdateProfileRes = {
