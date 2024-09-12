@@ -112,8 +112,10 @@ const Cities: any = {
   ]
 }
 
+const themeKey = 'conmecto:theme';
+
 export { 
   SEARCH_FOR, profilePictureOptions, postOptions, maxFileSizeBytes, allowedFileTypes, allowedImageTypes,
   maxImageSizeBytes, Days, initialLogoScreenTimeMilli, GENDER, polaroidTags, colors, GEOLOCATION_TIMEOUT_MILLIS, 
-  GEOLOCATION_MAX_AGE_MILLIS, Cities
+  GEOLOCATION_MAX_AGE_MILLIS, Cities, themeKey
 };

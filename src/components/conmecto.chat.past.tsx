@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, StyleSheet, Text, Dimensions, TouchableOpacity, FlatList } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Clipboard from '@react-native-clipboard/clipboard';
 import getPastGenMessages from '../api/get.past.gen.messages';
 import { getUserId } from '../utils/user.id';
 import { COLOR_CODE } from '../utils/enums';
+import { ThemeContext } from '../contexts/theme.context';
 
 Ionicons.loadFont();
 const { height } = Dimensions.get('window');
@@ -63,6 +64,7 @@ const GenMessageView = React.memo(({ genMessage }: { genMessage: PastGenMessage 
 });
 
 const ConmectoChatPast = ({ setViewPast }: Params) => {  
+    const { appTheme } = useContext(ThemeContext);
     const userId = getUserId() as number;
     const [pastGenMessages, setPastGenMessages] = useState<PastGenMessage[]>([]);
     const [paginationObj, setPaginationObj] = useState<PaginationObj>({
@@ -70,6 +72,7 @@ const ConmectoChatPast = ({ setViewPast }: Params) => {
         isLoading: true,
         hasMoreMessages: true
     });
+
     useEffect(() => {
         let check = true;
         const callGetData = async () => {
@@ -104,16 +107,24 @@ const ConmectoChatPast = ({ setViewPast }: Params) => {
     const onPressClose = () => {
         setViewPast(false);
     }
+
+    const themeColor = appTheme === 'dark' ? {
+        mainContainerBackgroundColor: COLOR_CODE.BLACK,
+        headerText: COLOR_CODE.DIM_GREY
+    } : {
+        mainContainerBackgroundColor: COLOR_CODE.OFF_WHITE,
+        headerText: COLOR_CODE.BLACK
+    }
     
     return (
-        <View style={styles.mainContainer}>
+        <View style={[styles.mainContainer, { backgroundColor: themeColor.mainContainerBackgroundColor }]}>
             <View style={styles.closeContainer}>
                 <TouchableOpacity onPress={() => onPressClose()}>
                     <Ionicons size={35} name='close-circle' color='#86A8E7' />
                 </TouchableOpacity>
             </View>
             <View style={styles.headerContainer}>
-                <Text style={styles.headerText}>
+                <Text style={[styles.headerText, { color: themeColor.headerText }]}>
                     Generated Messages: 
                 </Text>
             </View>
@@ -132,16 +143,16 @@ const ConmectoChatPast = ({ setViewPast }: Params) => {
 }
 
 const styles = StyleSheet.create({
-    mainContainer: { flex: 4, backgroundColor: COLOR_CODE.OFF_WHITE },
+    mainContainer: { flex: 4 },
     closeContainer: { flex: 0, alignItems: 'flex-end', paddingRight: 10 },
     headerContainer: { flex: 0, alignItems: 'flex-start', paddingLeft: 10 },
     headerText: { fontSize: 15, fontWeight: 'bold' },
     messageMainContainer: { height: height * 0.4 },
     contextMainContainer: { flex: 1, justifyContent: 'center', paddingLeft: 10 },
-    contextContainer: { height: '90%', width: '80%', backgroundColor: '#86A8E7', borderRadius: 25, padding: 10 },
+    contextContainer: { height: '90%', width: '80%', backgroundColor: COLOR_CODE.LOGO_BLUE, borderRadius: 25, padding: 10 },
     contextText: { fontSize: 15, fontWeight: 'bold', color: COLOR_CODE.OFF_WHITE },
     responseMainContainer: { flex: 3, justifyContent: 'center', paddingRight: 10 },
-    responseContainer: { height: '90%', width: '80%', backgroundColor: '#7F7FD5', borderRadius: 25, alignSelf: 'flex-end', padding: 10 },
+    responseContainer: { height: '90%', width: '80%', backgroundColor: COLOR_CODE.LOGO_COLOR, borderRadius: 25, alignSelf: 'flex-end', padding: 10 },
     responseText: { fontSize: 15, fontWeight: 'bold', color: COLOR_CODE.OFF_WHITE },
     copyTouchable: { flex: 0, alignSelf: 'center', padding: 5, borderWidth: 2, borderRadius: 10, borderColor: COLOR_CODE.OFF_WHITE },
     copyText: { fontSize: 15, fontWeight: 'bold', color: COLOR_CODE.OFF_WHITE }

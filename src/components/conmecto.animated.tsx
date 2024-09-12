@@ -5,7 +5,7 @@ import { IMAGE_LOGO_CROPPED } from '../files';
 
 const { height } = Dimensions.get('window');
 
-const ConmectoBotAnimated = ({ navigate, currentMatches }: any) => {
+const ConmectoBotAnimated = ({ navigate }: any) => {
   const rotateAnimation = useRef(new Animated.Value(0)).current;
   const [rotateCheck, setRotateCheck] = useState(false);
   
@@ -25,7 +25,7 @@ const ConmectoBotAnimated = ({ navigate, currentMatches }: any) => {
         }).start(() => {
           rotateAnimation.setValue(0);
           setRotateCheck(false);
-          navigate('ConmectoChat', { currentMatches });
+          navigate('ConmectoChat');
         });
     }
   }

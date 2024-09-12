@@ -46,8 +46,8 @@ const MatchedUser = ({
   return (
     <TouchableOpacity style={[
         styles.mainContainer, 
-        newMatch ? { borderWidth: 2, borderColor: colors[8] } : {}, 
-        chatNotification ? { borderWidth: 2, borderColor: colors[22] } : {}
+        newMatch ? { borderWidth: 3, borderColor: colors[8] } : {}, 
+        chatNotification ? { borderWidth: 3, borderColor: COLOR_CODE.LOGO_COLOR } : {}
       ]} 
       onPress={onPressMatchedUser}
     >
@@ -79,6 +79,17 @@ const MatchedUser = ({
                 <View style={styles.newMatchBorderContainer}>
                   <Text numberOfLines={1} adjustsFontSizeToFit style={styles.newMatchText}>
                     New Match
+                  </Text>
+                </View>
+              </View>
+            )
+          }
+          {
+            (chatNotification && !newMatch) && (
+              <View style={styles.newMatchContainer}>
+                <View style={styles.chatNotificationBorderContainer}>
+                  <Text numberOfLines={1} adjustsFontSizeToFit style={styles.newMatchText}>
+                    New Chat
                   </Text>
                 </View>
               </View>
@@ -161,5 +172,6 @@ const styles = StyleSheet.create({
   },
   newMatchContainer: { flex: 0, alignItems: 'center', justifyContent: 'center' },
   newMatchBorderContainer: { backgroundColor: colors[8], borderRadius: 10, padding: 5 },
+  chatNotificationBorderContainer: { backgroundColor: COLOR_CODE.LOGO_COLOR, borderRadius: 10, padding: 5 },
   newMatchText: { fontSize: 10, fontWeight: 'bold', color: COLOR_CODE.OFF_WHITE }
 });

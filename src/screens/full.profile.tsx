@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, Dimensions } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -6,6 +6,7 @@ import getConmectoScore from '../api/get.conmecto.score';
 import TopBar from '../components/top.bar';
 import { fireColorScoreBased, formatText } from '../utils/helpers';
 import { COLOR_CODE } from '../utils/enums';
+import { ThemeContext } from '../contexts/theme.context';
 import { DEFAULT_PROFILE_PIC } from '../files';
 
 FontAwesome.loadFont();
@@ -37,6 +38,7 @@ type props = {
 const { height, width } = Dimensions.get('window');
 
 const FullProfileScreen = ({ route }: props) => {
+  const { appTheme } = useContext(ThemeContext);
   const { profileDetails }: params = route?.params;
   const { age, name, profilePicture, city, work, university, userId, description } = profileDetails;
   const [conmectoStreak, setConmectoStreak] = useState(5);
@@ -55,15 +57,23 @@ const FullProfileScreen = ({ route }: props) => {
     }
   }, []);
 
+  const themeColor = appTheme === 'dark' ? {
+    mainContainerBackgroundColor: COLOR_CODE.BLACK,
+    nameText: COLOR_CODE.OFF_WHITE,
+  } : {
+    mainContainerBackgroundColor: COLOR_CODE.OFF_WHITE,
+    nameText: COLOR_CODE.BLACK,
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <TopBar />
-      <ScrollView style={styles.mainContainer}>
+      <ScrollView style={[styles.mainContainer, { backgroundColor: themeColor.mainContainerBackgroundColor }]}>
         <View style={styles.profilePicContainer}>
           <Image source={profilePicture ? { uri: profilePicture } : DEFAULT_PROFILE_PIC} style={styles.profilePic} />
         </View>
         <View style={styles.nameContainer}>
-          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.nameText}>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.nameText, { color: themeColor.nameText }]}>
             {formatText(name)} {age ? `| ${age}` : ''}
           </Text>
         </View>
@@ -116,8 +126,7 @@ export default FullProfileScreen;
 
 const styles = StyleSheet.create({
   mainContainer: {
-    flex: 1,
-    backgroundColor: COLOR_CODE.OFF_WHITE
+    flex: 1
   },
   profilePicContainer: { height: height * 0.3, width },
   profilePic: { 

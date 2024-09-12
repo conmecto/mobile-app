@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { StyleSheet, View, Dimensions, Text, TouchableOpacity, TextInput, KeyboardAvoidingView } from 'react-native';
 import { LinearGradient } from 'react-native-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Button } from 'react-native-paper';
 import { COLOR_CODE } from '../utils/enums';
+import { ThemeContext } from '../contexts/theme.context';
 
 Ionicons.loadFont();
 const { width } = Dimensions.get('window');
@@ -17,7 +18,6 @@ type TextGenSetting = {
 
 type Params = {
     context: string,
-    currentMatches: number,
     textGenSetting?: TextGenSetting,
     setGenerateText: any,
     setContext: any,
@@ -26,9 +26,10 @@ type Params = {
 }
 
 const ConmectoChatPrompts = ({ 
-    context, currentMatches,  textGenSetting, setContext, setGenerateText,
+    context, textGenSetting, setContext, setGenerateText,
     onCloseConmectoChat, setViewPast
 }: Params) => {
+    const { appTheme } = useContext(ThemeContext);
     const [keyboardEnabled, setKeyboardEnabled] = useState(false);
 
     const onEnterContext = (text: string) => {
@@ -41,11 +42,16 @@ const ConmectoChatPrompts = ({
         }
     }
     
-    const cannotGenerateMessage = textGenSetting?.isWaitingPeriod ? 'Reset in 24 hours ⏳' : ''
-    //currentMatches === 0 ? 'Cannot Generate, No Matches found. 🥺'
+    const cannotGenerateMessage = textGenSetting?.isWaitingPeriod ? 'Reset in 24 hours ⏳' : '';
+
+    const themeColor = appTheme === 'dark' ? {
+        mainContainerBackgroundColor: COLOR_CODE.BLACK
+    } : {
+        mainContainerBackgroundColor: COLOR_CODE.OFF_WHITE
+    }
 
     return (
-        <KeyboardAvoidingView behavior='padding' enabled={keyboardEnabled} style={styles.mainContainer}> 
+        <KeyboardAvoidingView behavior='padding' enabled={keyboardEnabled} style={[styles.mainContainer, { backgroundColor: themeColor.mainContainerBackgroundColor }]}> 
             <View style={styles.closeContainer}>
                 <TouchableOpacity onPress={() => onCloseConmectoChat()}>
                     <Ionicons size={35} name='close-circle' color='#86A8E7' />
@@ -107,7 +113,7 @@ const ConmectoChatPrompts = ({
 }
 
 const styles = StyleSheet.create({
-    mainContainer: { flex: 4, backgroundColor: COLOR_CODE.OFF_WHITE },
+    mainContainer: { flex: 4 },
     closeContainer: { flex: 0, alignItems: 'flex-end', paddingRight: width * 0.05 },
     genMessageMainContainer: { flex: 4, alignItems: 'center', justifyContent: 'center' },
     gradient: { height: '90%', width: '90%', borderRadius: 30 },

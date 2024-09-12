@@ -20,6 +20,8 @@ enum COLOR_CODE {
   RED = 'red',
   GOLDEN = '#FFD700',
   DIM_GREY = '#dadada',
+  LOGO_COLOR = '#7f7fd5',
+  LOGO_BLUE = '#86A8E7'
 }
 
 enum ERROR_CODES {

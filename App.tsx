@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import LaunchNavigator from './src/navigations/launch';
+import { ThemeContext } from './src/contexts/theme.context';
 
 const App = () => {
+  const [appTheme, setAppTheme] = useState(null);
+
   return (
-    <LaunchNavigator />
+    <ThemeContext.Provider value={{ appTheme, setAppTheme }}>
+      <LaunchNavigator />
+    </ThemeContext.Provider>
   );
 }
 

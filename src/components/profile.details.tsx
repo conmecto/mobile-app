@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { formatText } from '../utils/helpers';
 import { COLOR_CODE } from '../utils/enums';
 import { DEFAULT_PROFILE_PIC } from '../files';
+import { ThemeContext } from '../contexts/theme.context';
 
 FontAwesome.loadFont();
 MaterialCommunityIcons.loadFont();
@@ -30,6 +31,7 @@ type props = {
 }
 
 const ProfileDetails = ({ profileDetails, navigate, commonScreen }: props) => {
+  const { appTheme } = useContext(ThemeContext);
   const { age, name, profilePicture, city, description } = profileDetails;
   const isProfileComplete = !!(name && description && city && age && profilePicture);
   
@@ -41,6 +43,12 @@ const ProfileDetails = ({ profileDetails, navigate, commonScreen }: props) => {
     navigate('FullProfileScreen', { profileDetails });
   }
 
+  const themeColor = appTheme === 'dark' ? {
+    completeFont: COLOR_CODE.LIGHT_GREY
+  } : {
+    completeFont: COLOR_CODE.BLACK
+  }
+
   return (
     <View style={styles.mainContainer}>
       {
@@ -49,7 +57,7 @@ const ProfileDetails = ({ profileDetails, navigate, commonScreen }: props) => {
           <View style={[styles.headerContainer, isProfileComplete ? { justifyContent: 'flex-end', paddingRight: 20 } : {}]}>
             {
               !isProfileComplete && (
-                <Text numberOfLines={1} adjustsFontSizeToFit style={{ fontSize: 12, fontWeight: 'bold' }}>
+                <Text numberOfLines={1} adjustsFontSizeToFit style={[{ fontSize: 12, fontWeight: 'bold' }, { color: themeColor.completeFont }]}>
                   Complete your Profile❗
                 </Text>
               )

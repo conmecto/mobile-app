@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Linking } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Linking, RefreshControl } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 import { Button } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -16,7 +16,8 @@ import getMultipleUsersProfile from '../api/multiple-users.profile';
 import Environments from '../utils/environments';
 import { checkLocation } from '../utils/update.location';
 import { COLOR_CODE } from '../utils/enums';
-import { getUserId } from '../utils/user.id'; 
+import { getUserId } from '../utils/user.id';
+import { ThemeContext } from '../contexts/theme.context';
 import { FINDING_GIF } from '../files';
 
 type UserProfileRes = {
@@ -55,6 +56,7 @@ MaterialCommunityIcons.loadFont();
 const { height, width } = Dimensions.get('window');
 
 const MatchHomeScreen = ({ route, navigation }: any) => {
+  const { appTheme } = useContext(ThemeContext);
   const userId = getUserId() as number;
   const perPage = 5;
   const [matchObj, setMatchObj] = useState<MatchObj>({
@@ -222,6 +224,24 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
     }
   }, [matchObj.page]);
 
+  const themeColor = appTheme === 'dark' ? {
+    mainContainerBackgroundColor: COLOR_CODE.BLACK,
+    matchesTitleText: COLOR_CODE.OFF_WHITE,
+    findingMoreText: COLOR_CODE.OFF_WHITE,
+    noMatchText: COLOR_CODE.OFF_WHITE,
+    settingButtonColor: COLOR_CODE.BRIGHT_BLUE,
+    refreshButtonColor: COLOR_CODE.GREY,
+    locationText1: COLOR_CODE.OFF_WHITE,
+  } : {
+    mainContainerBackgroundColor: COLOR_CODE.OFF_WHITE,
+    matchesTitleText: COLOR_CODE.BLACK,
+    findingMoreText: COLOR_CODE.BRIGHT_BLUE,
+    noMatchText: COLOR_CODE.BRIGHT_BLUE,
+    settingButtonColor: COLOR_CODE.BLACK,
+    refreshButtonColor: COLOR_CODE.BRIGHT_BLUE,
+    locationText1: COLOR_CODE.BRIGHT_BLUE,
+  }
+
   const onLoadMoreMatches = ({ distanceFromEnd }: { distanceFromEnd: number }) => {
     if (matchObj.hasMore) {
       setMatchObj({ ...matchObj, isLoading: true, page: matchObj.page + 1 });
@@ -263,10 +283,10 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
   const NoMatch = () => {
     return (
       <View style={styles.noMatchContainer}>
-        <Text numberOfLines={2} style={styles.noMatchText}>
+        <Text numberOfLines={2} style={[styles.noMatchText, { color: themeColor.noMatchText }]}>
           Finding matches <Image source={FINDING_GIF} style={styles.noMatchGif}/>
         </Text>
-        <Text numberOfLines={2} style={styles.noMatchText}>
+        <Text numberOfLines={2} style={[styles.noMatchText, { color: themeColor.noMatchText }]}>
           Keep adding more Polaroids 😃
         </Text>
       </View>
@@ -274,12 +294,12 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
   } 
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: themeColor.mainContainerBackgroundColor }]}>
       <TopBar />
       <View style={{ flex: 1 }}>
         <View style={styles.headerContainer}> 
           <View style={styles.matchesTitleContainer}>
-            <Text style={styles.matchesTitleText}>
+            <Text style={[styles.matchesTitleText, { color: themeColor.matchesTitleText }]}>
               Matches
             </Text>           
           </View>
@@ -292,9 +312,9 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
         </View> 
         {
           !locationDenied && (
-            (currentMatches && currentMatches < 10) ? (
+            (currentMatches && currentMatches < 5) ? (
               <View style={styles.findingMoreContainer}>
-                <Text numberOfLines={1} style={styles.findingMoreText}>
+                <Text numberOfLines={1} style={[styles.findingMoreText, { color: themeColor.findingMoreText }]}>
                   Finding more Matches
                 <Image source={FINDING_GIF} style={{ height: 20, width: 20 }}/>
                 </Text>
@@ -315,8 +335,14 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
                 showsVerticalScrollIndicator={false}
                 onEndReached={onLoadMoreMatches}
                 onEndReachedThreshold={0}
-                refreshing={matchObj.isRefreshing}
-                onRefresh={() => setMatchObj({ page: 1, isLoading: true, isRefreshing: true, matches: [], hasMore: true })}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={matchObj.isRefreshing}
+                    onRefresh={() => setMatchObj({ page: 1, isLoading: true, isRefreshing: true, matches: [], hasMore: true })}
+                    // colors={[COLOR_CODE.BRIGHT_BLUE]} // Android
+                    tintColor={COLOR_CODE.BRIGHT_BLUE}  // iOS
+                  />
+                }
               />
             ) : (
               <FlatList 
@@ -324,29 +350,38 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
                 renderItem={({ item }) => <NoMatch />}
                 keyExtractor={(item: any, index: number) => ''}
                 showsVerticalScrollIndicator={false}
-                refreshing={matchObj.isRefreshing}
-                onRefresh={() => setMatchObj({ page: 1, isLoading: true, isRefreshing: true, matches: [], hasMore: true })}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={matchObj.isRefreshing}
+                    onRefresh={() => setMatchObj({ page: 1, isLoading: true, isRefreshing: true, matches: [], hasMore: true })}
+                    // colors={[COLOR_CODE.BRIGHT_BLUE]} // Android
+                    tintColor={COLOR_CODE.BRIGHT_BLUE}  // iOS
+                  />
+                }
               />
             ))
           }
           {
             locationDenied && (
               <View style={styles.locationContainer}>
-                <Text numberOfLines={1} adjustsFontSizeToFit style={styles.locationText1}>
+                <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.locationText1, { color: themeColor.locationText1 }]}>
                   Location access denied!
                 </Text>
-                <Text numberOfLines={2} adjustsFontSizeToFit style={styles.locationText2}>
-                  Conmecto use your location for Automated Matches,
+                <Text numberOfLines={2} adjustsFontSizeToFit style={[styles.locationText2,  { color: themeColor.locationText1 }]}>
+                  Conmecto uses your location for Automated
                 </Text>
-                <Text numberOfLines={2} adjustsFontSizeToFit style={styles.locationText2}>
-                  Please enable Location📍 access from the setting.
+                <Text numberOfLines={2} adjustsFontSizeToFit style={[styles.locationText2,  { color: themeColor.locationText1 }]}>
+                  Matches, Please enable
+                </Text>
+                <Text numberOfLines={2} adjustsFontSizeToFit style={[styles.locationText2,  { color: themeColor.locationText1 }]}>
+                  Location📍access from the setting.
                 </Text>
                 <Text>{'\n'}</Text>
                 <View style={{ flex: 0, width: '100%', flexDirection: 'row', justifyContent: 'space-evenly' }}>
-                  <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} onPress={() => onPressRefresh()}>
+                  <Button mode='contained' buttonColor={themeColor.refreshButtonColor} onPress={() => onPressRefresh()}>
                     Refresh
                   </Button>
-                  <Button mode='contained' buttonColor={COLOR_CODE.BLACK} onPress={() => linkToLocationSetting()}>
+                  <Button mode='contained' buttonColor={themeColor.settingButtonColor} onPress={() => linkToLocationSetting()}>
                     Setting
                   </Button>
                 </View>
@@ -355,7 +390,7 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
           }
         </View>
         <View style={styles.conmectoAnimatedContainer}>
-          <ConmectoBotAnimated navigate={navigation.navigate} currentMatches={currentMatches}/>
+          <ConmectoBotAnimated navigate={navigation.navigate} />
         </View>
       </View>
     </View>
@@ -364,8 +399,7 @@ const MatchHomeScreen = ({ route, navigation }: any) => {
       
 const styles = StyleSheet.create({
   mainContainer: { 
-    flex: 1, 
-    backgroundColor: COLOR_CODE.OFF_WHITE 
+    flex: 1
   },
   matchedUserContainer: { 
     height: Math.floor(height * 0.15), 
@@ -392,7 +426,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2 
   },
   noMatchContainer: { height: 500, alignItems: 'center', justifyContent: 'center' },
-  noMatchText: { fontSize: 20, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE },
+  noMatchText: { fontSize: 20, fontWeight: 'bold' },
   noMatchGif: { height: 40, width: 40 },
   headerContainer: { height: height * 0.05, width, flexDirection: 'row' },
   matchesTitleContainer: { flex: 1, justifyContent: 'center', alignItems: 'flex-start' },
@@ -405,10 +439,10 @@ const styles = StyleSheet.create({
   activityButtonText: { fontSize: 12, fontWeight: 'bold', color: COLOR_CODE.OFF_WHITE },
   conmectoAnimatedContainer: { position: 'absolute', right: 0, bottom: 0, width: height * 0.12, height: height * 0.12, backgroundColor: 'transparent' },
   findingMoreContainer: { height: height * 0.03, alignItems: 'flex-start', justifyContent: 'flex-start', paddingLeft: width * 0.05 },
-  findingMoreText: { fontSize: 10, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE  },
+  findingMoreText: { fontSize: 10, fontWeight: 'bold'  },
   locationContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  locationText1: { fontSize: 20, color: COLOR_CODE.BRIGHT_BLUE, fontWeight: 'bold' },
-  locationText2: { fontSize: 15, color: COLOR_CODE.BRIGHT_BLUE, fontWeight: 'bold' }
+  locationText1: { fontSize: 25, fontWeight: 'bold' },
+  locationText2: { fontSize: 15, fontWeight: 'bold' }
 });
 
 export default MatchHomeScreen;
