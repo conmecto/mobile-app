@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import TopBar from '../components/top.bar';
 import ProfileDetails from '../components/profile.details';
@@ -7,6 +7,7 @@ import getUserProfile from '../api/user.profile';
 import Loading from '../components/loading';
 import { getUserId } from '../utils/user.id';
 import { COLOR_CODE } from '../utils/enums';
+import { ThemeContext } from '../contexts/theme.context';
 
 type UserProfileRes = {
   id: number,
@@ -29,6 +30,7 @@ type ProfileObj = {
 }
 
 const ProfileScreen = ({ navigation, route }: any) => {
+  const { appTheme } = useContext(ThemeContext);
   const { commonScreen, matchedUserId }: { commonScreen: boolean, matchedUserId: number } = route?.params;
   let userId = getUserId() as number;
   if (commonScreen) {
@@ -62,11 +64,17 @@ const ProfileScreen = ({ navigation, route }: any) => {
       check = false;
     }
   }, []);
+
+  const themeColor = appTheme === 'dark' ? {
+    mainContainerBackgroundColor: COLOR_CODE.BLACK
+  } : {
+    mainContainerBackgroundColor: COLOR_CODE.OFF_WHITE
+  }
   
   return (
     <View style={styles.container}>
       <TopBar />
-      <SafeAreaView style={styles.mainContainer}>
+      <SafeAreaView style={[styles.mainContainer, { backgroundColor: themeColor.mainContainerBackgroundColor }]}>
         {
           profileObj.isLoading ?
           (<Loading flex={3} />) :

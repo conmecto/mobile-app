@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, FlatList } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, FlatList, RefreshControl } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
 import getUserPosts from '../api/user.posts';
 import { COLOR_CODE } from '../utils/enums';
+import { ThemeContext } from '../contexts/theme.context';
 
 type UserPost = {
   id: number,
@@ -41,6 +42,7 @@ const Polaroid =  React.memo(({ item, navigate }: { item: UserPost, navigate: an
   const onPressPolaroid = (post: UserPost) => {
     navigate('ViewPostScreen', { post });
   }
+
   return (
     <View style={styles.polaroidContainer}>
       <TouchableOpacity style={styles.polaroidTouchable} onPress={() => onPressPolaroid(item)}>
@@ -51,6 +53,7 @@ const Polaroid =  React.memo(({ item, navigate }: { item: UserPost, navigate: an
 });
   
 const Posts = ({ navigate, userId }: params) => {
+  const { appTheme } = useContext(ThemeContext);
   const perPage = 4;
   const [postData, setPostData] = useState<UserPost[]>([]);
   const [postObj, setPostObj] = useState<PostObj>({
@@ -127,10 +130,16 @@ const Posts = ({ navigate, userId }: params) => {
     }
   }
 
+  const themeColor = appTheme === 'dark' ? {
+    headerTextColor: COLOR_CODE.OFF_WHITE
+  } : {
+    headerTextColor: COLOR_CODE.BLACK
+  }
+
   return (
     <View style={styles.mainContainer}>
       <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Polaroids</Text> 
+        <Text style={[styles.headerText, { color: themeColor.headerTextColor }]}>Polaroids</Text> 
       </View>
       <View style={{ flex: 1 }}>
         <FlatList 
@@ -141,8 +150,14 @@ const Posts = ({ navigate, userId }: params) => {
           showsVerticalScrollIndicator={false}
           onEndReached={onLoadMorePost}
           onEndReachedThreshold={0}
-          refreshing={postObj.isRefreshing}
-          onRefresh={onRefreshPosts}
+          refreshControl={
+            <RefreshControl
+              refreshing={postObj.isRefreshing}
+              onRefresh={onRefreshPosts}
+              // colors={['#yourColor']} // Android 
+              tintColor={COLOR_CODE.BRIGHT_BLUE}  // iOS
+            />
+          }
         />
       </View>
     </View>

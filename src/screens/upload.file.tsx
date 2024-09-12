@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import environments from '../utils/environments';
 import { unlink } from 'react-native-fs';
 import requestSignedUrl from '../api/request.signed.url';
+import uploadPost from '../api/upload.post';
 import { getUserId } from '../utils/user.id';
 import { getFileType } from '../utils/helpers';
-import uploadPost from '../api/upload.post';
 import { COLOR_CODE } from '../utils/enums';
+import environments from '../utils/environments';
+import { ThemeContext } from '../contexts/theme.context';
 
 FontAwesome.loadFont();
 MaterialCommunityIcons.loadFont();
@@ -27,6 +28,7 @@ type param = {
 }
 
 const UploadFileScreen = ({ route, navigation }: any) => {  
+    const { appTheme } = useContext(ThemeContext);
     const { capturedPhoto, polaroidDetail }: param = route.params;
     const userId = getUserId() as number;
     const [isLoading, setIsLoading] = useState(true);
@@ -104,25 +106,35 @@ const UploadFileScreen = ({ route, navigation }: any) => {
             check = false;
         }
     }, []);
+
+    const themeColor = appTheme === 'dark' ? {
+        mainBackgroundColor: COLOR_CODE.BLACK,
+        addingText: COLOR_CODE.OFF_WHITE,
+        addedText: COLOR_CODE.OFF_WHITE,
+    } : {
+        mainBackgroundColor: COLOR_CODE.OFF_WHITE,
+        addingText: COLOR_CODE.BLACK,
+        addedText: COLOR_CODE.BRIGHT_BLUE,
+    }
     
     return (
         showError ? (
-            <View style={styles.mainContainer}>
+            <View style={[styles.mainContainer, { backgroundColor: themeColor.mainBackgroundColor }]}>
                 <Text style={styles.error}>{genericError}</Text>
             </View>
         ) : (
             isLoading ?
             (
                 <View style={{ flex: 1 }}>
-                    <View style={styles.mainContainer}>
-                        <Text style={styles.addingText}>Adding Polaroid...{'\n'}</Text>
+                    <View style={[styles.mainContainer, { backgroundColor: themeColor.mainBackgroundColor }]}>
+                        <Text style={[styles.addingText, { color: themeColor.addingText }]}>Adding Polaroid...{'\n'}</Text>
                         <Text style={{ fontSize: 30, fontWeight: 'bold', color: COLOR_CODE.BLACK }}>⏳👀</Text>
                     </View>
                 </View>
             ) :
             (
-                <View style={styles.mainContainer}>
-                    <Text style={styles.addedText}>Polaroid Added 📸</Text>
+                <View style={[styles.mainContainer, { backgroundColor: themeColor.mainBackgroundColor }]}>
+                    <Text style={[styles.addedText, { color: themeColor.addedText }]}>Polaroid Added 📸</Text>
                 </View>
             )
         )
@@ -138,6 +150,6 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     error: { fontSize: 30, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_RED },
-    addingText: { fontSize: 30, fontWeight: 'bold', color: COLOR_CODE.BLACK },
-    addedText: { fontSize: 25, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE }
+    addingText: { fontSize: 30, fontWeight: 'bold' },
+    addedText: { fontSize: 30, fontWeight: 'bold', color: COLOR_CODE.BRIGHT_BLUE }
 });

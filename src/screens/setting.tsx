@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, FlatList } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, FlatList, ScrollView } from 'react-native';
 import RNDateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { CommonActions } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { Modal, Provider, Portal, Button } from 'react-native-paper';
+import { Modal, Provider, Portal, Button, Switch } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import TopBar from '../components/top.bar';
 import Loading from '../components/loading';
@@ -20,6 +20,9 @@ import { getUserId, resetUserId } from '../utils/user.id';
 import { resetToken } from '../utils/token';
 import { resetPosts } from '../utils/post';
 import { resetUserCountry } from '../utils/user.country';
+import { saveToken } from '../utils/helpers';
+import { themeKey } from '../utils/constants';
+import { ThemeContext } from '../contexts/theme.context';
 
 type UserMatchSettingObject = {
   id?: number,
@@ -51,6 +54,7 @@ for(let i = 18; i <= 70; i++) {
 }
 
 const SettingScreen = ({ navigation }: any) => {  
+  const { appTheme, setAppTheme } = useContext(ThemeContext);
   const userId = getUserId() as number;
   const [showAccountModal, setShowAccountModal] = useState('');
   const [accountAction, setAccountAction] = useState('');
@@ -305,8 +309,33 @@ const SettingScreen = ({ navigation }: any) => {
     setSearchSettings({ ...searchSettings, modal: '', updateSettings: 'dob', dob: tempDob });
   }
 
+  const onChangeTheme = () => {
+    let tempTheme = '';
+    if (appTheme !== 'dark') {
+      tempTheme = 'dark';
+    } else {
+      tempTheme = 'light';
+    }
+    saveToken(themeKey, tempTheme).then().catch();
+    setAppTheme(tempTheme);
+  }
+
+  const themeColors = appTheme === 'dark' ? {
+    containerBackgroundColor: COLOR_CODE.BLACK,
+    settingFieldTextColor: COLOR_CODE.OFF_WHITE,
+    logoutTextColor: COLOR_CODE.OFF_WHITE,
+    settingValueTextColor: COLOR_CODE.DIM_GREY,
+    angleColor: COLOR_CODE.LIGHT_GREY
+  } : {
+    containerBackgroundColor: COLOR_CODE.OFF_WHITE,
+    settingFieldTextColor: COLOR_CODE.BLACK,
+    logoutTextColor: COLOR_CODE.BLACK,
+    settingValueTextColor: COLOR_CODE.GREY,
+    angleColor: COLOR_CODE.BLACK
+  }
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: themeColors.containerBackgroundColor }]}>
       <TopBar />
       <Provider>
         { 
@@ -314,7 +343,7 @@ const SettingScreen = ({ navigation }: any) => {
           (
             <Loading />
           ) : (
-            <View style={{ flex: 1 }}>
+            <ScrollView style={{ flex: 1 }}>
               <Portal>
                 <Modal 
                   visible={Boolean(searchSettings.modal)} 
@@ -398,17 +427,17 @@ const SettingScreen = ({ navigation }: any) => {
 
                 <View style={{ flex: 2 }}>
                   <View style={styles.settingTypeContainer}>
-                    <Text style={styles.settingFieldText}>Distance</Text>
+                    <Text style={[styles.settingFieldText, { color: themeColors.settingFieldTextColor }]}>Distance</Text>
                   </View>
                   <View style={{ flex: 2 }}>
                     <TouchableOpacity style={styles.settingFieldPressable} onPress={() => onPressOpenModal('searchArea')}>
                       <View style={styles.settingFieldTextContainer}> 
-                        <Text numberOfLines={1} adjustsFontSizeToFit style={styles.settingValueText}>
+                        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.settingValueText, { color: themeColors.settingValueTextColor}]}>
                           {formatText(searchSettings?.searchArea)}
                         </Text>
                       </View>
                       <View style={styles.settingFieldIconContainer}> 
-                        <FontAwesome name='angle-right' size={25} />
+                        <FontAwesome name='angle-right' size={25} color={themeColors.angleColor}/>
                       </View>
                     </TouchableOpacity>
                   </View>
@@ -416,15 +445,15 @@ const SettingScreen = ({ navigation }: any) => {
 
                 <View style={{ flex: 2 }}>
                   <View style={styles.settingTypeContainer}>
-                    <Text style={styles.settingFieldText}>Search For</Text>
+                    <Text style={[styles.settingFieldText, { color: themeColors.settingFieldTextColor }]}>Search For</Text>
                   </View>
                   <View style={{ flex: 2 }}>
                     <TouchableOpacity style={styles.settingFieldPressable} onPress={() => onPressOpenModal('searchFor')}>
                       <View style={styles.settingFieldTextContainer}> 
-                        <Text numberOfLines={1} adjustsFontSizeToFit style={styles.settingValueText}>{formatText(searchSettings?.searchFor)}</Text>
+                        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.settingValueText, { color: themeColors.settingValueTextColor}]}>{formatText(searchSettings?.searchFor)}</Text>
                       </View>
                       <View style={styles.settingFieldIconContainer}> 
-                        <FontAwesome name='angle-right' size={25} />
+                        <FontAwesome name='angle-right' size={25} color={themeColors.angleColor}/>
                       </View>
                     </TouchableOpacity>
                   </View>
@@ -432,19 +461,19 @@ const SettingScreen = ({ navigation }: any) => {
 
                 <View style={{ flex: 2 }}>
                   <View style={styles.settingTypeContainer}>
-                    <Text style={styles.settingFieldText}>Age Range</Text>
+                    <Text style={[styles.settingFieldText, { color: themeColors.settingFieldTextColor }]}>Age Range</Text>
                   </View>
                   <View style={{ flex: 2 }}>
                     <TouchableOpacity style={styles.settingFieldPressable} onPress={() => onPressOpenModal('age')}>
                       <View style={styles.settingFieldTextContainer}> 
-                        <Text numberOfLines={1} adjustsFontSizeToFit style={styles.settingValueText}>
+                        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.settingValueText, { color: themeColors.settingValueTextColor}]}>
                           {searchSettings?.minSearchAge}
                           {'   -   '}
                           {searchSettings?.maxSearchAge}
                         </Text>
                       </View>
                       <View style={styles.settingFieldIconContainer}> 
-                        <FontAwesome name='angle-right' size={25} />
+                        <FontAwesome name='angle-right' size={25} color={themeColors.angleColor}/>
                       </View>
                     </TouchableOpacity> 
                   </View>
@@ -452,17 +481,17 @@ const SettingScreen = ({ navigation }: any) => {
 
                 <View style={{ flex: 2 }}>
                   <View style={styles.settingTypeContainer}>
-                    <Text style={styles.settingFieldText}>Gender</Text>
+                    <Text style={[styles.settingFieldText, { color: themeColors.settingFieldTextColor }]}>Gender</Text>
                   </View>
                   <View style={{ flex: 2 }}>
                     <TouchableOpacity style={styles.settingFieldPressable} onPress={() => onPressOpenModal('gender')}>
                       <View style={styles.settingFieldTextContainer}> 
-                        <Text numberOfLines={1} adjustsFontSizeToFit style={styles.settingValueText}>
+                        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.settingValueText, { color: themeColors.settingValueTextColor}]}>
                           {formatText(searchSettings?.gender)}
                         </Text>
                       </View>
                       <View style={styles.settingFieldIconContainer}> 
-                        <FontAwesome name='angle-right' size={25} />
+                        <FontAwesome name='angle-right' size={25} color={themeColors.angleColor}/>
                       </View>
                     </TouchableOpacity>
                   </View>
@@ -470,7 +499,7 @@ const SettingScreen = ({ navigation }: any) => {
 
                 <View style={{ flex: 2 }}>
                   <View style={styles.settingTypeContainer}>
-                    <Text style={styles.settingFieldText}>
+                    <Text style={[styles.settingFieldText, { color: themeColors.settingFieldTextColor }]}>
                       Birth Date
                     </Text>
                   </View>
@@ -484,7 +513,7 @@ const SettingScreen = ({ navigation }: any) => {
                           alignItems: 'flex-start',
                           paddingLeft: 10,
                         }}>
-                          <Text numberOfLines={1} adjustsFontSizeToFit style={styles.settingValueText}>
+                          <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.settingValueText, { color: themeColors.settingValueTextColor}]}>
                             {new Date(searchSettings.dob)?.toDateString()}
                           </Text>
                         </View>
@@ -496,7 +525,7 @@ const SettingScreen = ({ navigation }: any) => {
                             </Text>
                           </View>
                           <View style={styles.settingFieldIconContainer}> 
-                            <FontAwesome name='angle-right' size={25} />
+                            <FontAwesome name='angle-right' size={25} color={themeColors.angleColor}/>
                           </View>
                         </TouchableOpacity>
                       )
@@ -513,10 +542,10 @@ const SettingScreen = ({ navigation }: any) => {
                 <View style={styles.accountSettingBody}>
                   <TouchableOpacity style={{ flex: 1, flexDirection: 'row' }} onPress={() => onPressAccountModal('logout')}>
                     <View style={styles.settingFieldTextContainer}> 
-                      <Text style={styles.logoutText}>Logout</Text>
+                      <Text style={[styles.logoutText, { color: themeColors.logoutTextColor}]}>Logout</Text>
                     </View>
                     <View style={styles.settingFieldIconContainer}> 
-                      <FontAwesome name='angle-right' size={25} />
+                      <FontAwesome name='angle-right' size={25} color={themeColors.angleColor}/>
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -524,10 +553,10 @@ const SettingScreen = ({ navigation }: any) => {
                 <View style={styles.accountSettingBody}>
                   <TouchableOpacity style={{ flex: 1, flexDirection: 'row' }} onPress={() => onPressAccountModal('terms')}>
                     <View style={styles.settingFieldTextContainer}> 
-                      <Text style={styles.logoutText}>Terms of Service</Text>
+                      <Text style={[styles.logoutText, { color: themeColors.logoutTextColor}]}>Terms of Service</Text>
                     </View>
                     <View style={styles.settingFieldIconContainer}> 
-                      <FontAwesome name='angle-right' size={25} />
+                      <FontAwesome name='angle-right' size={25} color={themeColors.angleColor}/>
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -535,10 +564,10 @@ const SettingScreen = ({ navigation }: any) => {
                 <View style={styles.accountSettingBody}>
                   <TouchableOpacity style={{ flex: 1, flexDirection: 'row' }} onPress={() => onPressAccountModal('policy')}>
                     <View style={styles.settingFieldTextContainer}> 
-                      <Text style={styles.logoutText}>Privacy Policy</Text>
+                      <Text style={[styles.logoutText, { color: themeColors.logoutTextColor}]}>Privacy Policy</Text>
                     </View>
                     <View style={styles.settingFieldIconContainer}> 
-                      <FontAwesome name='angle-right' size={25} />
+                      <FontAwesome name='angle-right' size={25} color={themeColors.angleColor}/>
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -546,19 +575,26 @@ const SettingScreen = ({ navigation }: any) => {
                 <View style={styles.accountSettingBody}>
                   <TouchableOpacity style={{ flex: 1, flexDirection: 'row' }} onPress={() => onPressAccountModal('delete')}>
                     <View style={styles.settingFieldTextContainer}> 
-                      <Text style={styles.logoutText}>Delete Account</Text>
+                      <Text style={[styles.logoutText, { color: themeColors.logoutTextColor}]}>Delete Account</Text>
                     </View>
                     <View style={styles.settingFieldIconContainer}> 
-                      <FontAwesome name='angle-right' size={25} />
+                      <FontAwesome name='angle-right' size={25} color={themeColors.angleColor}/>
                     </View>
                   </TouchableOpacity>
                 </View>
 
-                <View style={{ flex: 2, justifyContent: 'center', paddingLeft: 10 }}>
-                  <Text style={styles.logoutText}>Contact Email: {'\t'} contact@conmecto.com</Text>
+                <View style={styles.darkThemeContainer}>
+                  <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.logoutText, { color: themeColors.logoutTextColor}]}>
+                    Dark Theme
+                  </Text>
+                  <Switch value={appTheme === 'dark'} onValueChange={onChangeTheme} color={COLOR_CODE.BRIGHT_BLUE} />
+                </View>
+
+                <View style={styles.contactContainer}>
+                  <Text style={[styles.logoutText, { color: themeColors.logoutTextColor}]}>Contact Email: {'\t'} contact@conmecto.com</Text>
                 </View>
               </View>
-            </View>
+            </ScrollView>
           )
         }
       </Provider>
@@ -566,12 +602,9 @@ const SettingScreen = ({ navigation }: any) => {
   );
 }
 
-export default SettingScreen;
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLOR_CODE.OFF_WHITE,
+    flex: 1
   },
   
   settingContainer: {
@@ -594,7 +627,8 @@ const styles = StyleSheet.create({
 
   settingFieldText: {
     fontSize: 15,
-    fontWeight: '600'
+    fontWeight: '600',
+    color: COLOR_CODE.BLACK
   },
   settingFieldPressable: {
     flex: 1,
@@ -623,7 +657,7 @@ const styles = StyleSheet.create({
   },
 
   accountSettingContainer: {
-    height: height * 0.3
+    height: height * 0.4
   },
   accountSettingHeader: {
     flex: 1.5,
@@ -678,5 +712,9 @@ const styles = StyleSheet.create({
     fontFamily: 'SavoyeLetPlain',
     fontSize: 25
   },
-  dobError: { fontSize: 12, fontWeight: 'bold', alignSelf: 'center', color: COLOR_CODE.BRIGHT_RED }
+  dobError: { fontSize: 12, fontWeight: 'bold', alignSelf: 'center', color: COLOR_CODE.BRIGHT_RED },
+  darkThemeContainer: { flex: 2, flexDirection: 'row', paddingLeft: 10, paddingRight: 10, alignItems: 'center', justifyContent: 'space-between' },
+  contactContainer: { flex: 2, justifyContent: 'center', paddingLeft: 10 }
 });
+
+export default SettingScreen;

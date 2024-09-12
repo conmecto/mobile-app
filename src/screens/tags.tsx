@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, StyleSheet, Text, ScrollView, SafeAreaView } from 'react-native';
 import { Button, Chip } from 'react-native-paper'; 
 import { COLOR_CODE } from '../utils/enums';
 import { polaroidTags, colors } from '../utils/constants';
+import { ThemeContext } from '../contexts/theme.context';
 
 const randomColor = () => {
     return colors[Math.floor(Math.random() * colors.length)];
@@ -26,6 +27,7 @@ type polaroidDetail = {
 }
 
 const TagsScreen = ({ navigation, route }: any) => {  
+  const { appTheme } = useContext(ThemeContext);
   const [tagsCheck, setTagsCheck] = useState<Set<string>>(new Set());
   const [error, setError] = useState('');
 
@@ -55,8 +57,16 @@ const TagsScreen = ({ navigation, route }: any) => {
     navigation.navigate('UploadFileScreen', { capturedPhoto, polaroidDetail });
   }
 
+  const themeColor = appTheme === 'dark' ? {
+    mainBackgroundColor: COLOR_CODE.BLACK,
+    nameText: COLOR_CODE.OFF_WHITE,
+  } : {
+    mainBackgroundColor: COLOR_CODE.OFF_WHITE,
+    nameText: COLOR_CODE.BLACK,
+  }
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: themeColor.mainBackgroundColor }}>
         <View style={styles.headerContainer}>
             <Text style={styles.headerText}>
                 Select upto 5 Tags (Optional)

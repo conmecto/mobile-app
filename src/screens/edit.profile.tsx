@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 import { check, PERMISSIONS, RESULTS, request } from 'react-native-permissions';
@@ -16,6 +16,7 @@ import { profilePictureOptions, allowedImageTypes, maxImageSizeBytes } from '../
 import { formatText } from '../utils/helpers';
 import { getUserId } from '../utils/user.id';
 import Environments from '../utils/environments';
+import { ThemeContext } from '../contexts/theme.context';
 
 type UpdateProfileObj = {
   description?: string,
@@ -51,6 +52,7 @@ FontAwesome.loadFont();
 const { width, height } = Dimensions.get('window');
 
 const EditProfileScreen = (props: any) => {
+  const { appTheme } = useContext(ThemeContext);
   const params = props?.route?.params;
   const userId = getUserId() as number;
   const profileObj: UserProfileRes = params?.profileDetails;
@@ -163,6 +165,14 @@ const EditProfileScreen = (props: any) => {
     props.navigation.navigate('ProfileScreen');
   }
 
+  const themeColor = appTheme === 'dark' ? {
+    mainContainer: COLOR_CODE.BLACK,
+    uploadText: COLOR_CODE.OFF_WHITE
+  } : {
+    mainContainer: COLOR_CODE.OFF_WHITE,
+    uploadText: COLOR_CODE.GREY
+  }
+
   const checkAllSame = () => {
     if (updateObj.city?.toLowerCase() !== defaultUpdateObj.city?.toLowerCase()) {
       updateKeys.city = true;
@@ -266,7 +276,7 @@ const EditProfileScreen = (props: any) => {
   return (
     <View style={styles.container}>
       <TopBar />
-      <SafeAreaView style={styles.mainContainer}>
+      <SafeAreaView style={[styles.mainContainer, { backgroundColor: themeColor.mainContainer }]}>
         {
           (updateDetails || updateImage) ?
           (<Loading />) :
@@ -276,7 +286,7 @@ const EditProfileScreen = (props: any) => {
                 <TouchableOpacity style={styles.updateImageIconPressable} onPress={onUploadImageHandler}>
                   <FontAwesome name='upload' color={COLOR_CODE.BRIGHT_BLUE} size={40} />
                 </TouchableOpacity> 
-                <Text style={styles.uploadText}>
+                <Text style={[styles.uploadText, { color: themeColor.uploadText }]}>
                   Upload Profile Picture
                 </Text>
               </View>
@@ -285,31 +295,31 @@ const EditProfileScreen = (props: any) => {
               
               <View style={styles.textFieldsContainer}>
                 
-                <Text style={styles.uploadText}>
+                <Text style={[styles.uploadText, { color: themeColor.uploadText }]}>
                   Name
                 </Text>
                 <TextInput style={styles.commonInput} defaultValue={updateObj.name} onChangeText={text => onHandleChangeText(text, 'name')} />
                 <Text></Text>
                 
-                <Text style={styles.uploadText}>
+                <Text style={[styles.uploadText, { color: themeColor.uploadText }]}>
                   About (Max 250 characters)
                 </Text>
                 <TextInput style={styles.commonInput} defaultValue={updateObj.description} onChangeText={text => onHandleChangeText(text, 'description')} />
                 <Text></Text>
                 
-                <Text style={styles.uploadText}>
+                <Text style={[styles.uploadText, { color: themeColor.uploadText }]}>
                   City
                 </Text>
                 <TextInput style={styles.commonInput} defaultValue={updateObj.city} onChangeText={text => onHandleChangeText(text, 'city')} />
                 <Text></Text>
                 
-                <Text style={styles.uploadText}>
+                <Text style={[styles.uploadText, { color: themeColor.uploadText }]}>
                   Work
                 </Text>
                 <TextInput style={styles.commonInput} defaultValue={updateObj.work} onChangeText={text => onHandleChangeText(text, 'work')} />
                 <Text></Text>
                 
-                <Text style={styles.uploadText}>
+                <Text style={[styles.uploadText, { color: themeColor.uploadText }]}>
                   University
                 </Text>
                 <TextInput style={styles.commonInput} defaultValue={updateObj.university} onChangeText={text => onHandleChangeText(text, 'university')} />
@@ -352,8 +362,7 @@ const styles = StyleSheet.create({
 
   editContainer: {
     height: '100%',
-    width: '100%',
-    backgroundColor: COLOR_CODE.OFF_WHITE,
+    width: '100%'
   },
 
   editImageContainer: {
@@ -369,8 +378,7 @@ const styles = StyleSheet.create({
   },
   uploadText: {
     fontSize: 15,
-    fontWeight: 'bold',
-    color: COLOR_CODE.GREY
+    fontWeight: 'bold'
   },
 
   textFieldsContainer: {
@@ -378,6 +386,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   commonInput: {
+    borderTopStartRadius: 20,
+    borderTopEndRadius: 20,
+    borderBottomStartRadius: 20,
+    borderBottomEndRadius: 20,
     backgroundColor: COLOR_CODE.OFF_WHITE
   },
 

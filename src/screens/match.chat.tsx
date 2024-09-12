@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { 
-  View, Text, StyleSheet, Dimensions, TouchableOpacity, TextInput, 
+  View, Text, StyleSheet, Dimensions, TouchableOpacity, TextInput,
   KeyboardAvoidingView, FlatList, SafeAreaView
 } from 'react-native';
 import { omit } from 'lodash';
@@ -15,6 +15,7 @@ import { getUserId } from '../utils/user.id';
 import { COLOR_CODE, ChatSocketEvents } from '../utils/enums';
 import { formatText } from '../utils/helpers';
 import { getChatSocketInstance, deleteChatSocketInstance } from '../sockets/chat.socket';
+import { ThemeContext } from '../contexts/theme.context';
 
 type Chat = {
   id?: number,
@@ -51,6 +52,7 @@ FontAwesome.loadFont();
 const { width, height } = Dimensions.get('window');
 
 const MatchChatScreen = ({ navigation, route }: any) => {
+  const { appTheme } = useContext(ThemeContext);
   const userId = getUserId() as number;
   const { matchId, matchedUserId, matchedUserName }: { 
     matchId: number, matchedUserId: number, matchedUserName: string 
@@ -191,6 +193,18 @@ const MatchChatScreen = ({ navigation, route }: any) => {
     navigation.navigate('ViewChatFile', { chat });
   }
 
+  const themeColor = appTheme === 'dark' ? {
+    mainContainerBackgroundColor: COLOR_CODE.BLACK,
+    headerText: COLOR_CODE.OFF_WHITE,
+    textInput: COLOR_CODE.OFF_WHITE,
+    chatDisappearText: COLOR_CODE.OFF_WHITE,
+  } : {
+    mainContainerBackgroundColor: COLOR_CODE.OFF_WHITE,
+    headerText: COLOR_CODE.BLACK,
+    textInput: COLOR_CODE.DIM_GREY,
+    chatDisappearText: COLOR_CODE.BLACK,
+  }
+
   const ChatView = ({ chat }: { chat: Chat }) => {
     const isSender = chat.sender === userId;
     const chatMessageData = {
@@ -204,7 +218,7 @@ const MatchChatScreen = ({ navigation, route }: any) => {
   }
 
   return (
-    <KeyboardAvoidingView style={styles.chatMainContainer} behavior='padding'>
+    <KeyboardAvoidingView style={[styles.chatMainContainer, { backgroundColor: themeColor.mainContainerBackgroundColor }]} behavior='padding'>
       <Provider>
         {
           endMatchObj.isLoading ? 
@@ -230,7 +244,7 @@ const MatchChatScreen = ({ navigation, route }: any) => {
                 <View style={styles.headerContainer}>
                   <View style={styles.viewProfileContainer}>
                     <TouchableOpacity style={styles.viewProfileTouchable} onPress={onPressViewProfile}>
-                      <Text numberOfLines={1} adjustsFontSizeToFit style={styles.headerText}>
+                      <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.headerText, { color: themeColor.headerText }]}>
                         {formatText(matchedUserName) || 'View Profile'}
                       </Text>
                     </TouchableOpacity>
@@ -244,6 +258,15 @@ const MatchChatScreen = ({ navigation, route }: any) => {
                   </View>     
                 </View>
                 <View style={styles.bodyContainer}>
+                  {
+                    !chats.length && (
+                      <View style={styles.chatDisappearContainer}>
+                        <Text style={[styles.chatDisappearText, { color: themeColor.chatDisappearText }]}>
+                          Chats will disappear after 24 hours
+                        </Text>
+                      </View>
+                    )
+                  }
                   <View style={styles.chatsContainer}>     
                     <FlatList 
                       data={chats}
@@ -260,7 +283,7 @@ const MatchChatScreen = ({ navigation, route }: any) => {
                     <View style={styles.textContainer}>     
                       <TextInput 
                         placeholder='Send message' 
-                        style={styles.textInput}
+                        style={[styles.textInput, { backgroundColor: themeColor.textInput }]}
                         numberOfLines={1}
                         onChangeText={handleChangeText}
                         defaultValue={message}
@@ -325,8 +348,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 15,
-    fontWeight: 'bold',
-    color: COLOR_CODE.BLACK
+    fontWeight: 'bold'
   },
   endMatchContainer: {
     flex: 1,
@@ -357,7 +379,7 @@ const styles = StyleSheet.create({
   
   inputContainer: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'row'
   },
   textContainer: {
     flex: 4,
@@ -365,11 +387,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   textInput: {
-    height: '70%',
-    width: '90%',
-    borderRadius: 30,
+    height: height * 0.05,
+    width: width * 0.75,
+    borderRadius: 15,
     padding: 5,
-    backgroundColor: COLOR_CODE.LIGHT_GREY,
     fontSize: 15,
   },
   
@@ -385,6 +406,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
+  chatDisappearContainer: { flex: 0, justifyContent: 'center', alignItems: 'center', padding: 2 },
+  chatDisappearText: { fontSize: 10, fontWeight: 'bold' }
 });
 
 export default MatchChatScreen;

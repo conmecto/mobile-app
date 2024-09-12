@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WelcomeScreen from '../screens/welcome';
-import SignupSecondScreen from '../screens/signup.second';
 import ContactAdminScreen from '../screens/contact.admin';
 import LogoScreen from '../screens/logo';
-import SignupThirdScreen from '../screens/signup.third';
 import { getToken, updateTokens } from '../utils/helpers';
-import { initialLogoScreenTimeMilli } from '../utils/constants';
+import { initialLogoScreenTimeMilli, themeKey } from '../utils/constants';
 import { setUserId } from '../utils/user.id';
 import { setUserCountry } from '../utils/user.country';
+import { ThemeContext } from '../contexts/theme.context';
 import HomeTabNavigator from './home';
 
 const Stack = createNativeStackNavigator();
@@ -17,6 +16,14 @@ const Stack = createNativeStackNavigator();
 const LaunchStackNavigator = () => {
   const [isLoading, setLoading] = useState(true);
   const [initialScreen, setInitialScreen] = useState('WelcomeScreen');
+  const { setAppTheme } = useContext(ThemeContext);
+
+  const callSetTheme = async () => {
+    const appTheme = await getToken(themeKey);
+    if (appTheme && appTheme.password) {
+      setAppTheme(appTheme.password);
+    }
+  }
 
   const checkAuthenticated = async () => {
     const userIdObj = await getToken('userId');
@@ -35,6 +42,7 @@ const LaunchStackNavigator = () => {
     let check = true;
     if (check) {
       setUserCountry();
+      callSetTheme();
       checkAuthenticated();
     }
     return () => {
