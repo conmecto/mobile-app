@@ -114,8 +114,83 @@ const Cities: any = {
 
 const themeKey = 'conmecto:theme';
 
+const preferencesList = [
+  'vegan enthusiast',       'coffee lover',
+  'beach bum',              'fitness fanatic',
+  'fashionista',            'bookworm',
+  'world traveler',         'yoga practitioner',
+  'music junkie',           'adventure seeker',
+  'foodie explorer',        'minimalist style',
+  'pilates lover',          'hiking addict',
+  'vintage fashion',        'animal lover',
+  'wine aficionado',        'tech geek',
+  'organic eater',          'mountain climber',
+  'art collector',          'wellness guru',
+  'street foodie',          'digital nomad',
+  'urban explorer',         'craft beer lover',
+  'sourdough baker',        'salsa dancer',
+  'meditation enthusiast',  'retro gamer',
+  'surfing fan',            'skincare addict',
+  'crossfit trainer',       'streetwear collector',
+  'jazz aficionado',        'marathon runner',
+  'diy crafter',            'night owl',
+  'history buff',           'cycling enthusiast',
+  'tea connoisseur',        'sustainable shopper',
+  'film buff',              'hot springs fan',
+  'tennis player',          'scenic photographer',
+  'backpacking adventurer', 'cocktail mixologist',
+  'urban gardener',         'snowboarder'
+]
+
+const traits = [
+  'Kind & Helpful: Compassionate, supportive, considerate',
+  'Dog Lover: Animal enthusiast, loyal, affectionate',
+  'Business-Minded: Strategic, entrepreneurial, goal-oriented',
+  'Studious: Diligent, focused, intellectual',
+  'Creative: Imaginative, artistic, innovative',
+  'Adventurous: Risk-taking, exploratory, spontaneous',
+  'Organized: Structured, efficient, detail-oriented',
+  'Empathetic: Understanding, compassionate, sensitive',
+  'Confident: Self-assured, assertive, decisive',
+  'Patient: Calm, tolerant, understanding',
+  'Outgoing: Sociable, extroverted, friendly',
+  'Reliable: Trustworthy, dependable, consistent',
+  'Health-Conscious: Fitness-oriented, mindful, nutritious',
+  'Curious: Inquisitive, eager to learn',
+  'Generous: Giving, charitable, unselfish',
+  'Disciplined: Self-controlled, focused, methodical',
+  'Humble: Modest, unpretentious, down-to-earth',
+  'Funny: Humorous, entertaining, light-hearted',
+  'Artistic: Creative, expressive, imaginative',
+  'Analytical: Logical, detail-oriented, critical thinker'
+]
+
+const lookingFor = [
+  'Long-Term Relationship: Committed, future-oriented partnership',
+  'Short-Term Dating: Casual, temporary, fun',
+  'Friendship: Platonic, supportive, social connection',
+  'Casual Hookups: No-strings-attached, spontaneous encounters',
+  'Marriage: Serious, lifelong commitment',
+  'Travel Companion: Shared adventures, exploration',
+  'Intellectual Connection: Stimulating, deep conversations',
+  'Emotional Support: Understanding, empathetic relationship',
+  'Family-Oriented: Desire for children, family life',
+  'Mutual Growth: Personal development, shared goals',
+  'Physical Attraction: Strong, mutual interest in appearance',
+  'Cultural Exchange: Learning about different cultures',
+  'Activity Partner: Shared hobbies and interests',
+  'Romantic Connection: Love, affection, and romance',
+  'Professional Networking: Career-related connections and opportunities',
+  'Creative Collaboration: Working on projects together',
+  'Supportive Partnership: Encouragement and mutual support',
+  'Shared Values: Common beliefs and principles',
+  'Spiritual Connection: Shared spiritual or religious practices',
+  'Health and Fitness: Joint focus on wellness and exercise'
+]
+
 export { 
   SEARCH_FOR, profilePictureOptions, postOptions, maxFileSizeBytes, allowedFileTypes, allowedImageTypes,
   maxImageSizeBytes, Days, initialLogoScreenTimeMilli, GENDER, polaroidTags, colors, GEOLOCATION_TIMEOUT_MILLIS, 
-  GEOLOCATION_MAX_AGE_MILLIS, Cities, themeKey
+  GEOLOCATION_MAX_AGE_MILLIS, Cities, themeKey, preferencesList, traits,
+  lookingFor
 };

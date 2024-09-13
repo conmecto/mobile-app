@@ -12,7 +12,6 @@ MaterialCommunityIcons.loadFont();
 
 type UserProfileRes = {
   id: number,
-  userName?: string,
   description?: string,
   city?: string,
   country?: string,
@@ -21,7 +20,10 @@ type UserProfileRes = {
   profilePicture?: string,
   userId: number,
   name: string,
-  age?: number
+  age?: number,
+  preferences?: string,
+	traits?: string,
+	lookingFor?: string
 }
 
 type props = {
@@ -32,8 +34,14 @@ type props = {
 
 const ProfileDetails = ({ profileDetails, navigate, commonScreen }: props) => {
   const { appTheme } = useContext(ThemeContext);
-  const { age, name, profilePicture, city, description } = profileDetails;
-  const isProfileComplete = !!(name && description && city && age && profilePicture);
+  const { 
+    age, name, city, description, profilePicture, work, university, preferences, 
+    lookingFor, traits
+  } = profileDetails;
+  const isProfileComplete = !!(
+    name && description && city && age && profilePicture && work && university && preferences && 
+    lookingFor && traits
+  );
   
   const onPressEditProfile = () => {
     navigate('EditProfileScreen', { profileDetails });
