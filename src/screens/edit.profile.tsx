@@ -1,16 +1,17 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 import { check, PERMISSIONS, RESULTS, request } from 'react-native-permissions';
 import { launchImageLibrary, ImageLibraryOptions, Asset } from 'react-native-image-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { TextInput } from 'react-native-paper';
+import { TextInput, Button } from 'react-native-paper';
 import { pick } from 'lodash';
 import updateProfile from '../api/update.profile';
 import updateProfilePicture from '../api/update.profile.picture';
 import requestSignedUrl from '../api/request.signed.url';
 import TopBar from '../components/top.bar';
 import Loading from '../components/loading';
+import EditProfileSelect from '../components/edit.profile.select';
 import { COLOR_CODE } from '../utils/enums';
 import { profilePictureOptions, allowedImageTypes, maxImageSizeBytes } from '../utils/constants';
 import { formatText } from '../utils/helpers';
@@ -23,7 +24,10 @@ type UpdateProfileObj = {
   city?: string,
   name: string,
   work?: string,
-  university?: string
+  university?: string,
+  lookingFor?: string,
+  traits?: string,
+  preferences?: string
 }
 
 type UpdateProfileKeys = {
@@ -31,7 +35,10 @@ type UpdateProfileKeys = {
   city?: boolean,
   name?: boolean,
   work?: boolean,
-  university?: boolean
+  university?: boolean,
+  lookingFor?: boolean,
+  traits?: boolean,
+  preferences?: boolean
 }
 
 type UserProfileRes = {
@@ -45,7 +52,10 @@ type UserProfileRes = {
   profilePicture?: string,
   userId: number,
   name: string,
-  university?: string
+  university?: string,
+  lookingFor?: string,
+  traits?: string,
+  preferences?: string
 }
 
 FontAwesome.loadFont();
@@ -57,11 +67,14 @@ const EditProfileScreen = (props: any) => {
   const userId = getUserId() as number;
   const profileObj: UserProfileRes = params?.profileDetails;
   const defaultUpdateObj: UpdateProfileObj = {
-    description: profileObj.description || '',
     city: formatText(profileObj.city) || '',
     work: formatText(profileObj.work) || '',
     university: formatText(profileObj.university) || '',
-    name: formatText(profileObj.name)
+    name: formatText(profileObj.name),
+    lookingFor: profileObj.lookingFor,
+    preferences: profileObj.preferences,
+    traits: profileObj.traits,
+    description: profileObj.description || ''
   };
   const [error, setError] = useState('');
   const [updateImage, setUpdateImage] = useState(false);
@@ -69,7 +82,8 @@ const EditProfileScreen = (props: any) => {
   const [updateDetails, setUpdateDetails] = useState(false);
   const [updateObj, setUpdateObj] = useState<UpdateProfileObj>(defaultUpdateObj);
   const [updateKeys, setUpdateKeys] = useState<UpdateProfileKeys>({});
-
+  const [selectOption, setSelectOption] = useState('');
+  
   useEffect(() => {
     let check = true;
     const callUpdateData = async () => {
@@ -189,6 +203,15 @@ const EditProfileScreen = (props: any) => {
     if (updateObj.work?.toLowerCase() !== defaultUpdateObj.work?.toLowerCase()) {
       updateKeys.work = true;
     }
+    if (updateObj.lookingFor?.toLowerCase() !== defaultUpdateObj.lookingFor?.toLowerCase()) {
+      updateKeys.lookingFor = true;
+    }
+    if (updateObj.traits?.toLowerCase() !== defaultUpdateObj.traits?.toLowerCase()) {
+      updateKeys.traits = true;
+    }
+    if (updateObj.preferences?.toLowerCase() !== defaultUpdateObj.preferences?.toLowerCase()) {
+      updateKeys.preferences = true;
+    }
     setUpdateKeys(updateKeys);
   }
 
@@ -272,28 +295,36 @@ const EditProfileScreen = (props: any) => {
       }
     });
   }
- 
+
+  const onPressModal = (modal: string) => {
+    setSelectOption(modal);
+  }
+  
   return (
     <View style={styles.container}>
       <TopBar />
       <SafeAreaView style={[styles.mainContainer, { backgroundColor: themeColor.mainContainer }]}>
         {
-          (updateDetails || updateImage) ?
-          (<Loading />) :
-          (
-            <View style={styles.editContainer}>
+          (updateDetails || updateImage) && (<Loading />)
+        }
+        {
+          selectOption && (<EditProfileSelect updateKey={selectOption} setUpdateObj={setUpdateObj} updateObj={updateObj} setOpenSelect={setSelectOption} />)
+        }
+        {
+          (!updateDetails && !updateImage && !selectOption) && (
+            <ScrollView style={styles.editContainer}>
               <View style={styles.editImageContainer}>
                 <TouchableOpacity style={styles.updateImageIconPressable} onPress={onUploadImageHandler}>
-                  <FontAwesome name='upload' color={COLOR_CODE.BRIGHT_BLUE} size={40} />
-                </TouchableOpacity> 
-                <Text style={[styles.uploadText, { color: themeColor.uploadText }]}>
-                  Upload Profile Picture
-                </Text>
+                  <Text style={[styles.uploadText, { color: COLOR_CODE.OFF_WHITE }]}>
+                    Upload Profile Picture
+                  </Text>
+                </TouchableOpacity>
               </View>
 
               <View style={styles.horizontalLine}></View>
               
-              <View style={styles.textFieldsContainer}>
+              <View style={styles.textFieldsContainer}>    
+                <Text style={{ color: COLOR_CODE.BRIGHT_RED, fontSize: 15, fontWeight: 'bold' }}>{error}</Text>
                 
                 <Text style={[styles.uploadText, { color: themeColor.uploadText }]}>
                   Name
@@ -302,7 +333,7 @@ const EditProfileScreen = (props: any) => {
                 <Text></Text>
                 
                 <Text style={[styles.uploadText, { color: themeColor.uploadText }]}>
-                  About (Max 250 characters)
+                  About (Max 300 characters)
                 </Text>
                 <TextInput style={styles.commonInput} defaultValue={updateObj.description} onChangeText={text => onHandleChangeText(text, 'description')} />
                 <Text></Text>
@@ -324,23 +355,43 @@ const EditProfileScreen = (props: any) => {
                 </Text>
                 <TextInput style={styles.commonInput} defaultValue={updateObj.university} onChangeText={text => onHandleChangeText(text, 'university')} />
                 <Text></Text>
-                <Text style={{ color: COLOR_CODE.BRIGHT_RED, fontSize: 15, fontWeight: 'bold' }}>{error}</Text>
+              </View>
 
+              <View style={styles.lookingForContainer}>
+                <TouchableOpacity style={styles.lookingForTouchable} onPress={() => onPressModal('lookingFor')}>
+                  <Text numberOfLines={2} adjustsFontSizeToFit style={[styles.uploadText, { color: themeColor.uploadText }]}>
+                    Select What You Are Looking For 😍
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.lookingForTouchable} onPress={() => onPressModal('traits')}>
+                  <Text numberOfLines={2} adjustsFontSizeToFit style={[styles.uploadText, { color: themeColor.uploadText }]}>
+                    Select Your Core Values 💯
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.lookingForTouchable} onPress={() => onPressModal('preferences')}>
+                  <Text numberOfLines={2} adjustsFontSizeToFit style={[styles.uploadText, { color: themeColor.uploadText }]}>
+                    Select What Defines You 😉
+                  </Text>
+                </TouchableOpacity>
               </View>
 
               <View style={styles.cancelOrUpdateContainer}>
                 <View style={styles.cancelContainer}>
-                  <TouchableOpacity style={styles.cancelIconPressable} onPress={onCancelPressHandler}>
-                    <FontAwesome name='times-circle-o' color={COLOR_CODE.BRIGHT_RED} size={40} />
-                  </TouchableOpacity>  
+                  <Button mode='contained' buttonColor={COLOR_CODE.CHARCOAL_GREY} style={{ borderRadius: 10 }} onPress={onCancelPressHandler}>
+                    Cancel
+                  </Button>  
                 </View>
                 <View style={styles.updateContainer}>
-                  <TouchableOpacity style={styles.updateIconPressable} onPress={onUpdatePressHandler}>
-                    <FontAwesome name='check-circle-o' color={COLOR_CODE.BRIGHT_BLUE} size={40} />
-                  </TouchableOpacity>  
+                  <Button mode='contained' buttonColor={COLOR_CODE.BRIGHT_BLUE} style={{ borderRadius: 10 }} onPress={onUpdatePressHandler}>
+                    Update
+                  </Button>  
                 </View>         
               </View>
-            </View>
+            
+              
+            </ScrollView>
           )
         }
       </SafeAreaView>
@@ -355,26 +406,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mainContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
+    flex: 1
   },
 
   editContainer: {
-    height: '100%',
-    width: '100%'
+    flex: 1,
   },
 
   editImageContainer: {
-    flex: 1,
+    height: height * 0.1,
     alignItems: 'center',
     justifyContent: 'space-evenly'
   },
   updateImageIconPressable: {
-    height: width * 0.15,
-    width: width * 0.15,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    backgroundColor: COLOR_CODE.BRIGHT_BLUE,
+    borderRadius: 10,
+    padding: 10
   },
   uploadText: {
     fontSize: 15,
@@ -382,7 +431,7 @@ const styles = StyleSheet.create({
   },
 
   textFieldsContainer: {
-    flex: 5,
+    height: height * 0.6,
     padding: 20,
   },
   commonInput: {
@@ -394,7 +443,7 @@ const styles = StyleSheet.create({
   },
 
   cancelOrUpdateContainer: {
-    flex: 1,
+    height: height * 0.1,
     flexDirection: 'row',
   },
 
@@ -403,21 +452,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cancelIconPressable: {
-    width: width * 0.2,
-    height: width * 0.2,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
 
   updateContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  updateIconPressable: {
-    width: width * 0.2,
-    height: width * 0.2,
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -431,5 +468,26 @@ const styles = StyleSheet.create({
     fontSize: height * 0.02,
     fontWeight: '600',
     color: COLOR_CODE.BRIGHT_RED
-  }
+  },
+
+  lookingForContainer: {
+    height: height * 0.3,
+    paddingHorizontal: 20,
+    justifyContent: 'space-around'
+  },
+  lookingForTouchable: { 
+    height: '15%', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor: COLOR_CODE.LIGHT_GREY, 
+    borderRadius: 10
+  },
+
+  modalContainer: { 
+    position: 'absolute',
+    height: height * 0.6, 
+    width: width * 0.9, 
+    borderRadius: 20,
+    backgroundColor: COLOR_CODE.OFF_WHITE
+  },
 });

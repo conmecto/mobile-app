@@ -200,7 +200,7 @@ const FullProfileScreen = ({ route }: props) => {
               <View style={styles.preferencesValueContainer}>
                 {
                   preferences.map((preference, index) => 
-                    <ProfileTagItem key={index} tag={formatText(preference)} tagColor={themeColor.tagsColor} borderRadius={10} />
+                    <ProfileTagItem key={index} tag={preference} tagColor={themeColor.tagsColor} borderRadius={10} />
                   )
                 }
               </View>
