@@ -11,7 +11,6 @@ import { ThemeContext } from '../contexts/theme.context';
 
 type UserProfileRes = {
   id: number,
-  userName?: string,
   description?: string,
   city?: string,
   country?: string,
@@ -20,7 +19,10 @@ type UserProfileRes = {
   profilePicture?: string,
   userId: number,
   name: string,
-  age?: number
+  age?: number,
+  preferences?: string,
+	traits?: string,
+	lookingFor?: string
 }
 
 type ProfileObj = {

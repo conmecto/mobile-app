@@ -21,7 +21,10 @@ enum COLOR_CODE {
   GOLDEN = '#FFD700',
   DIM_GREY = '#dadada',
   LOGO_COLOR = '#7f7fd5',
-  LOGO_BLUE = '#86A8E7'
+  LOGO_BLUE = '#86A8E7',
+  CHARCOAL_GREY = '#34495E',
+  BROWN = '#562B00',
+  LIGHT_GREEN = '#A4E78B'
 }
 
 enum ERROR_CODES {

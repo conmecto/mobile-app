@@ -6,7 +6,6 @@ import { getUserCountry } from '../utils/user.country';
 
 type UserProfileRes = {
   id: number,
-  userName?: string,
   description?: string,
   city?: string,
   country?: string,
@@ -15,7 +14,10 @@ type UserProfileRes = {
   profilePicture?: string,
   userId: number,
   name: string,
-  age?: number
+  age?: number,
+  preferences?: string,
+	traits?: string,
+	lookingFor?: string
 }
 
 const getUserProfile = async (userId: number, callIfUnauthorized: boolean = true): Promise<UserProfileRes | undefined> => {
