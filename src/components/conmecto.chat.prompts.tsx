@@ -33,7 +33,7 @@ const ConmectoChatPrompts = ({
     const [keyboardEnabled, setKeyboardEnabled] = useState(false);
 
     const onEnterContext = (text: string) => {
-        setContext(text.substring(0, 50));
+        setContext(text.substring(0, 100));
     }
 
     const onPressGenerate = () => {
@@ -66,14 +66,14 @@ const ConmectoChatPrompts = ({
                     </View>
                     <View style={{ flex: 1, justifyContent: 'center' }}>
                         <Text numberOfLines={2} adjustsFontSizeToFit style={styles.contextTitleText}>
-                            Context: "The User {context}"
+                            Context: "{context}"
                         </Text>
                     </View>
                     <View style={styles.contextInputContainer}>
                         <TextInput 
                             onChangeText={text => onEnterContext(text)} 
                             value={context} 
-                            placeholder='The User ...... (50 characters limit)' 
+                            placeholder='Context...... (100 characters limit)' 
                             style={styles.contextInput} 
                             onFocus={() => setKeyboardEnabled(true)}
                             onSubmitEditing={() => setKeyboardEnabled(false)}
