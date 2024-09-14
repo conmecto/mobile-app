@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
@@ -16,6 +16,7 @@ import { COLOR_CODE, ERROR_CODES } from '../utils/enums';
 import { setAccessToken } from '../utils/token';
 import { saveToken, getToken } from '../utils/helpers';
 import { setUserId } from '../utils/user.id';
+import { ThemeContext } from '../contexts/theme.context';
 
 type SignupObj = {
   country?: string,
@@ -32,6 +33,7 @@ FontAwesome.loadFont();
 const { height, width } = Dimensions.get('window');
 
 const WelcomeScreen = ({ navigation }: any) => {
+  const { appTheme, setAppTheme } = useContext(ThemeContext);
   const country = getCountry()?.toLowerCase() || 'in';
   const [signupObj, setSignupObj] = useState<SignupObj>({ country: country });
   const [error, setError] = useState('');
@@ -141,6 +143,16 @@ const WelcomeScreen = ({ navigation }: any) => {
       }
     }
   }
+
+  const themeColors = appTheme === 'dark' ? {
+    containerBackgroundColor: COLOR_CODE.BLACK,
+    conmectoText: COLOR_CODE.OFF_WHITE,
+    appleButtonColor: AppleButton.Style.WHITE
+  } : {
+    containerBackgroundColor: COLOR_CODE.OFF_WHITE,
+    conmectoText: COLOR_CODE.BLACK,
+    appleButtonColor: AppleButton.Style.BLACK
+  }
   
   return (
     <View style={{ flex: 1 }}>
@@ -156,16 +168,16 @@ const WelcomeScreen = ({ navigation }: any) => {
         { 
           (loginFlow || continueSignupFlow) ? <Loading /> :
           (
-            <View style={styles.container}>
+            <View style={[styles.container, { backgroundColor: themeColors.containerBackgroundColor }]}>
               <View style={styles.hiContainer}>
                 <Text style={styles.hiText}>Hi there, Welcome to</Text>
-                <Text style={styles.conmectoText}>Conmecto 😁</Text>
+                <Text style={[styles.conmectoText, { color: themeColors.conmectoText }]}>Conmecto 😁</Text>
                 <Text style={styles.hiText}>We're thrilled to have you</Text>
                 <Text style={styles.hiText}>join our community. 🎉</Text>
               </View>
               <View style={styles.signinContainer}>
                 <AppleButton 
-                  buttonStyle={AppleButton.Style.BLACK}
+                  buttonStyle={themeColors.appleButtonColor}
                   buttonType={AppleButton.Type.SIGN_IN}
                   style={{
                     width: width * 0.7,
@@ -187,13 +199,13 @@ const WelcomeScreen = ({ navigation }: any) => {
                 <Text numberOfLines={2} adjustsFontSizeToFit style={styles.termsText}>
                   By continuing with Sign in, you agree to our
                 </Text>
-                <Button mode='text' onPress={() => setShowTerms('terms')} labelStyle={styles.linkText}>
+                <Button mode='text' onPress={() => setShowTerms('terms')} labelStyle={[styles.linkText, { color: themeColors.conmectoText }]}>
                   Terms of Service
                 </Button>
                 <Text style={styles.termsText}>
                   And that you have read our  
                 </Text>
-                <Button mode='text' onPress={() => setShowTerms('policy')} labelStyle={styles.linkText}>
+                <Button mode='text' onPress={() => setShowTerms('policy')} labelStyle={[styles.linkText, { color: themeColors.conmectoText }]}>
                   Privacy Policy
                 </Button>
               </View>
@@ -209,8 +221,7 @@ export default WelcomeScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLOR_CODE.OFF_WHITE
+    flex: 1
   },
 
   hiContainer: {
@@ -242,7 +253,6 @@ const styles = StyleSheet.create({
   },
   linkText: { 
     fontSize: 16,
-    color: 'black',
     textDecorationLine: 'underline', 
     fontWeight: 'bold' 
   },

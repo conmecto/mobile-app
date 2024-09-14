@@ -52,9 +52,11 @@ const ProfileDetails = ({ profileDetails, navigate, commonScreen }: props) => {
   }
 
   const themeColor = appTheme === 'dark' ? {
-    completeFont: COLOR_CODE.LIGHT_GREY
+    completeFont: COLOR_CODE.LIGHT_GREY,
+    nameText: COLOR_CODE.OFF_WHITE,
   } : {
-    completeFont: COLOR_CODE.BLACK
+    completeFont: COLOR_CODE.BLACK,
+    nameText: COLOR_CODE.BLACK,
   }
 
   return (
@@ -70,8 +72,8 @@ const ProfileDetails = ({ profileDetails, navigate, commonScreen }: props) => {
                 </Text>
               )
             }
-            <TouchableOpacity onPress={onPressEditProfile} style={{ height: '100%', width: '15%', borderRadius: 10, justifyContent: 'center', alignItems: 'center', backgroundColor: COLOR_CODE.BRIGHT_BLUE }}>
-              <Text numberOfLines={1} adjustsFontSizeToFit style={{ fontSize: 12, fontWeight: 'bold', color: COLOR_CODE.OFF_WHITE }}>
+            <TouchableOpacity onPress={onPressEditProfile} style={styles.editButtonContainer}>
+              <Text numberOfLines={1} adjustsFontSizeToFit style={styles.editText}>
                 Edit
               </Text>
             </TouchableOpacity>
@@ -82,7 +84,7 @@ const ProfileDetails = ({ profileDetails, navigate, commonScreen }: props) => {
         <TouchableOpacity onPress={onPressProfile} style={styles.profileTouchable}>
           <Image source={profilePicture ? 
             { uri: profilePicture } : DEFAULT_PROFILE_PIC} style={styles.profilePic} />
-          <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.commonText, profilePicture ? { color: COLOR_CODE.OFF_WHITE } : {}]}>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.commonText, profilePicture ? { color: COLOR_CODE.OFF_WHITE } : { color: themeColor.nameText }]}>
             {formatText(name)}
           </Text>
         </TouchableOpacity>
@@ -103,12 +105,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row'
   },
-  editButtonContainer: {
-    flex: 1,
-    paddingRight: 10,
-    alignItems: 'center', 
-    justifyContent: 'space-between',
-  },
+  editButtonContainer: { height: '100%', width: '15%', borderRadius: 10, justifyContent: 'center', alignItems: 'center', backgroundColor: COLOR_CODE.BRIGHT_BLUE },
+  editText: { fontSize: 12, fontWeight: 'bold', color: COLOR_CODE.OFF_WHITE },
+  
   profilePic: { 
     height: '100%', 
     width: '100%',
