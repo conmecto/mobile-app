@@ -104,7 +104,7 @@ const ConmectoChatResponse = ({
             <View style={styles.contextMainContainer}>
                 <View style={styles.contextContainer}>
                     <Text numberOfLines={5} adjustsFontSizeToFit style={styles.contextText}>
-                        The User {context}
+                        {context}
                     </Text>
                 </View>
             </View>
